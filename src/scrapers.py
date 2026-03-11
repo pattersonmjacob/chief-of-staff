@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
+import random
 import re
 import ssl
+import threading
+import time
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -11,6 +15,34 @@ from urllib.request import Request, urlopen
 
 DEFAULT_TIMEOUT = 20
 USER_AGENT = "chief-of-staff-jobs-bot/1.0"
+MAX_RETRIES = 3
+BACKOFF_SECONDS = 1.5
+DEFAULT_MIN_REQUEST_INTERVAL = 0.2
+_REQUEST_TIMES_LOCK = threading.Lock()
+_NEXT_ALLOWED_REQUEST_AT: dict[str, float] = {}
+
+
+def _to_float(value: str, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _min_request_interval_seconds() -> float:
+    return max(0.0, _to_float(os.getenv("MIN_REQUEST_INTERVAL_SECONDS", ""), DEFAULT_MIN_REQUEST_INTERVAL))
+
+
+def _respect_request_interval(host_key: str) -> None:
+    min_interval = _min_request_interval_seconds()
+    now = time.monotonic()
+    with _REQUEST_TIMES_LOCK:
+        next_allowed = _NEXT_ALLOWED_REQUEST_AT.get(host_key, 0.0)
+        wait_seconds = max(0.0, next_allowed - now)
+        _NEXT_ALLOWED_REQUEST_AT[host_key] = max(now, next_allowed) + min_interval
+
+    if wait_seconds > 0:
+        time.sleep(wait_seconds)
 
 
 @dataclass
@@ -58,11 +90,24 @@ def _normalize_company_slug(platform: str, company: str) -> str:
 
 
 def _fetch_json(url: str) -> Any:
+    host_key = urlparse(url).netloc.lower() or "default"
     request = Request(url, headers={"User-Agent": USER_AGENT})
     context = ssl.create_default_context()
-    with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
-        payload = response.read().decode("utf-8")
-    return json.loads(payload)
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            _respect_request_interval(host_key)
+            with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
+                payload = response.read().decode("utf-8")
+            return json.loads(payload)
+        except HTTPError as exc:
+            if exc.code not in {429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
+                raise
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            if retry_after and retry_after.isdigit():
+                delay = float(retry_after)
+            else:
+                delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            time.sleep(delay)
 
 
 def _strip_html(value: Any) -> str:
@@ -164,8 +209,25 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
         method="POST",
     )
     context = ssl.create_default_context()
-    with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
-        data = json.loads(response.read().decode("utf-8"))
+    data = None
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            _respect_request_interval("jobs.ashbyhq.com")
+            with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
+                data = json.loads(response.read().decode("utf-8"))
+            break
+        except HTTPError as exc:
+            if exc.code not in {429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
+                raise
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            if retry_after and retry_after.isdigit():
+                delay = float(retry_after)
+            else:
+                delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            time.sleep(delay)
+
+    if data is None:
+        return []
 
     teams = data.get("data", {}).get("jobBoardWithTeams", {}).get("teams", [])
     jobs: list[dict[str, Any]] = []

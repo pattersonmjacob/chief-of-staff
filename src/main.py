@@ -39,6 +39,50 @@ def _job_key(job: dict[str, Any]) -> str:
     return str(job.get("url") or f"{job.get('platform')}:{job.get('company')}:{job.get('title')}")
 
 
+def _merge_pipe_values(*values: Any) -> str:
+    parts: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        raw = str(value or "").strip()
+        if not raw:
+            continue
+        for part in [piece.strip() for piece in raw.split("|")]:
+            lowered = part.lower()
+            if part and lowered not in seen:
+                parts.append(part)
+                seen.add(lowered)
+    return " | ".join(parts)
+
+
+def _dedupe_and_collate_jobs(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+
+    for job in jobs:
+        key = f"{str(job.get('platform', '')).lower()}::{str(job.get('company', '')).lower()}::{str(job.get('title', '')).strip().lower()}"
+        current = merged.get(key)
+        if current is None:
+            merged[key] = dict(job)
+            continue
+
+        for field in ["location", "department", "team", "employment_type", "url"]:
+            current[field] = _merge_pipe_values(current.get(field, ""), job.get(field, ""))
+
+        current_description = str(current.get("description") or "")
+        incoming_description = str(job.get("description") or "")
+        if len(incoming_description) > len(current_description):
+            current["description"] = incoming_description
+
+        posted_values = [str(v) for v in [current.get("posted_at", ""), job.get("posted_at", "")] if str(v or "").strip()]
+        if posted_values:
+            current["posted_at"] = min(posted_values)
+
+        updated_values = [str(v) for v in [current.get("updated_at", ""), job.get("updated_at", "")] if str(v or "").strip()]
+        if updated_values:
+            current["updated_at"] = max(updated_values)
+
+    return sorted(merged.values(), key=lambda j: (str(j.get("company", "")), str(j.get("title", ""))))
+
+
 def classify_job_function(job: dict[str, Any]) -> str:
     text = " ".join([str(job.get("title", "")), str(job.get("department", "")), str(job.get("team", ""))]).lower()
     mapping = [
@@ -494,8 +538,7 @@ def main() -> None:
 
     print(f"[info] Filter stats: input={filter_stats['input']}, missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
 
-    unique_jobs = {job.get("url") or f"{job.get('company')}:{job.get('title')}": job for job in filtered_jobs}
-    jobs = sorted(unique_jobs.values(), key=lambda j: (j.get("company", ""), j.get("title", "")))
+    jobs = _dedupe_and_collate_jobs(filtered_jobs)
 
     run_at = utc_now_iso()
     jobs, run_stats = enrich_jobs_with_history_and_flags(jobs, previous_jobs, run_at)
