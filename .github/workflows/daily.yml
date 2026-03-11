@@ -1,0 +1,62 @@
+name: Daily jobs digest
+
+on:
+  schedule:
+    - cron: "15 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download external source list (optional)
+        env:
+          SOURCES_CSV_URL: ${{ vars.SOURCES_CSV_URL }}
+        run: |
+          if [ -n "$SOURCES_CSV_URL" ]; then
+            mkdir -p data
+            curl -fsSL "$SOURCES_CSV_URL" -o data/company_slugs.csv
+            echo "Downloaded source list to data/company_slugs.csv"
+          else
+            echo "No SOURCES_CSV_URL repo variable set; using config-defined sources"
+          fi
+
+      - name: Validate downloaded source list (optional)
+        env:
+          SOURCES_CSV_URL: ${{ vars.SOURCES_CSV_URL }}
+        run: |
+          if [ -n "$SOURCES_CSV_URL" ] && [ ! -s data/company_slugs.csv ]; then
+            echo "Expected data/company_slugs.csv to exist and be non-empty"
+            exit 1
+          fi
+
+      - name: Run scraper
+        env:
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          SMTP_TO: ${{ secrets.SMTP_TO }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        run: python src/main.py
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add jobs.json jobs.csv docs/index.html
+          git diff --cached --quiet || git commit -m "chore: update daily jobs digest"
+          git push
