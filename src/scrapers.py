@@ -135,6 +135,16 @@ def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
         if source.platform == "ashby":
             return fetch_ashby(source.company)
         raise ValueError(f"Unsupported platform: {source.platform}")
-    except (HTTPError, URLError, TimeoutError, ValueError) as exc:
+    except HTTPError as exc:
+        details = ""
+        try:
+            error_body = exc.read().decode("utf-8", errors="ignore").strip()
+            if error_body:
+                details = f" body={error_body[:240]}"
+        except Exception:
+            pass
+        print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
+        return []
+    except (URLError, TimeoutError, ValueError) as exc:
         print(f"[warn] {source.platform}:{source.company} failed: {exc}")
         return []
