@@ -6,6 +6,7 @@ Version 1 of a free, keyword-based jobs pipeline.
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
 - Filters jobs with keyword include/exclude matching (no AI/ranking yet).
+- Filters jobs with simple keyword matching (no AI/ranking yet).
 - Writes output files:
   - `jobs.json`
   - `jobs.csv`
@@ -36,7 +37,6 @@ Version 1 of a free, keyword-based jobs pipeline.
 3. Configure keyword filters:
    - `keywords_include`: terms to keep.
    - `keywords_exclude`: terms to drop after include matching.
-   - `fallback_to_unfiltered_if_empty` (default `true`): if filters return zero but scraping found jobs, publish unfiltered results for that run.
 
 4. Run locally:
 
@@ -46,11 +46,10 @@ Version 1 of a free, keyword-based jobs pipeline.
 
 ## Source CSV format
 
-The merged CSV used by the scraper contains:
+The CSV should include (at minimum):
 - `slug`
-- `vendor`
-- `company`
-- `open_jobs`
+- `vendor` (`Ashby`, `Greenhouse`, `Lever`)
+- `open_jobs` (or `job_count`)
 
 Only supported vendors are loaded. Duplicate `(vendor, slug)` pairs are deduplicated.
 
@@ -60,9 +59,7 @@ Workflow is in `.github/workflows/daily.yml` and runs:
 - Daily via cron
 - On manual trigger (`workflow_dispatch`)
 
-It prepares `data/company_slugs.csv` in one of two ways:
-- If repo variable `SOURCES_CSV_URL` is set, it downloads that combined CSV directly.
-- Otherwise it auto-merges Greenhouse + Lever + Ashby company lists using `src/build_sources.py`.
+It can optionally download a source list first when repo variable `SOURCES_CSV_URL` is set.
 
 ### Required repo settings
 
@@ -76,14 +73,6 @@ It prepares `data/company_slugs.csv` in one of two ways:
    - Settings → Pages → Source: **Deploy from branch**
    - Branch: `main`
    - Folder: `/docs`
-
-4. **Source list variables (optional)**
-   - `SOURCES_CSV_URL` (recommended if you already have one combined CSV)
-   - Or set one/more of these to override defaults used by `src/build_sources.py`:
-     - `GREENHOUSE_SOURCES_URL`
-     - `LEVER_SOURCES_URL`
-     - `ASHBY_SOURCES_URL`
-   - If these are not set, the workflow uses default ATS-Scrapers URLs.
 
 ## Optional SMTP email
 

@@ -4,31 +4,23 @@ import csv
 from pathlib import Path
 from typing import Any
 
+VENDOR_MAP = {
+    "ashby": "ashby",
+    "greenhouse": "greenhouse",
+    "lever": "lever",
+}
+
 
 def _normalize_vendor(value: str) -> str | None:
     normalized = (value or "").strip().lower()
-    if "ashby" in normalized:
-        return "ashby"
-    if "greenhouse" in normalized:
-        return "greenhouse"
-    if "lever" in normalized:
-        return "lever"
-    return None
+    return VENDOR_MAP.get(normalized)
 
 
 def _to_int(value: Any, default: int = 0) -> int:
     try:
-        text = str(value).strip().replace(",", "")
-        return int(float(text))
+        return int(str(value).strip())
     except (TypeError, ValueError):
         return default
-
-
-def _pick(row: dict[str, Any], keys: list[str]) -> str:
-    for key in keys:
-        if key in row and row[key] is not None and str(row[key]).strip() != "":
-            return str(row[key])
-    return ""
 
 
 def load_sources_from_csv(path: str | Path, min_open_jobs: int = 1, max_sources: int | None = None) -> list[dict[str, str]]:
@@ -42,13 +34,9 @@ def load_sources_from_csv(path: str | Path, min_open_jobs: int = 1, max_sources:
     with csv_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            vendor_raw = _pick(row, ["vendor", "platform", "source", "ats", "Vendor", "Platform"])
-            slug_raw = _pick(row, ["slug", "company_slug", "Slug", "company", "Company"])
-            jobs_raw = _pick(row, ["open_jobs", "job_count", "open job count", "Open Jobs", "Job count"])
-
-            vendor = _normalize_vendor(vendor_raw)
-            slug = slug_raw.strip().lower().strip("/")
-            open_jobs = _to_int(jobs_raw, default=0)
+            vendor = _normalize_vendor(row.get("vendor", ""))
+            slug = (row.get("slug", "") or "").strip().lower()
+            open_jobs = _to_int(row.get("open_jobs") or row.get("job_count"), default=0)
 
             if not vendor or not slug:
                 continue

@@ -62,9 +62,6 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
     source_rows = cfg.get("sources", [])
 
     sources_csv = cfg.get("sources_csv")
-    if not sources_csv and (ROOT / "data/company_slugs.csv").exists():
-        sources_csv = "data/company_slugs.csv"
-        print("[info] Auto-detected sources CSV at data/company_slugs.csv")
     if sources_csv:
         min_open_jobs = int(cfg.get("min_open_jobs", 1))
         max_sources = cfg.get("max_sources")
@@ -94,7 +91,6 @@ def filter_jobs(
                 str(job.get("department", "")),
                 str(job.get("team", "")),
                 str(job.get("location", "")),
-                str(job.get("company", "")),
             ]
         ).lower()
 
@@ -182,10 +178,6 @@ def main() -> None:
     include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
     exclude_keywords = cfg.get("keywords_exclude", [])
     filtered_jobs = filter_jobs(all_jobs, include_keywords, exclude_keywords)
-
-    if not filtered_jobs and all_jobs and cfg.get("fallback_to_unfiltered_if_empty", True):
-        print("[warn] No jobs matched keyword filters; falling back to unfiltered jobs for this run")
-        filtered_jobs = all_jobs
 
     unique_jobs = {job.get("url") or f"{job.get('company')}:{job.get('title')}": job for job in filtered_jobs}
     jobs = sorted(unique_jobs.values(), key=lambda j: (j.get("company", ""), j.get("title", "")))

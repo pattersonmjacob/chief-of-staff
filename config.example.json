@@ -18,7 +18,7 @@
     "it operations",
     "call center operations"
   ],
-  "sources_csv": "data/company_slugs.csv",
+  "sources_csv": "",
   "sources_csv_url": "",
   "min_open_jobs": 1,
   "max_sources": 1000,
@@ -38,6 +38,5 @@
   ],
   "email": {
     "enabled": false
-  },
-  "fallback_to_unfiltered_if_empty": true
+  }
 }
