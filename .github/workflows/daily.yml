@@ -37,8 +37,7 @@ jobs:
       SOURCE_OFFSET: "${{ matrix.source_offset }}"
       SCRAPE_CONCURRENCY: "24"
       MAX_SOURCES: 1000
-      SOURCE_OFFSET: ${{ matrix.source_offset }}
-        chunk_index: [0, 1, 2, 3, 4, 5, 6, 7]
+      SOURCE_OFFSET: ${{ matrix.source_offset }} chunk_index: [0, 1, 2, 3, 4, 5, 6, 7]
     env:
       SOURCES_CSV: data/company_slugs.csv
       MAX_SOURCES: 1000
