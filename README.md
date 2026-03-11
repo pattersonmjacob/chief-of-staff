@@ -5,6 +5,7 @@ Version 1 of a free, keyword-based jobs pipeline.
 ## What it does
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
+- Filters jobs with keyword include/exclude matching (no AI/ranking yet).
 - Filters jobs with simple keyword matching (no AI/ranking yet).
 - Writes output files:
   - `jobs.json`
@@ -20,6 +21,24 @@ Version 1 of a free, keyword-based jobs pipeline.
    cp config.example.json config.json
    ```
 
+2. Choose source mode in `config.json`:
+
+   - **Automatic source list (recommended):**
+     - Set `sources_csv` to a local CSV path (for example `data/company_slugs.csv`).
+     - Optionally set `sources_csv_url` and the script will download the CSV before reading it.
+     - Optional controls:
+       - `min_open_jobs` (default `1`)
+       - `max_sources` (for example `1000`)
+
+   - **Manual source list:**
+     - Keep `sources_csv` empty or remove it.
+     - Add known company slugs under `sources`.
+
+3. Configure keyword filters:
+   - `keywords_include`: terms to keep.
+   - `keywords_exclude`: terms to drop after include matching.
+
+4. Run locally:
 2. Edit `config.json`:
    - Add your desired keyword list.
    - Add known company slugs under `sources`.
@@ -30,12 +49,35 @@ Version 1 of a free, keyword-based jobs pipeline.
    python src/main.py
    ```
 
+## Source CSV format
+
+The CSV should include (at minimum):
+- `slug`
+- `vendor` (`Ashby`, `Greenhouse`, `Lever`)
+- `open_jobs` (or `job_count`)
+
+Only supported vendors are loaded. Duplicate `(vendor, slug)` pairs are deduplicated.
+
 ## GitHub Actions
 
 Workflow is in `.github/workflows/daily.yml` and runs:
 - Daily via cron
 - On manual trigger (`workflow_dispatch`)
 
+It can optionally download a source list first when repo variable `SOURCES_CSV_URL` is set.
+
+### Required repo settings
+
+1. **Actions write permissions**
+   - Settings → Actions → General → Workflow permissions → **Read and write permissions**.
+
+2. **Branch rules**
+   - If branch protection is on, ensure workflow commits are allowed or switch to PR-based updates.
+
+3. **Pages**
+   - Settings → Pages → Source: **Deploy from branch**
+   - Branch: `main`
+   - Folder: `/docs`
 It commits generated `jobs.json`, `jobs.csv`, and `docs/index.html` back to the default branch.
 
 ## GitHub Pages
@@ -59,6 +101,15 @@ If `"email": {"enabled": true}` in `config.json`, set these repository secrets:
 
 If secrets are missing, the script logs a warning and skips sending.
 
+## Troubleshooting
+
+- If workflow runs but returns zero jobs:
+  - Verify `sources_csv` exists and has valid `slug` + `vendor` values.
+  - Confirm vendor names map to supported platforms (`Ashby`, `Greenhouse`, `Lever`).
+  - Check keyword filters are not overly restrictive.
+
+- If workflow fails to push updated artifacts:
+  - Recheck Actions write permissions and branch protection settings.
 ## Notes
 
 - ATS slugs are manually maintained in v1.

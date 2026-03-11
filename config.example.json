@@ -1,4 +1,40 @@
 {
+  "keywords_include": [
+    "chief of staff",
+    "office of the ceo",
+    "founder's office",
+    "founders office",
+    "strategic operations",
+    "strategy and operations",
+    "strategy & operations",
+    "business operations",
+    "bizops",
+    "strategic initiatives",
+    "special projects"
+  ],
+  "keywords_exclude": [
+    "clinical operations",
+    "manufacturing operations",
+    "it operations",
+    "call center operations"
+  ],
+  "sources_csv": "",
+  "sources_csv_url": "",
+  "min_open_jobs": 1,
+  "max_sources": 1000,
+  "sources": [
+    {
+      "platform": "greenhouse",
+      "company": "openai"
+    },
+    {
+      "platform": "lever",
+      "company": "notion"
+    },
+    {
+      "platform": "ashby",
+      "company": "linear"
+    }
   "keywords": [
     "chief of staff",
     "business operations",
