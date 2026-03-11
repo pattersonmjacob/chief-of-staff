@@ -39,5 +39,8 @@
   "email": {
     "enabled": false
   },
+  "github_pages_url": "",
+  "scrape_concurrency": 24,
+  "verbose_sources": false
   "github_pages_url": ""
 }

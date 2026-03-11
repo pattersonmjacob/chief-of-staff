@@ -13,6 +13,7 @@ Version 1 of a free, keyword-based jobs pipeline.
   - `jobs.csv`
   - `docs/index.html` (for GitHub Pages)
   - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
+- Automatically tracks repeated HTTP 404 sources in `data/do_not_check.json` and skips them on future runs (after 3+ 404s and a healthy non-404 streak guard).
   - Optional GitHub Pages link banner in output (set `github_pages_url` or let Actions auto-detect).
 - Can optionally send an email digest through SMTP (using GitHub Actions secrets).
 
@@ -32,6 +33,8 @@ Version 1 of a free, keyword-based jobs pipeline.
      - Optional controls:
        - `min_open_jobs` (default `1`)
        - `max_sources` (optional; leave empty or `null` for no cap)
+       - `scrape_concurrency` (default `24`; increase/decrease parallel source fetch workers)
+       - `verbose_sources` (default `false`; when true logs every source result)
 
    - **Manual source list:**
      - Keep `sources_csv` empty or remove it.
@@ -45,6 +48,12 @@ Version 1 of a free, keyword-based jobs pipeline.
 
    ```bash
    python src/main.py
+   ```
+
+   Optional fast-run override:
+
+   ```bash
+   SCRAPE_CONCURRENCY=32 python src/main.py
    ```
 
 ## Source CSV format

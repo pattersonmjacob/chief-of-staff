@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import json
 from json import JSONDecodeError
@@ -15,7 +16,7 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from render import render_html
-from scrapers import CompanySource, fetch_jobs_for_source
+from scrapers import CompanySource, FetchResult, fetch_jobs_for_source_status
 from sources import load_sources_from_csv
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -25,6 +26,7 @@ JOBS_JSON = ROOT / "jobs.json"
 JOBS_CSV = ROOT / "jobs.csv"
 DOCS_HTML = ROOT / "docs" / "index.html"
 RUN_META_JSON = ROOT / "data" / "run_meta.json"
+DO_NOT_CHECK_JSON = ROOT / "data" / "do_not_check.json"
 
 
 
@@ -103,6 +105,75 @@ def write_run_meta(run_at: str, total_jobs: int, new_jobs: int) -> None:
     RUN_META_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+
+
+def load_do_not_check_state() -> dict[str, Any]:
+    if not DO_NOT_CHECK_JSON.exists():
+        return {"counts": {}, "blocked": {}}
+    try:
+        data = json.loads(DO_NOT_CHECK_JSON.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return {"counts": {}, "blocked": {}}
+        counts = data.get("counts") if isinstance(data.get("counts"), dict) else {}
+        blocked = data.get("blocked") if isinstance(data.get("blocked"), dict) else {}
+        return {"counts": counts, "blocked": blocked}
+    except Exception:
+        return {"counts": {}, "blocked": {}}
+
+
+def write_do_not_check_state(state: dict[str, Any]) -> None:
+    DO_NOT_CHECK_JSON.parent.mkdir(parents=True, exist_ok=True)
+    DO_NOT_CHECK_JSON.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def source_key(platform: str, slug: str) -> str:
+    return f"{platform}:{slug}"
+
+
+def apply_do_not_check_filter(sources: list[CompanySource], state: dict[str, Any]) -> list[CompanySource]:
+    blocked = state.get("blocked", {})
+    filtered: list[CompanySource] = []
+    skipped = 0
+    for source in sources:
+        key = source_key(source.platform, source.company)
+        if key in blocked:
+            skipped += 1
+            continue
+        filtered.append(source)
+
+    if skipped:
+        print(f"[info] Skipped {skipped} sources from do-not-check list")
+    return filtered
+
+
+def update_404_block_state(
+    state: dict[str, Any],
+    result: FetchResult,
+    non_404_streak: int,
+    health_ready: bool,
+    min_non_404_streak: int = 25,
+) -> tuple[dict[str, Any], int, bool]:
+    counts = state.setdefault("counts", {})
+    blocked = state.setdefault("blocked", {})
+
+    key = source_key(result.source.platform, result.normalized_company or result.source.company)
+
+    if result.http_status == 404:
+        new_count = int(counts.get(key, 0)) + 1
+        counts[key] = new_count
+        if new_count > 2 and health_ready and key not in blocked:
+            blocked[key] = {
+                "blocked_at": utc_now_iso(),
+                "reason": f"HTTP 404 repeated {new_count} times after healthy non-404 streak gate",
+            }
+            print(f"[warn] Added to do-not-check list: {key}")
+        return state, 0, health_ready
+
+    # Any non-404 outcome increments health streak and can unlock 404 blocking.
+    next_streak = non_404_streak + 1
+    return state, next_streak, (health_ready or next_streak > min_non_404_streak)
+
+
 def _load_json_file(path: Path) -> dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -110,6 +181,68 @@ def _load_json_file(path: Path) -> dict[str, Any]:
         raise ValueError(
             f"Invalid JSON in {path.name} at line {exc.lineno}, column {exc.colno}: {exc.msg}"
         ) from exc
+
+
+
+
+def _to_int(value: Any, default: int) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def get_scrape_concurrency(cfg: dict[str, Any], source_count: int) -> int:
+    env_value = os.getenv("SCRAPE_CONCURRENCY", "").strip()
+    if env_value:
+        return max(1, _to_int(env_value, 24))
+
+    configured = cfg.get("scrape_concurrency", 24)
+    workers = max(1, _to_int(configured, 24))
+    return min(workers, max(1, source_count))
+
+
+def fetch_all_jobs(
+    sources: list[CompanySource],
+    max_workers: int,
+    do_not_check_state: dict[str, Any],
+    verbose: bool = False,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    if not sources:
+        return [], do_not_check_state
+
+    all_jobs: list[dict[str, Any]] = []
+    completed = 0
+    non_404_streak = 0
+    health_ready = False
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_source = {executor.submit(fetch_jobs_for_source_status, source): source for source in sources}
+        for future in as_completed(future_to_source):
+            source = future_to_source[future]
+            result = FetchResult(source=source, normalized_company=source.company, jobs=[], error="future_failed")
+            try:
+                result = future.result()
+            except Exception as exc:  # defensive: fetcher normally swallows network errors
+                print(f"[warn] {source.platform}:{source.company} failed unexpectedly: {exc}")
+
+            all_jobs.extend(result.jobs)
+            do_not_check_state, non_404_streak, health_ready = update_404_block_state(
+                state=do_not_check_state,
+                result=result,
+                non_404_streak=non_404_streak,
+                health_ready=health_ready,
+                min_non_404_streak=25,
+            )
+
+            completed += 1
+            if verbose or completed % 100 == 0 or completed == len(sources):
+                status = result.http_status if result.http_status is not None else "ok"
+                print(
+                    f"[info] Progress {completed}/{len(sources)} · "
+                    f"{source.platform}:{source.company} status={status} jobs={len(result.jobs)}"
+                )
+
+    return all_jobs, do_not_check_state
 
 
 def load_config() -> dict[str, Any]:
@@ -126,6 +259,8 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
 
     env_sources_csv = os.getenv("SOURCES_CSV", "").strip()
     env_sources_csv_url = os.getenv("SOURCES_CSV_URL", "").strip()
+    env_max_sources = os.getenv("MAX_SOURCES", "").strip()
+    env_source_offset = os.getenv("SOURCE_OFFSET", "").strip()
 
     if env_sources_csv:
         updated["sources_csv"] = env_sources_csv
@@ -134,6 +269,14 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     if env_sources_csv_url:
         updated["sources_csv_url"] = env_sources_csv_url
         print("[info] Using SOURCES_CSV_URL override")
+
+    if env_max_sources:
+        updated["max_sources"] = int(env_max_sources)
+        print(f"[info] Using MAX_SOURCES override: {env_max_sources}")
+
+    if env_source_offset:
+        updated["source_offset"] = int(env_source_offset)
+        print(f"[info] Using SOURCE_OFFSET override: {env_source_offset}")
 
     if not updated.get("sources_csv"):
         default_sources_csv = ROOT / "data" / "company_slugs.csv"
@@ -169,9 +312,15 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         min_open_jobs = int(cfg.get("min_open_jobs", 1))
         max_sources = cfg.get("max_sources")
         max_sources_int = int(max_sources) if max_sources is not None else None
+        source_offset = int(cfg.get("source_offset", 0))
         try:
-            source_rows = load_sources_from_csv(ROOT / sources_csv, min_open_jobs=min_open_jobs, max_sources=max_sources_int)
-            print(f"[info] Loaded {len(source_rows)} sources from {sources_csv}")
+            source_rows = load_sources_from_csv(
+                ROOT / sources_csv,
+                min_open_jobs=min_open_jobs,
+                max_sources=max_sources_int,
+                source_offset=source_offset,
+            )
+            print(f"[info] Loaded {len(source_rows)} sources from {sources_csv} (offset={source_offset}, max={max_sources_int})")
         except FileNotFoundError:
             print(f"[warn] sources_csv not found at {sources_csv}; falling back to config.sources")
 
@@ -320,13 +469,20 @@ def main() -> None:
     maybe_download_sources_csv(cfg)
 
     sources = get_sources(cfg)
+    do_not_check_state = load_do_not_check_state()
+    sources = apply_do_not_check_filter(sources, do_not_check_state)
     print(f"[info] Using {len(sources)} sources")
 
-    all_jobs = []
-    for source in sources:
-        source_jobs = fetch_jobs_for_source(source)
-        print(f"[info] {source.platform}:{source.company} returned {len(source_jobs)} jobs")
-        all_jobs.extend(source_jobs)
+    scrape_concurrency = get_scrape_concurrency(cfg, len(sources))
+    verbose_sources = bool(cfg.get("verbose_sources", False))
+    print(f"[info] Scrape concurrency: {scrape_concurrency}")
+
+    all_jobs, do_not_check_state = fetch_all_jobs(
+        sources,
+        max_workers=scrape_concurrency,
+        do_not_check_state=do_not_check_state,
+        verbose=verbose_sources,
+    )
 
     print(f"[info] Total fetched jobs before filtering: {len(all_jobs)}")
 
@@ -347,6 +503,7 @@ def main() -> None:
     github_pages_url = resolve_github_pages_url(cfg)
     write_outputs(jobs, github_pages_url=github_pages_url)
     write_run_meta(run_at, total_jobs=len(jobs), new_jobs=run_stats["new_count"])
+    write_do_not_check_state(do_not_check_state)
     maybe_send_email(jobs, cfg.get("email", {}))
     print(f"[info] Wrote {len(jobs)} jobs to jobs.json, jobs.csv, and docs/index.html")
     print(f"[info] New since last run: {run_stats['new_count']}")

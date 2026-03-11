@@ -9,8 +9,17 @@ permissions:
   contents: write
 
 jobs:
-  run:
+  scrape-chunks:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk_index: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      SOURCES_CSV: data/company_slugs.csv
+      MAX_SOURCES: 1000
+      SOURCE_OFFSET: ${{ matrix.chunk_index * 1000 }}
+      SCRAPE_CONCURRENCY: 24
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,18 +29,98 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run scraper
+      - name: Run scraper chunk
+        run: python src/main.py
+
+      - name: Save chunk outputs
+        run: |
+          mkdir -p chunk
+          cp jobs.json chunk/jobs_${{ matrix.chunk_index }}.json
+
+      - name: Upload chunk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobs-chunk-${{ matrix.chunk_index }}
+          path: chunk/jobs_${{ matrix.chunk_index }}.json
+          if-no-files-found: error
+
+  aggregate-and-publish:
+    runs-on: ubuntu-latest
+    needs: scrape-chunks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download chunk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: jobs-chunk-*
+          path: chunk-artifacts
+          merge-multiple: true
+
+      - name: Merge chunk outputs and rebuild artifacts
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+          import sys
+
+          ROOT = Path('.')
+          sys.path.append(str(ROOT / 'src'))
+          from render import render_html
+
+          chunk_files = sorted((ROOT / 'chunk-artifacts').glob('jobs_*.json'))
+          all_jobs = []
+          for path in chunk_files:
+            try:
+              data = json.loads(path.read_text(encoding='utf-8'))
+              if isinstance(data, list):
+                all_jobs.extend(data)
+            except Exception as exc:
+              print(f"[warn] Skipping invalid chunk file {path}: {exc}")
+
+          unique = {}
+          for job in all_jobs:
+            key = job.get('url') or f"{job.get('platform')}:{job.get('company')}:{job.get('title')}"
+            unique[key] = job
+
+          jobs = sorted(unique.values(), key=lambda j: (j.get('company', ''), j.get('title', '')))
+          (ROOT / 'jobs.json').write_text(json.dumps(jobs, indent=2), encoding='utf-8')
+
+          fields = [
+            'title', 'company', 'platform', 'location', 'department', 'team', 'employment_type',
+            'job_function', 'is_technical', 'posted_at', 'updated_at', 'first_seen_at', 'last_seen_at', 'is_new', 'url'
+          ]
+          with (ROOT / 'jobs.csv').open('w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            for job in jobs:
+              writer.writerow({name: job.get(name, '') for name in fields})
+
+          github_pages_url = ''
+          repository = '${{ github.repository }}'
+          if '/' in repository:
+            owner, repo = repository.split('/', 1)
+            github_pages_url = f"https://{owner}.github.io/{repo}/"
+
+          (ROOT / 'docs' / 'index.html').write_text(render_html(jobs, github_pages_url=github_pages_url), encoding='utf-8')
+          print(f"[info] Aggregated {len(chunk_files)} chunk files into {len(jobs)} unique jobs")
+          PY
+
+      - name: Commit generated files
         env:
-          SOURCES_CSV: data/company_slugs.csv
           SMTP_FROM: ${{ secrets.SMTP_FROM }}
           SMTP_TO: ${{ secrets.SMTP_TO }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
-        run: python src/main.py
-
-      - name: Commit generated files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -19,6 +19,15 @@ class CompanySource:
     company: str
 
 
+@dataclass
+class FetchResult:
+    source: CompanySource
+    normalized_company: str
+    jobs: list[dict[str, Any]]
+    http_status: int | None = None
+    error: str = ""
+
+
 def _normalize_company_slug(platform: str, company: str) -> str:
     value = (company or "").strip().lower().strip("/")
     if not value:
@@ -178,19 +187,21 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
     return jobs
 
 
-def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
+def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
     normalized_company = _normalize_company_slug(source.platform, source.company)
     if normalized_company != source.company:
         print(f"[info] Normalized {source.platform} source: {source.company} -> {normalized_company}")
 
     try:
         if source.platform == "greenhouse":
-            return fetch_greenhouse(normalized_company)
-        if source.platform == "lever":
-            return fetch_lever(normalized_company)
-        if source.platform == "ashby":
-            return fetch_ashby(normalized_company)
-        raise ValueError(f"Unsupported platform: {source.platform}")
+            jobs = fetch_greenhouse(normalized_company)
+        elif source.platform == "lever":
+            jobs = fetch_lever(normalized_company)
+        elif source.platform == "ashby":
+            jobs = fetch_ashby(normalized_company)
+        else:
+            raise ValueError(f"Unsupported platform: {source.platform}")
+        return FetchResult(source=source, normalized_company=normalized_company, jobs=jobs)
     except HTTPError as exc:
         details = ""
         try:
@@ -200,7 +211,11 @@ def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
         except Exception:
             pass
         print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
-        return []
+        return FetchResult(source=source, normalized_company=normalized_company, jobs=[], http_status=exc.code, error=f"HTTP {exc.code}")
     except (URLError, TimeoutError, ValueError) as exc:
         print(f"[warn] {source.platform}:{source.company} failed: {exc}")
-        return []
+        return FetchResult(source=source, normalized_company=normalized_company, jobs=[], error=str(exc))
+
+
+def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
+    return fetch_jobs_for_source_status(source).jobs
