@@ -35,6 +35,15 @@
       "platform": "ashby",
       "company": "linear"
     }
+  "keywords": [
+    "chief of staff",
+    "business operations",
+    "strategic initiatives"
+  ],
+  "sources": [
+    {"platform": "greenhouse", "company": "openai"},
+    {"platform": "lever", "company": "notion"},
+    {"platform": "ashby", "company": "linear"}
   ],
   "email": {
     "enabled": false

@@ -6,6 +6,7 @@ Version 1 of a free, keyword-based jobs pipeline.
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
 - Filters jobs with keyword include/exclude matching (no AI/ranking yet).
+- Filters jobs with simple keyword matching (no AI/ranking yet).
 - Writes output files:
   - `jobs.json`
   - `jobs.csv`
@@ -38,6 +39,11 @@ Version 1 of a free, keyword-based jobs pipeline.
    - `keywords_exclude`: terms to drop after include matching.
 
 4. Run locally:
+2. Edit `config.json`:
+   - Add your desired keyword list.
+   - Add known company slugs under `sources`.
+
+3. Run locally:
 
    ```bash
    python src/main.py
@@ -72,6 +78,15 @@ It can optionally download a source list first when repo variable `SOURCES_CSV_U
    - Settings → Pages → Source: **Deploy from branch**
    - Branch: `main`
    - Folder: `/docs`
+It commits generated `jobs.json`, `jobs.csv`, and `docs/index.html` back to the default branch.
+
+## GitHub Pages
+
+Set GitHub Pages source to:
+- Branch: `main`
+- Folder: `/docs`
+
+Then your digest page is served from `docs/index.html`.
 
 ## Optional SMTP email
 
@@ -95,3 +110,8 @@ If secrets are missing, the script logs a warning and skips sending.
 
 - If workflow fails to push updated artifacts:
   - Recheck Actions write permissions and branch protection settings.
+## Notes
+
+- ATS slugs are manually maintained in v1.
+- Deduplication is per-run only.
+- Filtering is keyword-only.
