@@ -1,0 +1,36 @@
+name: Refresh company source list
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build merged source CSV from ATS lists
+        run: |
+          python src/build_sources.py --output data/company_slugs.csv \
+            --lever-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/lever/lever_companies.csv \
+            --greenhouse-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv \
+            --ashby-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv
+
+      - name: Commit refreshed source CSV
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/company_slugs.csv
+          git diff --cached --quiet || git commit -m "chore: refresh company source list"
+          git push

@@ -55,11 +55,20 @@ Only supported vendors are loaded. Duplicate `(vendor, slug)` pairs are deduplic
 
 ## GitHub Actions
 
-Workflow is in `.github/workflows/daily.yml` and runs:
-- Daily via cron
-- On manual trigger (`workflow_dispatch`)
+There are two workflows:
 
-It can optionally download a source list first when repo variable `SOURCES_CSV_URL` is set.
+1. **Daily jobs digest** (`.github/workflows/daily.yml`)
+   - Runs daily via cron (`15 12 * * *`) and on manual trigger.
+   - Uses `SOURCES_CSV=data/company_slugs.csv` so daily scraping reads the repo-pinned source list.
+
+2. **Refresh company source list** (`.github/workflows/refresh-sources-weekly.yml`)
+   - Runs weekly on Mondays (`0 9 * * 1`) and on manual trigger.
+   - Pulls and merges these upstream lists into `data/company_slugs.csv` and commits the updated file:
+     - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/lever/lever_companies.csv`
+     - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv`
+     - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv`
+
+This gives you a stable, versioned source list in-repo that is refreshed weekly and consumed daily.
 
 ### Required repo settings
 
