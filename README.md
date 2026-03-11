@@ -6,11 +6,14 @@ Version 1 of a free, keyword-based jobs pipeline.
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
 - Filters jobs with keyword include/exclude matching (no AI/ranking yet).
+- Hard-requires job title to match `chief ... staff` (case-insensitive wildcard) before other include/exclude filtering.
 - Filters jobs with simple keyword matching (no AI/ranking yet).
 - Writes output files:
   - `jobs.json`
   - `jobs.csv`
   - `docs/index.html` (for GitHub Pages)
+  - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
+  - Optional GitHub Pages link banner in output (set `github_pages_url` or let Actions auto-detect).
 - Can optionally send an email digest through SMTP (using GitHub Actions secrets).
 
 ## Setup
@@ -28,7 +31,7 @@ Version 1 of a free, keyword-based jobs pipeline.
      - Optionally set `sources_csv_url` and the script will download the CSV before reading it.
      - Optional controls:
        - `min_open_jobs` (default `1`)
-       - `max_sources` (for example `1000`)
+       - `max_sources` (optional; leave empty or `null` for no cap)
 
    - **Manual source list:**
      - Keep `sources_csv` empty or remove it.
@@ -115,3 +118,15 @@ If secrets are missing, the script logs a warning and skips sending.
 
 - If workflow fails to push updated artifacts:
   - Recheck Actions write permissions and branch protection settings.
+
+
+## Filtering behavior
+
+- Hard requirement: title must match `chief ... staff` (case-insensitive).
+- Keyword include/exclude checks run against: title, department, team, location, and description text (when available from the source API).
+
+## Security checklist
+
+- Do **not** commit `config.json` if it contains private values. Keep secrets in GitHub Actions secrets.
+- SMTP credentials are read from environment variables (`SMTP_*`) and are not written to artifacts.
+- Use HTTPS-only upstream endpoints (Greenhouse/Lever/Ashby APIs) and avoid adding arbitrary untrusted URLs.

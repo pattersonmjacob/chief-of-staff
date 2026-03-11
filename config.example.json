@@ -21,7 +21,7 @@
   "sources_csv": "",
   "sources_csv_url": "",
   "min_open_jobs": 1,
-  "max_sources": 1000,
+  "max_sources": null,
   "sources": [
     {
       "platform": "greenhouse",
@@ -38,5 +38,6 @@
   ],
   "email": {
     "enabled": false
-  }
+  },
+  "github_pages_url": ""
 }

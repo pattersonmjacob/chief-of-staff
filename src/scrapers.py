@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import ssl
 from dataclasses import dataclass
 from typing import Any
@@ -55,6 +56,11 @@ def _fetch_json(url: str) -> Any:
     return json.loads(payload)
 
 
+def _strip_html(value: Any) -> str:
+    text = str(value or "")
+    return re.sub(r"<[^>]+>", " ", text).strip()
+
+
 def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields: dict[str, Any]) -> dict[str, Any]:
     location = raw_job.get("location") or raw_job.get("offices") or fields.get("location") or ""
     if isinstance(location, dict):
@@ -75,6 +81,15 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
         "department": fields.get("department") or raw_job.get("department") or "",
         "team": fields.get("team") or "",
         "employment_type": fields.get("employment_type") or raw_job.get("commitment") or "",
+        "description": _strip_html(
+            fields.get("description")
+            or raw_job.get("content")
+            or raw_job.get("descriptionPlain")
+            or raw_job.get("description")
+            or ""
+        ),
+        "posted_at": fields.get("posted_at") or raw_job.get("updated_at") or raw_job.get("createdAt") or raw_job.get("created_at") or "",
+        "updated_at": fields.get("updated_at") or raw_job.get("updatedAt") or raw_job.get("updated_at") or "",
     }
 
 
@@ -86,6 +101,7 @@ def fetch_greenhouse(company_slug: str) -> list[dict[str, Any]]:
         fields = {
             "department": (raw_job.get("departments") or [{}])[0].get("name", "") if raw_job.get("departments") else "",
             "team": (raw_job.get("offices") or [{}])[0].get("name", "") if raw_job.get("offices") else "",
+            "posted_at": raw_job.get("updated_at") or "",
         }
         jobs.append(_normalize_job("greenhouse", company_slug, raw_job, fields))
     return jobs
@@ -101,6 +117,9 @@ def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
             "team": raw_job.get("categories", {}).get("department", ""),
             "employment_type": raw_job.get("categories", {}).get("commitment", ""),
             "location": raw_job.get("categories", {}).get("location", ""),
+            "description": raw_job.get("descriptionPlain") or raw_job.get("description") or "",
+            "posted_at": raw_job.get("createdAt") or "",
+            "updated_at": raw_job.get("updatedAt") or "",
         }
         jobs.append(_normalize_job("lever", company_slug, raw_job, fields))
     return jobs
@@ -122,6 +141,8 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
         "        location { name }\n"
         "        employmentType\n"
         "        applyUrl\n"
+        "        publishedDate\n"
+        "        updatedAt\n"
         "      }\n"
         "    }\n"
         "  }\n"
@@ -150,6 +171,8 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
             fields = {
                 "team": team_name,
                 "employment_type": raw_job.get("employmentType", ""),
+                "posted_at": raw_job.get("publishedDate") or "",
+                "updated_at": raw_job.get("updatedAt") or "",
             }
             jobs.append(_normalize_job("ashby", company_slug, job, fields))
     return jobs
