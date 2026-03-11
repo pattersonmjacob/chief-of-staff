@@ -41,6 +41,29 @@ def load_config() -> dict[str, Any]:
     raise FileNotFoundError("No config.json or config.example.json found.")
 
 
+def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
+    updated = dict(cfg)
+
+    env_sources_csv = os.getenv("SOURCES_CSV", "").strip()
+    env_sources_csv_url = os.getenv("SOURCES_CSV_URL", "").strip()
+
+    if env_sources_csv:
+        updated["sources_csv"] = env_sources_csv
+        print(f"[info] Using SOURCES_CSV override: {env_sources_csv}")
+
+    if env_sources_csv_url:
+        updated["sources_csv_url"] = env_sources_csv_url
+        print("[info] Using SOURCES_CSV_URL override")
+
+    if not updated.get("sources_csv"):
+        default_sources_csv = ROOT / "data" / "company_slugs.csv"
+        if default_sources_csv.exists():
+            updated["sources_csv"] = str(default_sources_csv.relative_to(ROOT))
+            print(f"[info] Auto-detected source list at {updated['sources_csv']}")
+
+    return updated
+
+
 def maybe_download_sources_csv(cfg: dict[str, Any]) -> None:
     url = cfg.get("sources_csv_url")
     path_value = cfg.get("sources_csv")
@@ -180,7 +203,7 @@ def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> N
 
 
 def main() -> None:
-    cfg = load_config()
+    cfg = apply_runtime_overrides(load_config())
     maybe_download_sources_csv(cfg)
 
     sources = get_sources(cfg)
