@@ -5,7 +5,7 @@ import ssl
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 
 DEFAULT_TIMEOUT = 20
@@ -16,6 +16,35 @@ USER_AGENT = "chief-of-staff-jobs-bot/1.0"
 class CompanySource:
     platform: str
     company: str
+
+
+def _normalize_company_slug(platform: str, company: str) -> str:
+    value = (company or "").strip().lower().strip("/")
+    if not value:
+        return ""
+
+    if not (value.startswith("http://") or value.startswith("https://")):
+        return value
+
+    parsed = urlparse(value)
+    host = (parsed.netloc or "").lower()
+    path_parts = [part for part in parsed.path.split("/") if part]
+    if not path_parts:
+        return ""
+
+    if platform == "greenhouse":
+        if "greenhouse.io" in host and path_parts[-1] == "jobs" and len(path_parts) > 1:
+            return path_parts[-2]
+        if "greenhouse.io" in host and path_parts[:2] == ["v1", "boards"] and len(path_parts) > 2:
+            return path_parts[2]
+    elif platform == "lever":
+        if "lever.co" in host and path_parts[0] == "postings" and len(path_parts) > 1:
+            return path_parts[1]
+    elif platform == "ashby":
+        if "ashbyhq.com" in host and path_parts[-1] == "jobs" and len(path_parts) > 1:
+            return path_parts[-2]
+
+    return path_parts[-1]
 
 
 def _fetch_json(url: str) -> Any:
@@ -127,14 +156,28 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
 
 
 def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
+    normalized_company = _normalize_company_slug(source.platform, source.company)
+    if normalized_company != source.company:
+        print(f"[info] Normalized {source.platform} source: {source.company} -> {normalized_company}")
+
     try:
         if source.platform == "greenhouse":
-            return fetch_greenhouse(source.company)
+            return fetch_greenhouse(normalized_company)
         if source.platform == "lever":
-            return fetch_lever(source.company)
+            return fetch_lever(normalized_company)
         if source.platform == "ashby":
-            return fetch_ashby(source.company)
+            return fetch_ashby(normalized_company)
         raise ValueError(f"Unsupported platform: {source.platform}")
-    except (HTTPError, URLError, TimeoutError, ValueError) as exc:
+    except HTTPError as exc:
+        details = ""
+        try:
+            error_body = exc.read().decode("utf-8", errors="ignore").strip()
+            if error_body:
+                details = f" body={error_body[:240]}"
+        except (OSError, UnicodeDecodeError):
+            pass
+        print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
+        return []
+    except (URLError, TimeoutError, ValueError) as exc:
         print(f"[warn] {source.platform}:{source.company} failed: {exc}")
         return []

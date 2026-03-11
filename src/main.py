@@ -41,6 +41,29 @@ def load_config() -> dict[str, Any]:
     raise FileNotFoundError("No config.json or config.example.json found.")
 
 
+def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
+    updated = dict(cfg)
+
+    env_sources_csv = os.getenv("SOURCES_CSV", "").strip()
+    env_sources_csv_url = os.getenv("SOURCES_CSV_URL", "").strip()
+
+    if env_sources_csv:
+        updated["sources_csv"] = env_sources_csv
+        print(f"[info] Using SOURCES_CSV override: {env_sources_csv}")
+
+    if env_sources_csv_url:
+        updated["sources_csv_url"] = env_sources_csv_url
+        print("[info] Using SOURCES_CSV_URL override")
+
+    if not updated.get("sources_csv"):
+        default_sources_csv = ROOT / "data" / "company_slugs.csv"
+        if default_sources_csv.exists():
+            updated["sources_csv"] = str(default_sources_csv.relative_to(ROOT))
+            print(f"[info] Auto-detected source list at {updated['sources_csv']}")
+
+    return updated
+
+
 def maybe_download_sources_csv(cfg: dict[str, Any]) -> None:
     url = cfg.get("sources_csv_url")
     path_value = cfg.get("sources_csv")
@@ -79,11 +102,17 @@ def filter_jobs(
     jobs: list[dict[str, Any]],
     include_keywords: list[str],
     exclude_keywords: list[str],
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
     includes = [k.strip().lower() for k in include_keywords if k.strip()]
     excludes = [k.strip().lower() for k in exclude_keywords if k.strip()]
 
     filtered = []
+    stats = {
+        "input": len(jobs),
+        "excluded_missing_include": 0,
+        "excluded_by_exclude": 0,
+        "output": 0,
+    }
     for job in jobs:
         haystack = " ".join(
             [
@@ -95,12 +124,19 @@ def filter_jobs(
         ).lower()
 
         include_match = True if not includes else any(keyword in haystack for keyword in includes)
+        if not include_match:
+            stats["excluded_missing_include"] += 1
+            continue
+
         exclude_match = any(keyword in haystack for keyword in excludes)
+        if exclude_match:
+            stats["excluded_by_exclude"] += 1
+            continue
 
-        if include_match and not exclude_match:
-            filtered.append(job)
+        filtered.append(job)
 
-    return filtered
+    stats["output"] = len(filtered)
+    return filtered, stats
 
 
 def write_outputs(jobs: list[dict[str, Any]]) -> None:
@@ -167,17 +203,25 @@ def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> N
 
 
 def main() -> None:
-    cfg = load_config()
+    cfg = apply_runtime_overrides(load_config())
     maybe_download_sources_csv(cfg)
 
     sources = get_sources(cfg)
+    print(f"[info] Using {len(sources)} sources")
+
     all_jobs = []
     for source in sources:
-        all_jobs.extend(fetch_jobs_for_source(source))
+        source_jobs = fetch_jobs_for_source(source)
+        print(f"[info] {source.platform}:{source.company} returned {len(source_jobs)} jobs")
+        all_jobs.extend(source_jobs)
+
+    print(f"[info] Total fetched jobs before filtering: {len(all_jobs)}")
 
     include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
     exclude_keywords = cfg.get("keywords_exclude", [])
-    filtered_jobs = filter_jobs(all_jobs, include_keywords, exclude_keywords)
+    filtered_jobs, filter_stats = filter_jobs(all_jobs, include_keywords, exclude_keywords)
+
+    print(f"[info] Filter stats: input={filter_stats['input']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
 
     unique_jobs = {job.get("url") or f"{job.get('company')}:{job.get('title')}": job for job in filtered_jobs}
     jobs = sorted(unique_jobs.values(), key=lambda j: (j.get("company", ""), j.get("title", "")))
