@@ -23,13 +23,20 @@ def _to_int(value: Any, default: int = 0) -> int:
         return default
 
 
-def load_sources_from_csv(path: str | Path, min_open_jobs: int = 1, max_sources: int | None = None) -> list[dict[str, str]]:
+def load_sources_from_csv(
+    path: str | Path,
+    min_open_jobs: int = 1,
+    max_sources: int | None = None,
+    source_offset: int = 0,
+) -> list[dict[str, str]]:
     csv_path = Path(path)
     if not csv_path.exists():
         raise FileNotFoundError(f"sources CSV not found: {csv_path}")
 
     sources: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
+    source_offset = max(0, source_offset)
+    skipped = 0
 
     with csv_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -47,6 +54,10 @@ def load_sources_from_csv(path: str | Path, min_open_jobs: int = 1, max_sources:
             if key in seen:
                 continue
             seen.add(key)
+
+            if skipped < source_offset:
+                skipped += 1
+                continue
 
             sources.append({"platform": vendor, "company": slug})
 
