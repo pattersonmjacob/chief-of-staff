@@ -1,0 +1,85 @@
+from __future__ import annotations
+
+import argparse
+import csv
+from io import StringIO
+from pathlib import Path
+from urllib.request import urlopen
+
+
+DEFAULT_GREENHOUSE_URL = "https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv"
+DEFAULT_LEVER_URL = "https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/lever/lever_companies.csv"
+DEFAULT_ASHBY_URL = "https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv"
+
+
+def _download_csv_rows(url: str) -> list[dict[str, str]]:
+    with urlopen(url, timeout=30) as response:  # nosec B310
+        text = response.read().decode("utf-8", errors="replace")
+    return list(csv.DictReader(StringIO(text)))
+
+
+def _pick(row: dict[str, str], keys: list[str]) -> str:
+    for key in keys:
+        if key in row and row[key] and str(row[key]).strip():
+            return str(row[key]).strip()
+    return ""
+
+
+def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[dict[str, str]], ashby_rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    merged: list[dict[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add_rows(rows: list[dict[str, str]], vendor: str) -> None:
+        for row in rows:
+            slug = _pick(row, ["slug", "company_slug", "board_token", "path", "hostedJobsUrl", "url"]).strip().lower().strip("/")
+            company = _pick(row, ["company", "name", "title", "organization", "company_name"])
+
+            if not slug:
+                continue
+            key = (vendor, slug)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            merged.append(
+                {
+                    "slug": slug,
+                    "vendor": vendor,
+                    "company": company or slug,
+                    "open_jobs": "1",
+                }
+            )
+
+    add_rows(greenhouse_rows, "Greenhouse")
+    add_rows(lever_rows, "Lever")
+    add_rows(ashby_rows, "Ashby")
+    return merged
+
+
+def write_sources_csv(rows: list[dict[str, str]], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["slug", "vendor", "company", "open_jobs"])
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Merge ATS company source lists into one CSV")
+    parser.add_argument("--output", default="data/company_slugs.csv")
+    parser.add_argument("--greenhouse-url", default=DEFAULT_GREENHOUSE_URL)
+    parser.add_argument("--lever-url", default=DEFAULT_LEVER_URL)
+    parser.add_argument("--ashby-url", default=DEFAULT_ASHBY_URL)
+    args = parser.parse_args()
+
+    greenhouse_rows = _download_csv_rows(args.greenhouse_url)
+    lever_rows = _download_csv_rows(args.lever_url)
+    ashby_rows = _download_csv_rows(args.ashby_url)
+
+    merged = merge_source_rows(greenhouse_rows, lever_rows, ashby_rows)
+    write_sources_csv(merged, Path(args.output))
+    print(f"[info] Wrote {len(merged)} merged sources to {args.output}")
+
+
+if __name__ == "__main__":
+    main()
