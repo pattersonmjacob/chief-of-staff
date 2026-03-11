@@ -34,7 +34,7 @@ jobs:
     env:
       SOURCES_CSV: data/company_slugs.csv
       MAX_SOURCES: 1000
-      SOURCE_OFFSET: ${{ matrix.chunk_index * 1000 }}
+      SOURCE_OFFSET: ${{ matrix.source_offset }}
       SCRAPE_CONCURRENCY: 24
     steps:
       - name: Checkout
