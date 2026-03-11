@@ -174,7 +174,7 @@ def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
             error_body = exc.read().decode("utf-8", errors="ignore").strip()
             if error_body:
                 details = f" body={error_body[:240]}"
-        except (OSError, UnicodeDecodeError):
+        except Exception:
             pass
         print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
         return []
