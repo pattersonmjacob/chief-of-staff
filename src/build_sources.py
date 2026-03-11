@@ -4,6 +4,7 @@ import argparse
 import csv
 from io import StringIO
 from pathlib import Path
+from urllib.parse import urlparse
 from urllib.request import urlopen
 
 
@@ -25,13 +26,41 @@ def _pick(row: dict[str, str], keys: list[str]) -> str:
     return ""
 
 
+
+def _normalize_slug(vendor: str, raw_slug: str) -> str:
+    value = (raw_slug or "").strip().lower().strip("/")
+    if not value:
+        return ""
+
+    if value.startswith("http://") or value.startswith("https://"):
+        parsed = urlparse(value)
+        host = (parsed.netloc or "").lower()
+        path_parts = [part for part in parsed.path.split("/") if part]
+
+        if vendor == "Greenhouse":
+            if "greenhouse.io" in host and path_parts:
+                return path_parts[-1].lower()
+        elif vendor == "Lever":
+            if "lever.co" in host and path_parts:
+                return path_parts[-1].lower()
+        elif vendor == "Ashby":
+            if "ashbyhq.com" in host and path_parts:
+                return path_parts[-1].lower()
+
+        if path_parts:
+            return path_parts[-1].lower()
+        return ""
+
+    return value
+
 def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[dict[str, str]], ashby_rows: list[dict[str, str]]) -> list[dict[str, str]]:
     merged: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
 
     def add_rows(rows: list[dict[str, str]], vendor: str) -> None:
         for row in rows:
-            slug = _pick(row, ["slug", "company_slug", "board_token", "path", "hostedJobsUrl", "url"]).strip().lower().strip("/")
+            raw_slug = _pick(row, ["slug", "company_slug", "board_token", "path", "hostedJobsUrl", "url"])
+            slug = _normalize_slug(vendor, raw_slug)
             company = _pick(row, ["company", "name", "title", "organization", "company_name"])
 
             if not slug:
