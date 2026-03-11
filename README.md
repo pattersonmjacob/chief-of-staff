@@ -6,6 +6,7 @@ Version 1 of a free, keyword-based jobs pipeline.
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
 - Filters jobs with keyword include/exclude matching (no AI/ranking yet).
+- Filters jobs with simple keyword matching (no AI/ranking yet).
 - Writes output files:
   - `jobs.json`
   - `jobs.csv`
