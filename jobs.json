@@ -1,1 +1,3482 @@
-[]
+[
+  {
+    "platform": "greenhouse",
+    "company": "2k",
+    "title": "Sr Manager, Commercial Strategy & Operations - 2K Sports Lab",
+    "location": "London, England, United Kingdom",
+    "url": "https://job-boards.greenhouse.io/2k/jobs/7653156003",
+    "department": "Commercial Operations - 2K Publishing",
+    "team": "London, England ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "2k",
+    "title": "Strategic Operations & Planning Lead, Trust & Safety",
+    "location": "Dublin, Ireland",
+    "url": "https://job-boards.greenhouse.io/2k/jobs/7544178003",
+    "department": "Global Marketing Player Journey Strategy and Operations - 2K Publishing",
+    "team": "Dublin, Ireland",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "accenturefederalservices",
+    "title": "Detection Engineer",
+    "location": "Arlington, VA",
+    "url": "https://boards.greenhouse.io/accenturefederalservices/jobs/4651344006?gh_jid=4651344006",
+    "department": "52264470 - AFS - Business Operations",
+    "team": "San Antonio, TX",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "aclu",
+    "title": "Director of Risk Management",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/aclu/jobs/8425602002",
+    "department": "Business Operations and Support Services",
+    "team": "New York, NY - National",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "acluinternships",
+    "title": "Summer 2026 Graduate Intern, National Knowledge & Learning Program- Business Operations & Support Services",
+    "location": "Remote/Hybrid- New York City",
+    "url": "https://job-boards.greenhouse.io/acluinternships/jobs/8425446002",
+    "department": "Administration and Finance",
+    "team": "New York, NY - National",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "addepar1",
+    "title": "Chief of Staff - R&D",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/addepar1/jobs/8120254002",
+    "department": "Engineering Executive Suite",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "addepar1",
+    "title": "Strategic Initiatives & Client Operations Analyst",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/addepar1/jobs/8392881002",
+    "department": "Sales Client Engagement",
+    "team": "Remote - United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "adyen",
+    "title": "Head of Strategy & Business Operations",
+    "location": "Amsterdam",
+    "url": "https://job-boards.greenhouse.io/adyen/jobs/7699069",
+    "department": "Strategy & Execution",
+    "team": "Amsterdam",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "adyen",
+    "title": "Senior Strategy & Business Operations Manager",
+    "location": "Amsterdam",
+    "url": "https://job-boards.greenhouse.io/adyen/jobs/7653382",
+    "department": "Strategy & Execution",
+    "team": "Amsterdam",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "adyen",
+    "title": "Strategy & Business Operations Lead",
+    "location": "Amsterdam",
+    "url": "https://job-boards.greenhouse.io/adyen/jobs/7653366",
+    "department": "Strategy & Execution",
+    "team": "Amsterdam",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "affinipay1",
+    "title": "Product Operations Specialist",
+    "location": "Remote - Colombia",
+    "url": "https://www.8am.com/openings/?gh_jid=4659194006",
+    "department": "Business Operations",
+    "team": "Remote - Colombia",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "agoda",
+    "title": "Senior Specialist, Strategy & Operations - Tokyo",
+    "location": "Tokyo",
+    "url": "https://job-boards.greenhouse.io/agoda/jobs/7548105",
+    "department": "Supply",
+    "team": "Tokyo",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "aift",
+    "title": "Chief of Staff, Vulcan (GenAI safety & security)",
+    "location": "Taiwan, Hong Kong, Singapore, UAE (Dubai/Abu Dhabi)",
+    "url": "https://job-boards.greenhouse.io/aift/jobs/5727286004",
+    "department": "Asia - AI Security",
+    "team": "Hong Kong Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Process Strategy and Optimization Manager",
+    "location": "United States ",
+    "url": "https://careers.airbnb.com/positions/7550345?gh_jid=7550345",
+    "department": "Business Operations/Analysis",
+    "team": "United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Regulatory Operations Lead, APAC",
+    "location": "Seoul, South Korea",
+    "url": "https://careers.airbnb.com/positions/7571217?gh_jid=7571217",
+    "department": "Business Operations/Analysis",
+    "team": "Seoul, South Korea",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Regulatory Operations Lead, EMEA",
+    "location": "Paris, France",
+    "url": "https://careers.airbnb.com/positions/7571193?gh_jid=7571193",
+    "department": "Business Operations/Analysis",
+    "team": "London, United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Regulatory Operations Lead, EMEA",
+    "location": "London, United Kingdom",
+    "url": "https://careers.airbnb.com/positions/7609900?gh_jid=7609900",
+    "department": "Business Operations/Analysis",
+    "team": "London, United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Responsable de la Performance des Fournisseurs",
+    "location": "Canada",
+    "url": "https://careers.airbnb.com/positions/7585386?gh_jid=7585386",
+    "department": "Business Operations/Analysis",
+    "team": "Canada",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Sales Operations Lead, APAC",
+    "location": "Singapore, Singapore",
+    "url": "https://careers.airbnb.com/positions/7433769?gh_jid=7433769",
+    "department": "Business Operations/Analysis",
+    "team": "Singapore",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Senior Enablement Manager",
+    "location": "Singapore ",
+    "url": "https://careers.airbnb.com/positions/7613446?gh_jid=7613446",
+    "department": "Business Operations/Analysis",
+    "team": "Singapore, Singapore",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Senior Supply Market Planning Manager",
+    "location": "Dublin, Ireland, London, United Kingdom",
+    "url": "https://careers.airbnb.com/positions/7451677?gh_jid=7451677",
+    "department": "Business Operations/Analysis",
+    "team": "Dublin, Ireland",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "airbnb",
+    "title": "Vendor Performance Manager",
+    "location": "Canada",
+    "url": "https://careers.airbnb.com/positions/7585385?gh_jid=7585385",
+    "department": "Business Operations/Analysis",
+    "team": "Canada",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allarahealth",
+    "title": "Senior Analyst, Strategy and Operations ",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/allarahealth/jobs/5016266008",
+    "department": "Operations",
+    "team": "Corporate",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Accountant ",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/5114757008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Advanced Drone Operator",
+    "location": "Austin, TX",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/4974411008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Facilities Operation Associate ",
+    "location": "Austin, TX",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/5097239008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "General Opportunities ",
+    "location": "Greater Austin, TX",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/4515655008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Innovation Lab Solutions Lead ",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/5137988008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Mission Operations Engineer",
+    "location": "Austin, TX",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/4933964008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Office Admin",
+    "location": "Austin, TX",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/5141683008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Technical Operations Engineer",
+    "location": "Austin, TX",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/4934011008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "allencontrolsystems",
+    "title": "Technical Writer",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/allencontrolsystems/jobs/5126176008",
+    "department": "Business Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "aloyoga",
+    "title": "Director of Special Projects, Architecture + Store Design",
+    "location": "Beverly Hills, California, United States",
+    "url": "https://boards.greenhouse.io/aloyoga/jobs/5721861004?gh_jid=5721861004",
+    "department": "Store Development",
+    "team": "Beverly Hills",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "alphagrepsecurities",
+    "title": "Business Operations",
+    "location": "Shanghai, China",
+    "url": "https://job-boards.greenhouse.io/alphagrepsecurities/jobs/8452018002",
+    "department": "Operations",
+    "team": "AlphaGrep - China",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "alphasense",
+    "title": "Senior Director of Strategic Initiatives, Global Markets",
+    "location": "London, Greater London, England, United Kingdom",
+    "url": "https://job-boards.greenhouse.io/alphasense/jobs/7979410002",
+    "department": "Finance",
+    "team": "Remote - United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "alt",
+    "title": "Chief of Staff",
+    "location": "New York City ",
+    "url": "https://job-boards.greenhouse.io/alt/jobs/7595398003",
+    "department": "People",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "altoslabs",
+    "title": "Strategy and Operations Manager / Senior Manager,  Institute of Computation (12 month contract)",
+    "location": "San Francisco Bay Area, CA;San Diego, CA",
+    "url": "https://job-boards.greenhouse.io/altoslabs/jobs/5811925004",
+    "department": "Institute of Computation",
+    "team": "Bay Area, California",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "alumniventures",
+    "title": "AI Associate to the CEO",
+    "location": "Manchester, New Hampshire, USA",
+    "url": "https://job-boards.greenhouse.io/alumniventures/jobs/4114158009",
+    "department": "Office of the CEO",
+    "team": "Manchester Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "amaehealth",
+    "title": "Strategy & Operations",
+    "location": "San Francisco, CA",
+    "url": "https://job-boards.greenhouse.io/amaehealth/jobs/4077449009",
+    "department": "Central Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "anaplan",
+    "title": "Anaplan Model Builder",
+    "location": "Gurugram, India",
+    "url": "https://job-boards.greenhouse.io/anaplan/jobs/8388068002",
+    "department": "Business Operations ",
+    "team": "Gurugram - Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "anaplan",
+    "title": "Anaplan Model Builder",
+    "location": "Gurugram, India",
+    "url": "https://job-boards.greenhouse.io/anaplan/jobs/8365829002",
+    "department": "Business Operations ",
+    "team": "Gurugram - Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "anaplan",
+    "title": "Anaplan Solution Architect",
+    "location": "Remote-Texas, United States",
+    "url": "https://job-boards.greenhouse.io/anaplan/jobs/8414839002",
+    "department": "Business Operations ",
+    "team": "Texas - Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Analyst, Air Dominance & Strike",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5022015007?gh_jid=5022015007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Associate",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4951316007?gh_jid=4951316007",
+    "department": "Corporate Technology : Business Operations ",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Associate - Technical Projects",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4951318007?gh_jid=4951318007",
+    "department": "Corporate Technology : Business Operations ",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Associate, Production",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4619191007?gh_jid=4619191007",
+    "department": "Manufacturing : Manufacturing ",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Engineer, Air Dominance & Strike ",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5019247007?gh_jid=5019247007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Lead",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4951325007?gh_jid=4951325007",
+    "department": "Corporate Technology : Business Operations ",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations Manager, Intelligence Systems",
+    "location": "Reston, Virginia, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5043844007?gh_jid=5043844007",
+    "department": "AFS : Intelligence Systems Engineering : Software - Intelligence Systems",
+    "team": "Reston, VA (NOVA)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations, Air Dominance and Strike ",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5050522007?gh_jid=5050522007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Business Operations, Production",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4925945007?gh_jid=4925945007",
+    "department": "Manufacturing : Manufacturing ",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Chief of Staff, Air Dominance & Strike ",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4841348007?gh_jid=4841348007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Chief Engineering",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Chief of Staff, Design",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4740150007?gh_jid=4740150007",
+    "department": "Sales and Marketing : Design : Design",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Chief of Staff, Tactical Recon & Strike",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5068434007?gh_jid=5068434007",
+    "department": "Tactical Recon & Strike",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Director of Operations, Air Dominance & Strike",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5006440007?gh_jid=5006440007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Division Operations Lead",
+    "location": "Abu Dhabi, United Arab Emirates",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5046467007?gh_jid=5046467007",
+    "department": "Maritime & Maneuver Dominance : Maneuver Dominance Engineering : Business Operations",
+    "team": "Abu Dhabi, UAE",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Facilities Strategy and Operations, Air Dominance & Strike",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4776749007?gh_jid=4776749007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Operations Lead, Space",
+    "location": "Costa Mesa, California, United States; Washington, District of Columbia, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5024877007?gh_jid=5024877007",
+    "department": "AFS : Space Engineering : Business Operations",
+    "team": "Washington, DC (999)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Revenue Operations and Strategic Planning, Air Dominance & Strike",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5022522007?gh_jid=5022522007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Senior Analytics Engineer",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4743827007?gh_jid=4743827007",
+    "department": "Business Operations : Business Operations : Analytics",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Senior Business Operations Engineer, Air Dominance & Strike ",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5038166007?gh_jid=5038166007",
+    "department": "Air Dominance & Strike : Air Dominance & Strike Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Senior Data Engineer",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4587312007?gh_jid=4587312007",
+    "department": "Business Operations : Business Operations : Analytics",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Senior Software Engineer, Data & Analytics",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/4874833007?gh_jid=4874833007",
+    "department": "Business Operations : Business Operations : Analytics",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Senior Software Engineer, Data Platform",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5000092007?gh_jid=5000092007",
+    "department": "Business Operations : Business Operations : Analytics",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Spacecraft Mission Operations Engineer, Space",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5034120007?gh_jid=5034120007",
+    "department": "AFS : Space Engineering : Business Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Special Projects Senior Manager, Air Defense",
+    "location": "Irvine, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5056036007?gh_jid=5056036007",
+    "department": "AFS : Air Defense Engineering : Mission Operations",
+    "team": "Irvine, CA (22M)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Strategic Operations, M&A",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5057456007?gh_jid=5057456007",
+    "department": "Corporate Technology : Strategic Operations : Strategic Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "andurilindustries",
+    "title": "Strategy & Operations, Capital Projects",
+    "location": "Costa Mesa, California, United States",
+    "url": "https://boards.greenhouse.io/andurilindustries/jobs/5029465007?gh_jid=5029465007",
+    "department": "Core Operations : Facilities : Core Operations",
+    "team": "Costa Mesa, CA (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "anthropic",
+    "title": "Compute Capacity Strategy & Operations",
+    "location": "San Francisco, CA | New York City, NY",
+    "url": "https://job-boards.greenhouse.io/anthropic/jobs/5068424008",
+    "department": "Compute",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "anthropic",
+    "title": "GTM Strategy & Operations (Industries) - EMEA",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/anthropic/jobs/5005519008",
+    "department": "Sales",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "anthropic",
+    "title": "Sales Strategy & Operations - DACH",
+    "location": "Munich, Germany",
+    "url": "https://job-boards.greenhouse.io/anthropic/jobs/5130368008",
+    "department": "Sales",
+    "team": "Munich, Germany",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "apolloio",
+    "title": "GTM Strategy & Operations Manager - Analytics & Intelligence",
+    "location": "Remote, United States",
+    "url": "https://job-boards.greenhouse.io/apolloio/jobs/5762733004",
+    "department": "Revenue",
+    "team": "Remote - Canada",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "apolloio",
+    "title": "GTM Strategy & Operations Manager - Analytics & Intelligence",
+    "location": "Remote, Canada",
+    "url": "https://job-boards.greenhouse.io/apolloio/jobs/5762734004",
+    "department": "Revenue",
+    "team": "Remote - Canada",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "appian",
+    "title": "Associate Consultant Intern",
+    "location": "McLean, Virginia",
+    "url": "https://job-boards.greenhouse.io/appian/jobs/7326021",
+    "department": "Customer Success - Strategic Operations",
+    "team": "Appian Corporation - US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "appian",
+    "title": "Career Manager",
+    "location": "Sydney, Australia",
+    "url": "https://job-boards.greenhouse.io/appian/jobs/6901197",
+    "department": "Customer Success - Strategic Operations",
+    "team": "Appian Corporation - APJ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "appier",
+    "title": "Sr Director of Pricing and Strategic Operations, Taiwan",
+    "location": "Taipei, Taiwan",
+    "url": "https://job-boards.greenhouse.io/appier/jobs/7185407",
+    "department": "Corporate Strategy and Development",
+    "team": "Taipei, Taiwan",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "appliedintuition",
+    "title": "Special Projects Associate",
+    "location": "Sunnyvale, California, United States",
+    "url": "https://boards.greenhouse.io/appliedintuition/jobs/4659537005?gh_jid=4659537005",
+    "department": "Business Development",
+    "team": "Sunnyvale",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "applovin",
+    "title": "Business Operations, Strategy & Product Analyst",
+    "location": "Toronto",
+    "url": "https://boards.greenhouse.io/applovin/jobs/4660609006?gh_jid=4660609006",
+    "department": "Business Operations - Apps",
+    "team": "Toronto",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "applovin",
+    "title": "Manager, Business Development",
+    "location": "Los Angeles/Santa Monica, CA",
+    "url": "https://boards.greenhouse.io/applovin/jobs/4657264006?gh_jid=4657264006",
+    "department": "Business Operations - eCommerce",
+    "team": "Remote - United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "applytocuebox",
+    "title": "Chief of Staff @ CueBox, Performing Arts Software Startup",
+    "location": "New York City",
+    "url": "https://job-boards.greenhouse.io/applytocuebox/jobs/5435230004",
+    "department": "CueBox",
+    "team": "",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "aquia",
+    "title": "Director of Business Development",
+    "location": "U.S. - Remote",
+    "url": "https://job-boards.greenhouse.io/aquia/jobs/5057253008",
+    "department": "Business Operations",
+    "team": "United States - Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "archer56",
+    "title": "Staff Survivability/Operations Analysis Engineer",
+    "location": "Remote; San Jose, California, United States",
+    "url": "https://job-boards.greenhouse.io/archer56/jobs/6524165003",
+    "department": "Special Projects Group",
+    "team": "HQ (190 Tasman)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "archer56",
+    "title": "Staff Technical Program Manager",
+    "location": "San Jose, California, United States",
+    "url": "https://job-boards.greenhouse.io/archer56/jobs/7650036003",
+    "department": "Special Projects Group",
+    "team": "HQ (190 Tasman)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "arine",
+    "title": "Chief of Staff",
+    "location": "San Francisco, CA (Hybrid)",
+    "url": "https://job-boards.greenhouse.io/arine/jobs/5737836004",
+    "department": "Office of the CEO",
+    "team": "Arine HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "arine",
+    "title": "Executive Assistant",
+    "location": "San Francisco, CA (Hybrid)",
+    "url": "https://job-boards.greenhouse.io/arine/jobs/5737859004",
+    "department": "Office of the CEO",
+    "team": "Arine HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Manager, Hardware Sourcing ",
+    "location": "Suzhou, China",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4652615005",
+    "department": "Business Operations",
+    "team": "Suzhou, China",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Production Planner ",
+    "location": "Taipei, Taiwan",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4649966005",
+    "department": "Business Operations",
+    "team": "Taipei, Taiwan",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Senior Hardware NPI Planner",
+    "location": "San Jose, CA",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4666996005",
+    "department": "Business Operations",
+    "team": "San Jose, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Senior Power BI Developer",
+    "location": "San Jose, CA",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4668746005",
+    "department": "Business Operations",
+    "team": "San Jose, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Senior Principal Category Sourcing Manager \u2013 Corporate Services & Operations",
+    "location": "San Jose, CA",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4616287005",
+    "department": "Business Operations",
+    "team": "San Jose, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Senior Production Planner",
+    "location": "Suzhou, China",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4634965005",
+    "department": "Business Operations",
+    "team": "Suzhou, China",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "asteralabs",
+    "title": "Technical Chief of Staff for ASIC Engineering",
+    "location": "San Jose, CA",
+    "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4632063005",
+    "department": "ASIC Engineering",
+    "team": "San Jose, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "astranis",
+    "title": "Recruiting Coordination Associate (Spring 2026)",
+    "location": "San Francisco",
+    "url": "https://job-boards.greenhouse.io/astranis/jobs/4609435006",
+    "department": "Business Operations Internships",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "automatticcareers",
+    "title": "AI Ops Manager - New York",
+    "location": "New York City",
+    "url": "https://job-boards.greenhouse.io/automatticcareers/jobs/7558661",
+    "department": "Business Operations Wrangler",
+    "team": "Architecture",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "automatticcareers",
+    "title": "Product Operations Manager, Jetpack",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/automatticcareers/jobs/7519012",
+    "department": "Business Operations Wrangler",
+    "team": "Product Maisons",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "automatticcareers",
+    "title": "Senior Revenue Operations Manager",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/automatticcareers/jobs/7475345",
+    "department": "Business Operations Wrangler",
+    "team": "Product Maisons",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "automatticcareers",
+    "title": "Technical Account Manager, Automattic Special Projects Team",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/automatticcareers/jobs/6458591",
+    "department": "Technical Account Manager",
+    "team": "Customer-Centric Operations",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "axon",
+    "title": "Director, Enterprise Business Operations  ",
+    "location": "Atlanta, Georgia, United States; Scottsdale, Arizona, United States",
+    "url": "https://job-boards.greenhouse.io/axon/jobs/7552514003",
+    "department": "3004 Sales Enterprise / Commercial",
+    "team": "Arizona-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "axon",
+    "title": "Director, Enterprise Business Operations  ",
+    "location": "Denver, Colorado, United States",
+    "url": "https://job-boards.greenhouse.io/axon/jobs/7595686003",
+    "department": "3004 Sales Enterprise / Commercial",
+    "team": "Arizona-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "axon",
+    "title": "Director, Enterprise Business Operations  ",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/axon/jobs/7595683003",
+    "department": "3004 Sales Enterprise / Commercial",
+    "team": "Arizona-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "axon",
+    "title": "Director, Enterprise Business Operations  ",
+    "location": "Seattle, Washington, United States",
+    "url": "https://job-boards.greenhouse.io/axon/jobs/7595682003",
+    "department": "3004 Sales Enterprise / Commercial",
+    "team": "Arizona-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "axon",
+    "title": "Director, Enterprise Business Operations  ",
+    "location": "Boston, Massachusetts, United States",
+    "url": "https://job-boards.greenhouse.io/axon/jobs/7595675003",
+    "department": "3004 Sales Enterprise / Commercial",
+    "team": "Arizona-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "axon",
+    "title": "Director, Enterprise Business Operations  ",
+    "location": "San Francisco, California, United States",
+    "url": "https://job-boards.greenhouse.io/axon/jobs/7595674003",
+    "department": "3004 Sales Enterprise / Commercial",
+    "team": "Arizona-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "babylist",
+    "title": "Chief of Staff to CFO/COO",
+    "location": "Emeryville, CA",
+    "url": "https://job-boards.greenhouse.io/babylist/jobs/5690329004",
+    "department": "General & Administrative",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "banyansoftware",
+    "title": "Executive Leadership Program - Chief of Staff",
+    "location": "United States",
+    "url": "https://job-boards.greenhouse.io/banyansoftware/jobs/4980694007",
+    "department": "Operating Partners",
+    "team": "Remote - USA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "banyansoftware",
+    "title": "Executive Leadership Programme - Chief of Staff (Europe)",
+    "location": "Denmark; Netherlands; Sweden",
+    "url": "https://job-boards.greenhouse.io/banyansoftware/jobs/5012912007",
+    "department": "Executive Team",
+    "team": "Amsterdam, Netherlands",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "baselayer",
+    "title": "Business Operations Analyst",
+    "location": "New York",
+    "url": "https://job-boards.greenhouse.io/baselayer/jobs/5148935008",
+    "department": "Operations & Finance",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "beyondfinance",
+    "title": "Strategy & Operations Analyst",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/beyondfinance/jobs/6961066",
+    "department": "Strategy & Operations",
+    "team": "Chicago, IL",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "beyondfinance",
+    "title": "Strategy & Operations Associate",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/beyondfinance/jobs/6961384",
+    "department": "Strategy & Operations",
+    "team": "Chicago, IL",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "beyondfinance",
+    "title": "Strategy & Operations Manager",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/beyondfinance/jobs/6961473",
+    "department": "Strategy & Operations",
+    "team": "Chicago, IL",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "bigid",
+    "title": "Marketing Operations Manager",
+    "location": "Remote - US",
+    "url": "https://bigid.com/company/careers/job-details/8233854002?gh_jid=8233854002",
+    "department": "Business Operations ",
+    "team": "USA (Remote)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "bigid",
+    "title": "Proposal Contractor",
+    "location": "Atlanta ",
+    "url": "https://bigid.com/company/careers/job-details/8425813002?gh_jid=8425813002",
+    "department": "Business Operations ",
+    "team": "USA (Remote)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "billcom",
+    "title": "Senior Staff, Strategic Initiatives",
+    "location": "United States",
+    "url": "https://www.bill.com/job?5824352004&gh_jid=5824352004",
+    "department": "Product",
+    "team": "Draper, UT",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "billcom",
+    "title": "Senior Staff, Strategy & Operations",
+    "location": "United States",
+    "url": "https://www.bill.com/job?5710117004&gh_jid=5710117004",
+    "department": "Product",
+    "team": "United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "billcom",
+    "title": "Strategy and Operations, Director",
+    "location": "United States",
+    "url": "https://www.bill.com/job?5671276004&gh_jid=5671276004",
+    "department": "Product",
+    "team": "Draper, UT",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blankstreet",
+    "title": "Chief of Staff",
+    "location": "New York City",
+    "url": "https://job-boards.greenhouse.io/blankstreet/jobs/7621264003",
+    "department": "Business Operations & Strategy",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blankstreet",
+    "title": "Global Head of Central Operations",
+    "location": "New York City, NY",
+    "url": "https://job-boards.greenhouse.io/blankstreet/jobs/7631210003",
+    "department": "Business Operations & Strategy",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blankstreet",
+    "title": "Global Head of Central Operations",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/blankstreet/jobs/7631169003",
+    "department": "Business Operations & Strategy",
+    "team": "UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blankstreet",
+    "title": "Strategy & Business Operations Senior Associate | New York City",
+    "location": "New York City, US",
+    "url": "https://job-boards.greenhouse.io/blankstreet/jobs/6658566003",
+    "department": "Business Operations & Strategy",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "bloomreach",
+    "title": "Principal Revenue Strategy & Operations Manager",
+    "location": "United Kingdom",
+    "url": "https://job-boards.greenhouse.io/bloomreach/jobs/7602837",
+    "department": "Revenue",
+    "team": "United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blueskyinnovators",
+    "title": "Data Analyst and SETA Technical Support SME \u2013 Undersea Warfare (USW), Top Secret",
+    "location": "Chantilly, VA",
+    "url": "https://job-boards.greenhouse.io/blueskyinnovators/jobs/5134265008",
+    "department": "Intelligence and Strategic Initiatives Sector",
+    "team": "Chantilly, VA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blueskyinnovators",
+    "title": "Senior Systems Engineer, TS/SCI with Poly",
+    "location": "Chantilly, VA",
+    "url": "https://job-boards.greenhouse.io/blueskyinnovators/jobs/4579601008",
+    "department": "Intelligence and Strategic Initiatives Sector",
+    "team": "Chantilly, VA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blueskyinnovators",
+    "title": "Software Engineer-Data Engineer, TS/SCI with Poly",
+    "location": "Reston, VA",
+    "url": "https://job-boards.greenhouse.io/blueskyinnovators/jobs/4579745008",
+    "department": "Intelligence and Strategic Initiatives Sector",
+    "team": "Chantilly, VA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blueskyinnovators",
+    "title": "Subject Matter Expert (SME), TS/SCI",
+    "location": "Arlington, VA or Chantilly, VA",
+    "url": "https://job-boards.greenhouse.io/blueskyinnovators/jobs/5024394008",
+    "department": "Intelligence and Strategic Initiatives Sector",
+    "team": "Chantilly, VA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "blueskyinnovators",
+    "title": "Subject Matter Expert (SME)-SCO SETA, Top Secret Clearance",
+    "location": "Chantilly, VA",
+    "url": "https://job-boards.greenhouse.io/blueskyinnovators/jobs/5105283008",
+    "department": "Intelligence and Strategic Initiatives Sector",
+    "team": "Chantilly, VA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "brex",
+    "title": " BizOps Lead, BD",
+    "location": "San Francisco, California, United States",
+    "url": "https://www.brex.com/careers/8362761002?gh_jid=8362761002",
+    "department": "Operations",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "brex",
+    "title": "BizOps Lead, BD",
+    "location": "Vancouver, British Columbia, Canada",
+    "url": "https://www.brex.com/careers/8367081002?gh_jid=8367081002",
+    "department": "Operations",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "brex",
+    "title": "BizOps Lead, BD",
+    "location": "Salt Lake City, Utah, United States",
+    "url": "https://www.brex.com/careers/8366671002?gh_jid=8366671002",
+    "department": "Operations",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "brex",
+    "title": "BizOps Lead, BD",
+    "location": "Seattle, Washington, United States",
+    "url": "https://www.brex.com/careers/8366663002?gh_jid=8366663002",
+    "department": "Operations",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "brex",
+    "title": "BizOps Lead, BD",
+    "location": "New York, New York, United States",
+    "url": "https://www.brex.com/careers/8366662002?gh_jid=8366662002",
+    "department": "Operations",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "bridgebio",
+    "title": "Chief of Staff to CEO of BridgeBio and GondolaBio",
+    "location": "Palo Alto - 3160 Porter",
+    "url": "https://job-boards.greenhouse.io/bridgebio/jobs/5067375007",
+    "department": "Management",
+    "team": "Palo Alto - 3160 Porter",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "bridgebio",
+    "title": "Sr. Manager Clinical Outsourcing\u00a0",
+    "location": " San Francisco, CA/Hybrid",
+    "url": "https://job-boards.greenhouse.io/bridgebio/jobs/5048001007",
+    "department": "Clinical Development Business Operations",
+    "team": "Remote - USA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "brooklinen",
+    "title": "Director, Business Operations (Product Lifecycle & Go-To Market)",
+    "location": "New York, New York",
+    "url": "https://job-boards.greenhouse.io/brooklinen/jobs/7691990",
+    "department": "Design, Product Development, Merchandising",
+    "team": "New York HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "bvnk",
+    "title": "Business Operations & Strategy Manager",
+    "location": "London",
+    "url": "https://job-boards.eu.greenhouse.io/bvnk/jobs/4798814101",
+    "department": "BVNK - Operations",
+    "team": "United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "capitalrx",
+    "title": "Strategic Operations Analyst",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/capitalrx/jobs/5122733008",
+    "department": "Technology",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "caronsale",
+    "title": "Praktikant -  Strategic Operations ",
+    "location": "Berlin",
+    "url": "https://job-boards.eu.greenhouse.io/caronsale/jobs/4772983101",
+    "department": "Praktikanten/ Internships",
+    "team": "Berlin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "carta",
+    "title": "GTM Strategy and Ops Associate",
+    "location": "Singapore",
+    "url": "https://job-boards.greenhouse.io/carta/jobs/7614416003",
+    "department": "Sales Strategy & Operations",
+    "team": "Singapore",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "carta",
+    "title": "Senior Program Manager, Account Management Strategy & Operations",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/carta/jobs/7614162003",
+    "department": "Business Systems",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "carta",
+    "title": "Strategy & BizOps Intern",
+    "location": "Singapore",
+    "url": "https://job-boards.greenhouse.io/carta/jobs/7497885003",
+    "department": "Strategy & Business Operations",
+    "team": "Singapore",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ceg",
+    "title": "Chief of Staff - Samlino Group",
+    "location": "Copenhagen, Denmark; Lisbon, Portugal",
+    "url": "https://job-boards.greenhouse.io/ceg/jobs/7649099003",
+    "department": "Management",
+    "team": "Samlino Group",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ceg",
+    "title": "Chief of Staff - Samlino Group",
+    "location": "Lisbon, Portugal",
+    "url": "https://job-boards.greenhouse.io/ceg/jobs/7649036003",
+    "department": "Operations",
+    "team": "Samlino Group",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "celigo",
+    "title": "Analytics Engineer",
+    "location": "Hyderabad",
+    "url": "https://job-boards.greenhouse.io/celigo/jobs/7661316",
+    "department": "G&A: Business Operations",
+    "team": "India",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "celigo",
+    "title": "Analytics Engineer",
+    "location": "Hyderabad",
+    "url": "https://job-boards.greenhouse.io/celigo/jobs/7704759",
+    "department": "G&A: Business Operations",
+    "team": "India",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "celigo",
+    "title": "Business Systems Engineer - Dev/QA",
+    "location": "Hyderabad, India",
+    "url": "https://job-boards.greenhouse.io/celigo/jobs/7270158",
+    "department": "G&A: Business Operations",
+    "team": "India",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "celonis",
+    "title": "Manager, NAM Revenue Operations",
+    "location": "Raleigh, US, North Carolina",
+    "url": "https://job-boards.greenhouse.io/celonis/jobs/7578487003?gh_jid=7578487003",
+    "department": "Business Operations",
+    "team": "Raleigh, US, North Carolina",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "celonis",
+    "title": "Senior Manager, EMEA Value Engineering Strategy & Operations",
+    "location": "London, United Kingdom",
+    "url": "https://job-boards.greenhouse.io/celonis/jobs/7645740003?gh_jid=7645740003",
+    "department": "Corporate",
+    "team": "London, United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ceribell",
+    "title": "Commercial Strategy & Operations Director (Hybrid)",
+    "location": "Sunnyvale, CA",
+    "url": "https://job-boards.greenhouse.io/ceribell/jobs/5821987004",
+    "department": "Medical & Strategy",
+    "team": "Sunnyvale - HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ceribell",
+    "title": "Commercial Strategy & Operations Director (Hybrid)",
+    "location": "Sunnyvale, CA",
+    "url": "https://job-boards.greenhouse.io/ceribell/jobs/5819494004",
+    "department": "Medical & Strategy",
+    "team": "Sunnyvale - HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cfoinsights",
+    "title": "Global Business Operations Internship at CFO Insights",
+    "location": "London, United Kingdom",
+    "url": "https://job-boards.greenhouse.io/cfoinsights/jobs/5924587003",
+    "department": "Marketing",
+    "team": "United Media",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Capture Strategist - U.S. Air Force",
+    "location": "Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5029633007",
+    "department": "Business Operations ",
+    "team": "Washington D.C.",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Capture Strategist - U.S. Army",
+    "location": "Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5029631007",
+    "department": "Business Operations ",
+    "team": "Washington D.C.",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Cost Accounting Manager",
+    "location": "Hawthorne, California, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5060055007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Future Capabilities Capture Manager",
+    "location": "Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5043518007",
+    "department": "Business Operations ",
+    "team": "Washington D.C.",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Growth Lead - US Federal Agencies",
+    "location": "Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5010611007",
+    "department": "Business Operations ",
+    "team": "Washington D.C.",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "IT Support Specialist",
+    "location": "Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5058388007",
+    "department": "Business Operations ",
+    "team": "Washington D.C.",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Recruiting Coordinator",
+    "location": "Hawthorne, California, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/4976433007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Senior Supply Chain Procurement Buyer",
+    "location": "Hawthorne, California, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5059487007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Supply Chain Buyer",
+    "location": "Hawthorne, California, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5059481007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Technical Operations Engineer",
+    "location": "Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/4991010007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Technical Operations Engineer",
+    "location": "Hawthorne, California, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/4991007007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "chaosindustries",
+    "title": "Technical Recruiter",
+    "location": "Hawthorne, California, United States",
+    "url": "https://job-boards.greenhouse.io/chaosindustries/jobs/5040517007",
+    "department": "Business Operations ",
+    "team": "Los Angeles, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "circleso",
+    "title": "AI Platform Engineer, Applied AI",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/circleso/jobs/5102925008",
+    "department": "Special Projects",
+    "team": "",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "circleso",
+    "title": "Senior Full-Stack Software Engineer, Applied AI",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/circleso/jobs/5112809008",
+    "department": "Special Projects",
+    "team": "",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "clear",
+    "title": "Chief of Staff, Office of the President",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/clear/jobs/7665035",
+    "department": "People",
+    "team": "NYHQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cloudflare",
+    "title": "Principal Technical Engagement Manager  ",
+    "location": "Hybrid",
+    "url": "https://boards.greenhouse.io/cloudflare/jobs/6725818?gh_jid=6725818",
+    "department": "Special Projects",
+    "team": "AMER",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cloudflare",
+    "title": "Strategy and M&A Lead",
+    "location": "Hybrid",
+    "url": "https://boards.greenhouse.io/cloudflare/jobs/7138086?gh_jid=7138086",
+    "department": "Special Projects",
+    "team": "AMER",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "clutch",
+    "title": "Strategy & Operations Manager",
+    "location": "Toronto, Ontario, Canada",
+    "url": "https://job-boards.greenhouse.io/clutch/jobs/5792377004",
+    "department": "Marketplace Supply",
+    "team": "Toronto (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "clutch",
+    "title": "Strategy & Operations Manager (Business Operations)",
+    "location": "Toronto, Ontario, Canada",
+    "url": "https://job-boards.greenhouse.io/clutch/jobs/5271249004",
+    "department": "Operations",
+    "team": "Toronto (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "clutch",
+    "title": "Strategy & Operations, Senior Manager",
+    "location": "Toronto, Ontario, Canada",
+    "url": "https://job-boards.greenhouse.io/clutch/jobs/5792372004",
+    "department": "Marketplace Supply",
+    "team": "Toronto (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "coalition",
+    "title": "Capacity Program Manager",
+    "location": "Any location, Canada",
+    "url": "https://www.coalitioninc.com/job-posting?gh_jid=4616301005",
+    "department": "Special Projects",
+    "team": "United States - Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "coalition",
+    "title": "Capacity Program Manager",
+    "location": "Any location, United States",
+    "url": "https://www.coalitioninc.com/job-posting?gh_jid=4508205005",
+    "department": "Special Projects",
+    "team": "United States - Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "coherehealth",
+    "title": "Strategic Operations Analyst",
+    "location": "United States",
+    "url": "https://job-boards.greenhouse.io/coherehealth/jobs/7575264003",
+    "department": "Strategic Operations",
+    "team": "United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "concentric",
+    "title": "Response Co-ordinator (Operations Center Hereford)",
+    "location": "Hereford, England, United Kingdom ",
+    "url": "https://job-boards.greenhouse.io/concentric/jobs/4575337006",
+    "department": "SecOps Team",
+    "team": "Special Projects and Services Limited",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "constantcontact",
+    "title": "Senior Director, Product Strategy & Operations ",
+    "location": "Boston, MA",
+    "url": "https://job-boards.greenhouse.io/constantcontact/jobs/7601989",
+    "department": "135 Product",
+    "team": "Waltham",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "coursera",
+    "title": "Enablement Specialist (6 month Fixed Term Contract, London, Remote Based)",
+    "location": "United Kingdom",
+    "url": "https://job-boards.greenhouse.io/coursera/jobs/5698282004",
+    "department": "Sales Strategy & Operations",
+    "team": "United Kingdom",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "coursera",
+    "title": "Marketing Operations Process Manager (Delhi NCR)",
+    "location": "India",
+    "url": "https://job-boards.greenhouse.io/coursera/jobs/5742043004",
+    "department": "Marketing Strategy & Operations",
+    "team": "India",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cresta",
+    "title": "Deal Strategy & Operations Manager",
+    "location": "San Francisco, CA/ US,  Remote (PT Time Zone Only)",
+    "url": "https://job-boards.greenhouse.io/cresta/jobs/5096246008",
+    "department": "Sales",
+    "team": "US (Remote)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cultureamp",
+    "title": "Strategy & Business Operations Senior Associate",
+    "location": "Melbourne",
+    "url": "https://job-boards.greenhouse.io/cultureamp/jobs/7385310",
+    "department": "Org Admin",
+    "team": "Melbourne",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "customerio",
+    "title": "Corporate Counsel - EMEA",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/customerio/jobs/7543363",
+    "department": "Business Operations",
+    "team": "EMEA Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "customerio",
+    "title": "Director, Information Technology",
+    "location": "Americas Remote",
+    "url": "https://job-boards.greenhouse.io/customerio/jobs/7449779",
+    "department": "Business Operations",
+    "team": "USA Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "customerio",
+    "title": "Project Manager",
+    "location": "Americas Remote",
+    "url": "https://job-boards.greenhouse.io/customerio/jobs/7652551",
+    "department": "Business Operations",
+    "team": "Americas Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "customerio",
+    "title": "VP, Finance",
+    "location": "Americas Remote",
+    "url": "https://job-boards.greenhouse.io/customerio/jobs/7650969",
+    "department": "Business Operations",
+    "team": "Americas Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cvx",
+    "title": "Chief of Staff CVX Ventures",
+    "location": "Berlin, Germany",
+    "url": "https://job-boards.greenhouse.io/cvx/jobs/6690262003",
+    "department": "Management",
+    "team": "CVX Ventures",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cvx",
+    "title": "Chief of Staff CVX Ventures",
+    "location": "Amsterdam, Netherlands",
+    "url": "https://job-boards.greenhouse.io/cvx/jobs/6690263003",
+    "department": "Management",
+    "team": "CVX Ventures",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cvx",
+    "title": "Chief of Staff CVX Ventures",
+    "location": "London, United Kingdom",
+    "url": "https://job-boards.greenhouse.io/cvx/jobs/6690261003",
+    "department": "Management",
+    "team": "CVX Ventures",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cvx",
+    "title": "Chief of Staff CVX Ventures",
+    "location": "Stockholm, Sweden",
+    "url": "https://job-boards.greenhouse.io/cvx/jobs/6690264003",
+    "department": "Management",
+    "team": "CVX Ventures",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "cvx",
+    "title": "Chief of Staff CVX Ventures Denmark",
+    "location": "Copenhagen, Denmark",
+    "url": "https://job-boards.greenhouse.io/cvx/jobs/6606439003",
+    "department": "Management",
+    "team": "CVX Denmark",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "databricks",
+    "title": "Sr Security Assurance Engineer - Special Projects",
+    "location": "United States",
+    "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8430837002",
+    "department": "Security",
+    "team": "United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "dbtlabsinc",
+    "title": "Field Engineering Business Operations Lead",
+    "location": "US - Remote",
+    "url": "https://job-boards.greenhouse.io/dbtlabsinc/jobs/4670020005",
+    "department": "GTM Operations",
+    "team": "US - Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Executive Business Partner, Office of the CEO",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7590880",
+    "department": "Central Operations, Responsibility, and Engagement",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Portfolio Program Manager, Office of the CEO  ",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7682215",
+    "department": "Central Operations, Responsibility, and Engagement",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Product Manager, Technical Intelligence, Google DeepMind",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7522587",
+    "department": "Office of the CEO",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Research Scientist, Strategic Initiatives, Multimedia ML",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7653585",
+    "department": "Science",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Strategy & Operations Senior Manager, Security & Risk Operations",
+    "location": "Mountain View, California, US",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7528566",
+    "department": "GenAI",
+    "team": "Mountain View, California, US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Strategy and Special Projects, Office of the CEO ",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7679684",
+    "department": "Central Operations, Responsibility, and Engagement",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Strategy and Special Projects, Office of the CEO - 12 Month Fixed Term Contract",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7679750",
+    "department": "Central Operations, Responsibility, and Engagement",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Tech Strategy Director, Compute, Google DeepMind",
+    "location": "Mountain View, California, US",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7535866",
+    "department": "Office of the CEO",
+    "team": "Mountain View, California, US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "deepmind",
+    "title": "Tech Strategy Product Manager, Google DeepMind",
+    "location": "Mountain View, California, US",
+    "url": "https://job-boards.greenhouse.io/deepmind/jobs/7535915",
+    "department": "Office of the CEO",
+    "team": "Mountain View, California, US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "dforeferrals",
+    "title": "Finance Director ",
+    "location": "New York City, NY",
+    "url": "https://job-boards.greenhouse.io/dforeferrals/jobs/5734952004",
+    "department": "OceanX Business Operations",
+    "team": "OceanX",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "dialpad",
+    "title": "Director, Business Operations",
+    "location": "Tempe, US",
+    "url": "https://job-boards.greenhouse.io/dialpad/jobs/8439351002",
+    "department": "525 - Sales Ops",
+    "team": "USA-TX-Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "dialpad",
+    "title": "Director, Business Operations",
+    "location": "Austin, US",
+    "url": "https://job-boards.greenhouse.io/dialpad/jobs/8436719002",
+    "department": "525 - Sales Ops",
+    "team": "USA-TX-Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "diligentcorporation",
+    "title": "Chief of Staff",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/diligentcorporation/jobs/5766723004",
+    "department": "Executive",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "diligentcorporation",
+    "title": "Director Engineering Operations (Chief of Staff)",
+    "location": "New York, New York, United States; Remote U.S; Washington, District of Columbia, United States",
+    "url": "https://job-boards.greenhouse.io/diligentcorporation/jobs/5725510004",
+    "department": "R&D",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Associate Manager, Consumer Strategy & Operations",
+    "location": "Sydney, NSW; Melbourne, VIC",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7572190",
+    "department": "614 Strategy & Operations",
+    "team": "Melbourne",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Associate Manager, Strategy & Operations",
+    "location": "Sydney, NSW; Melbourne, VIC",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7583964",
+    "department": "641 Ads & Promotions Strategy",
+    "team": "Melbourne",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Associate Manager, Strategy and Operations",
+    "location": "Sydney, NSW; Melbourne, VIC",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7697754",
+    "department": "614 Strategy & Operations",
+    "team": "Sydney",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Director, Business Development and Partnerships",
+    "location": "Melbourne, VIC; Sydney, NSW",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7605197",
+    "department": "614 Strategy & Operations",
+    "team": "Melbourne",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Senior Associate, Sales Strategy and Operations",
+    "location": "Melbourne, VIC; Sydney, NSW",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7669268",
+    "department": "536 Sales S&O",
+    "team": "Melbourne",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Senior Associate, Strategy & Operations",
+    "location": "Sydney, NSW; Melbourne, VIC",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/6805879",
+    "department": "614 Strategy & Operations",
+    "team": "Melbourne",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Senior Associate, Strategy & Operations",
+    "location": "Auckland, New Zealand",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7584721",
+    "department": "541 Merchant Strategy and Operations",
+    "team": "Auckland CBD",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashaustralia",
+    "title": "Senior Associate, Strategy & Operations (New Verticals - International Growth)",
+    "location": "Sydney, NSW; Melbourne, VIC",
+    "url": "https://job-boards.greenhouse.io/doordashaustralia/jobs/7300101",
+    "department": "632 New Business Verticals",
+    "team": "Sydney",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashcanada",
+    "title": "Associate Manager, QA Strategy & Operations",
+    "location": "Alberta, AB; Toronto, ON; Vancouver, BC",
+    "url": "https://job-boards.greenhouse.io/doordashcanada/jobs/7531384",
+    "department": "621 Support Management",
+    "team": "Toronto",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Ads Platform Growth Efficiency - Strategy & Operations",
+    "location": "New York, NY; Chicago, IL; San Francisco, CA; Los Angeles, CA; Seattle, WA; Washington D.C.; Tempe, AZ",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7569624",
+    "department": "641 Ads & Promotions Strategy",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, DashMart - Category Strategy & Operations",
+    "location": "San Francisco, CA; Los Angeles, CA; Seattle, WA; Chicago, IL; Phoenix, AZ; Washington D.C.; New York, NY; United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7643064",
+    "department": "633 DashMart Strategy & Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, DashMart - Product Operations",
+    "location": "San Francisco, CA; Los Angeles, CA; Seattle, WA; Denver, CO; Chicago, IL; Phoenix, AZ; Washington D.C.; New York, NY",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7593047",
+    "department": "633 DashMart Strategy & Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Financial Products - Strategy & Operations",
+    "location": "San Francisco, CA; Los Angeles, CA; Seattle, WA; Chicago, IL; Washington DC; New York, NY; Tempe, AZ ",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7644867",
+    "department": "641 Ads & Promotions Strategy",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Integrations Strategy & Operations ",
+    "location": "New York, NY; Atlanta, GA; San Francisco, CA; Phoenix, AZ",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7580094",
+    "department": "542 Partner Integrations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Marketplace - DashPass Strategy & Operations",
+    "location": "San Francisco, CA; New York, NY; Seattle, WA; Miami, FL; Los Angeles, CA; Denver, CO; Washington, DC; Tempe, AZ; Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7559338",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Marketplace - Restaurant Growth Strategy & Operations",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7661657",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Merchant Quality Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Chicago, IL; Seattle, WA; Atlanta, GA; Austin, TX; Denver, CO",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7590262",
+    "department": "541 Merchant Strategy and Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, New Verticals - Drive Strategy & Operations",
+    "location": "New York, NY; Los Angeles, CA; Seattle, WA; San Francisco, CA; Washington D.C.; Chicago, IL; Tempe, AZ",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7579866",
+    "department": "613 Platform Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, New Verticals - Search Experience Strategy & Operations",
+    "location": "New York City, NY; San Francisco, CA; Chicago, IL; Seattle, WA; Los Angeles, CA; Washington, DC; Phoenix, AZ",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7517616",
+    "department": "632 New Business Verticals",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, New Verticals Strategy & Operations \u2014 Consumer Fintech",
+    "location": "New York, NY; San Francisco, CA; Chicago, IL; Seattle, WA; Los Angeles, CA; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7663723",
+    "department": "632 New Business Verticals",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Sales Strategy & Operations",
+    "location": "Atlanta, GA; Austin, TX; Boston, MA; Chicago, IL; Denver, CO; Los Angeles, CA; New York, NY; Tempe, AZ; San Francisco, CA; Seattle, WA; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7689378",
+    "department": "536 Sales S&O",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Strategic Accounts - Strategy & Operations",
+    "location": "Chicago, IL; Los Angeles, CA; New York, NY; Tempe, AZ; San Francisco, CA; Seattle, WA; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7600598",
+    "department": "641 Ads & Promotions Strategy",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate Manager, Strategy & Operations, Merchant Onboarding & Experience",
+    "location": "San Francisco, CA; New York, NY",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7593178",
+    "department": "531 Enterprise Outside Sales",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, Commerce Platform Logistics - Strategy and Operations",
+    "location": "New York, NY; San Francisco, CA; Seattle, WA; Los Angeles, CA; Chicago, IL; Sunnyvale, CA; Washington D.C.; Phoenix, AZ",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7561096",
+    "department": "618 Logistics",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, Dasher & Logistics - Logistics Growth & Regulatory Compliance Strategy & Operations",
+    "location": "San Francisco, CA; Sunnyvale, CA; Los Angeles, CA; Seattle, WA; New York, NY; Washington, DC; Chicago, IL; Tempe, AZ; Denver, CO",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7550497",
+    "department": "618 Logistics",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, Marketplace - Strategy & Operations ",
+    "location": "Miami, FL; San Juan, PR",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7516075",
+    "department": "614 Strategy & Operations",
+    "team": "Miami",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, New Verticals - Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7525219",
+    "department": "632 New Business Verticals",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, New Verticals - Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Seattle, WA; Los Angeles, CA; Chicago, IL; Tempe, AZ; Washington, DC",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7367035",
+    "department": "632 New Business Verticals",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, Revenue Operations - Strategy & Operations",
+    "location": "United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7602081",
+    "department": "413 In-Store Marketing",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Associate, Strategy and Operations - Merchant Fraud",
+    "location": "Chicago,IL; Tempe, AZ; Austin, TX; Denver, CO; Philadelphia, PA; Miami, FL; Atlanta, GA",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7684700",
+    "department": "621 Support Management",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Manager, DashMart - Growth Strategy& Operations",
+    "location": "New York, NY; San Francisco, CA; Seattle, WA; Los Angeles, CA; Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7624611",
+    "department": "633 DashMart Strategy & Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Manager, Marketplace, New Bets, Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Los Angeles, CA; Seattle, WA; Washington D.C.; Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/6786292",
+    "department": "614 Strategy & Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Manager, Merchant Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Chicago, IL; Austin, TX; Denver, CO; Los Angeles, CA; Miami, FL; Seattle, WA",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7374400",
+    "department": "541 Merchant Strategy and Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Manager, New Verticals - Gift Card Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Los Angeles, CA; Seattle, WA; Washington, DC",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7661816",
+    "department": "632 New Business Verticals",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Manager, New Verticals - Retail Selection Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Seattle, WA; Los Angeles, CA; Chicago, IL; Tempe, AZ; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7702372",
+    "department": "632 New Business Verticals",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Manager, Sales Strategy & Operations, Commerce Platform",
+    "location": "New York, NY; Washington D.C.; Los Angeles, CA; San Francisco, CA; Chicago, IL; Denver, CO; Seattle, WA; United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7545294",
+    "department": "536 Sales S&O",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Analyst, Sales Strategy & Operations",
+    "location": "Chicago, IL; Los Angeles, CA; New York, NY; San Francisco, CA; Seattle, WA; Tempe, AZ; Washington, D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7524574",
+    "department": "536 Sales S&O",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Commerce Platform, Growth & Quality - Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Austin, TX; Los Angeles, CA; Seattle, WA; Denver, CO; Chicago, IL; Miami, FL; United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7528823",
+    "department": "613 Platform Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Dasher & Logistics - Live Operations Parcel Strategy & Operations",
+    "location": "United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7702008",
+    "department": "618 Logistics",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Innovation & New Bets - Strategy & Operations",
+    "location": "New York, NY; Denver, CO; Los Angeles, CA; Chicago, IL; United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7654723",
+    "department": "613 Platform Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Marketplace - DashPass Strategy & Operations",
+    "location": "San Francisco, CA; New York, NY; Seattle, WA; Miami, FL; Los Angeles, CA; Denver, CO; Washington, DC; Tempe, AZ; Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7559326",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Marketplace - Restaurant Growth Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Los Angeles, CA; Chicago, IL; Seattle, WA; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7579976",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Marketplace, Consumer Experience S&O",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7480878",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Marketplace, Local Strategy & Operations",
+    "location": "United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7688277",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Merchant Strategy & Operations",
+    "location": "New York, NY; San Francisco, CA; Chicago, IL; Austin, TX; Denver, CO; Los Angeles, CA; Miami, FL; Seattle, WA",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7347172",
+    "department": "541 Merchant Strategy and Operations",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, New Verticals - Drive Strategy & Operations",
+    "location": "San Francisco, CA; New York, NY; Seattle, WA; Chicago, IL;  Los Angeles, CA; Tempe, AZ; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7680652",
+    "department": "613 Platform Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Associate, Strategy & Operations - Commerce Platform",
+    "location": "New York, NY; San Francisco, CA; Los Angeles, CA; Chicago, IL; Denver, CO",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7612061",
+    "department": "613 Platform Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Manager - Marketplace, Texas Strategy & Operations",
+    "location": "Austin, TX; Dallas, TX; Fort Worth, TX; Houston, TX",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7555815",
+    "department": "614 Strategy & Operations",
+    "team": "Austin",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Manager, Consumer Experience S&O",
+    "location": "San Francisco, CA; New York, NY; Seattle, WA; United States - Remote",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7604521",
+    "department": "614 Strategy & Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Manager, DashPass Strategy & Operations",
+    "location": "Los Angeles, CA; San Francisco, CA; Seattle, WA; New York, NY",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7590188",
+    "department": "614 Strategy & Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Senior Manager, Restaurant Growth",
+    "location": "San Francisco, CA; New York, NY; Seattle, WA; Denver, CO; Chicago, IL; Austin, TX; Atlanta, GA; Boston, MA; Miami, FL",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7639415",
+    "department": "614 Strategy & Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "doordashusa",
+    "title": "Sr. Manager, Digital Ordering - Strategy & Operations",
+    "location": "San Francisco, CA; New York, NY; Seattle, WA; Chicago, IL;  Los Angeles, CA; Tempe, AZ; Denver, CO; Boston, MA, Austin, TX, Portland,OR; Washington D.C.",
+    "url": "https://job-boards.greenhouse.io/doordashusa/jobs/7670884",
+    "department": "613 Platform Operations",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "downingcapitalgroup",
+    "title": "Chief of Staff (Remote)",
+    "location": "Brazil",
+    "url": "https://job-boards.greenhouse.io/downingcapitalgroup/jobs/4616229007",
+    "department": "Downing Capital Group",
+    "team": "Downing Capital Group",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "dragos",
+    "title": "Senior Systems Engineer - Development Infrastructure",
+    "location": "United States",
+    "url": "https://job-boards.greenhouse.io/dragos/jobs/4986056008",
+    "department": "Business Operations",
+    "team": "Dragos USA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "drweng",
+    "title": "Business Operations and Execution Analyst",
+    "location": "Chicago",
+    "url": "https://job-boards.greenhouse.io/drweng/jobs/7568917",
+    "department": "Project Management",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "drweng",
+    "title": "Junior Strategy and Operations Analyst, Flow Macro (European Market Hours)",
+    "location": "Montreal",
+    "url": "https://job-boards.greenhouse.io/drweng/jobs/7560394",
+    "department": "EDT Flow",
+    "team": "Montr\u00e9al",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "elitetechnology",
+    "title": "Vice President, Sales Strategy & Operations",
+    "location": "US - Remote",
+    "url": "https://job-boards.greenhouse.io/elitetechnology/jobs/5141442008",
+    "department": "Sales Operations",
+    "team": "US - Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "emarketer",
+    "title": "Data Analyst, Ad Buyer Insights",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/emarketer/jobs/5778008004",
+    "department": "\u2022 Strategy & Operations",
+    "team": "EMARKETER - United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "emarketer",
+    "title": "Senior Manager, Ad Buyer Insights",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/emarketer/jobs/5795324004",
+    "department": "\u2022 Strategy & Operations",
+    "team": "EMARKETER - United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "emergentlabsinc",
+    "title": "Head of Partnerships",
+    "location": "San Francisco",
+    "url": "https://job-boards.greenhouse.io/emergentlabsinc/jobs/4108908009",
+    "department": "Founder's Office ",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "employerdirecthealthcare",
+    "title": "Chief of Staff to CEO",
+    "location": "Dallas, TX - Open to Remote with Travel to Dallas",
+    "url": "https://job-boards.greenhouse.io/employerdirecthealthcare/jobs/4996893007",
+    "department": "Executive",
+    "team": "Dallas, TX - Open to Remote with Travel to Dallas",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "employerdirecthealthcare",
+    "title": "Senior Salesforce Health Cloud Administrator",
+    "location": "Dallas, Texas, United States",
+    "url": "https://job-boards.greenhouse.io/employerdirecthealthcare/jobs/5063790007",
+    "department": "Commercial Strategy & Operations",
+    "team": "Dallas - Hybrid (3x in office/week)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "engine",
+    "title": "Sales Strategy and Operations Manager",
+    "location": "Remote - USA",
+    "url": "https://job-boards.greenhouse.io/engine/jobs/7545594003",
+    "department": "Revenue Operations & Enablement",
+    "team": "Remote - USA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ennoblecare",
+    "title": "Senior Director Strategic Initiatives and Partnerships",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/ennoblecare/jobs/4653645006",
+    "department": "Executive",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Business Compliance Associate - NetCredit",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7697244",
+    "department": "Strategy & Operations ",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Business Compliance Associate -CashNet USA",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7608803",
+    "department": "Strategy & Operations ",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Lead, Strategy & Operations - CashNetUSA (Hybrid)",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7430144",
+    "department": "Strategy & Operations ",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Lead, Strategy & Operations - NetCredit (Hybrid)",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7522965",
+    "department": "Strategy & Operations ",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Senior Associate, Strategy & Operations - NetCredit (Hybrid)",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7248939",
+    "department": "Strategy & Operations ",
+    "team": "Chicago",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Senior Associate, Strategy & Operations - Sales (Hybrid)",
+    "location": "Denver, CO",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7654539",
+    "department": "Strategy & Operations ",
+    "team": "Denver",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "enova",
+    "title": "Senior Associate, Strategy & Operations - Sales (Hybrid)",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/enova/jobs/7654166",
+    "department": "Strategy & Operations ",
+    "team": "Denver",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "epickids",
+    "title": "Senior Manager, Global Strategy and Operations",
+    "location": "San Jose, California",
+    "url": "https://job-boards.greenhouse.io/epickids/jobs/7652767003",
+    "department": "Business Operations",
+    "team": "TAL Education Group HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "eqvilentjobs",
+    "title": "FPGA Engineer",
+    "location": "Remote",
+    "url": "https://job-boards.eu.greenhouse.io/eqvilentjobs/jobs/4518567101",
+    "department": "Special Projects",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ethoslife",
+    "title": "Senior Analyst, Strategic Operations",
+    "location": "Bangalore, India",
+    "url": "https://job-boards.greenhouse.io/ethoslife/jobs/8429910002",
+    "department": "Product",
+    "team": "Bangalore, India",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "ethoslife",
+    "title": "Senior Manager, Strategy & Operations (Consumer Business)",
+    "location": "Remote US",
+    "url": "https://job-boards.greenhouse.io/ethoslife/jobs/8328817002",
+    "department": "Finance & Operations",
+    "team": "Remote US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "eucalyptus",
+    "title": "Strategy & Operations Associate",
+    "location": "Toronto, Ontario, Canada",
+    "url": "https://job-boards.greenhouse.io/eucalyptus/jobs/4645951005",
+    "department": "Expansion",
+    "team": "CA - HQ - Toronto",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "evolutioniq",
+    "title": "AI Business Operations Manager",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/evolutioniq/jobs/5809064004",
+    "department": "Engineering",
+    "team": "New York (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faire",
+    "title": "GTM Strategy & Operations Senior Associate",
+    "location": "San Francisco, CA",
+    "url": "https://boards.greenhouse.io/faire/jobs/8130244002?gh_jid=8130244002",
+    "department": "Strategy & Analytics ",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faire",
+    "title": "International Strategy & Operations Lead",
+    "location": "London, UK",
+    "url": "https://boards.greenhouse.io/faire/jobs/8455621002?gh_jid=8455621002",
+    "department": "Strategy & Analytics ",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faire",
+    "title": "International Strategy & Operations Senior Associate",
+    "location": "London, UK",
+    "url": "https://boards.greenhouse.io/faire/jobs/8397578002?gh_jid=8397578002",
+    "department": "Strategy & Analytics ",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faire",
+    "title": "Program Manager, Revenue Strategy and Operations",
+    "location": "San Francisco, CA",
+    "url": "https://boards.greenhouse.io/faire/jobs/8437997002?gh_jid=8437997002",
+    "department": "GTM Operations",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faire",
+    "title": "Strategy & Operations Lead",
+    "location": "San Francisco, CA",
+    "url": "https://boards.greenhouse.io/faire/jobs/8240795002?gh_jid=8240795002",
+    "department": "Strategy & Analytics ",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "familyoffice",
+    "title": "Technology Chief of Staff",
+    "location": "New York",
+    "url": "https://job-boards.greenhouse.io/familyoffice/jobs/7529389003",
+    "department": "Technology",
+    "team": "SFM-NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faradayfuture",
+    "title": "CRM Business Operations Manager",
+    "location": "Gardena, California, United States",
+    "url": "https://job-boards.greenhouse.io/faradayfuture/jobs/7482105003",
+    "department": "UES",
+    "team": "Gardena, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "faradayfuture",
+    "title": "Manager, Aftersales Business Operations \u2013 EAI Robotics ",
+    "location": "El Segundo, California, United States",
+    "url": "https://job-boards.greenhouse.io/faradayfuture/jobs/7644245003",
+    "department": "EAI Robotics",
+    "team": "El Segundo, CA-HQ",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fastly",
+    "title": "Sales Strategy & Operations Lead",
+    "location": "Denver, CO",
+    "url": "https://www.fastly.com/about/jobs/apply?gh_jid=7654551",
+    "department": "Sales Ops & Enablement",
+    "team": "New York City, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fay",
+    "title": "Business Operations",
+    "location": "NYC or SF",
+    "url": "https://job-boards.greenhouse.io/fay/jobs/5133451008",
+    "department": "Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Business Operations Associate",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4723842101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Business Operations Associate",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4794597101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Business Operations Manager",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4790197101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Business Operations Manager",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4778597101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Business Operations Senior Manager",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4790665101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Business Operations Senior Manager",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4724227101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "feverup",
+    "title": "Sales Strategy & Operations Manager",
+    "location": "Madrid",
+    "url": "https://job-boards.eu.greenhouse.io/feverup/jobs/4790988101",
+    "department": "OP Strategy",
+    "team": "Madrid",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "Business Operations",
+    "location": "San Francisco, CA \u2022 New York, NY \u2022 United States",
+    "url": "https://boards.greenhouse.io/figma/jobs/5786381004?gh_jid=5786381004",
+    "department": "Business Operations",
+    "team": "US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "Corporate Development & Strategy, M&A Integration",
+    "location": "San Francisco, CA \u2022 New York, NY \u2022 United States",
+    "url": "https://boards.greenhouse.io/figma/jobs/5699991004?gh_jid=5699991004",
+    "department": "Business Operations",
+    "team": "US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "GTM Systems Analyst",
+    "location": "San Francisco, CA \u2022 New York, NY \u2022 United States",
+    "url": "https://boards.greenhouse.io/figma/jobs/5811266004?gh_jid=5811266004",
+    "department": "Business Operations",
+    "team": "US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "IT Engineer (London, United Kingdom) ",
+    "location": "London, England",
+    "url": "https://boards.greenhouse.io/figma/jobs/5813865004?gh_jid=5813865004",
+    "department": "Business Operations",
+    "team": "London, UK",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "International Tax Manager",
+    "location": "San Francisco, CA \u2022 New York, NY \u2022 United States",
+    "url": "https://boards.greenhouse.io/figma/jobs/5802466004?gh_jid=5802466004",
+    "department": "Business Operations",
+    "team": "US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "Senior Technical Revenue Manager",
+    "location": "San Francisco, CA \u2022 New York, NY \u2022 United States",
+    "url": "https://boards.greenhouse.io/figma/jobs/5735644004?gh_jid=5735644004",
+    "department": "Business Operations",
+    "team": "US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figma",
+    "title": "Strategic Finance",
+    "location": "San Francisco, CA \u2022 New York, NY \u2022 United States",
+    "url": "https://boards.greenhouse.io/figma/jobs/5792631004?gh_jid=5792631004",
+    "department": "Business Operations",
+    "team": "US",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figure",
+    "title": "Lead, Partnerships Business Operations & Strategy",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/figure/jobs/8388879002",
+    "department": "Finance",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "figure",
+    "title": "Senior Manager, Business Operations & Strategy",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/figure/jobs/8357914002",
+    "department": "Finance",
+    "team": "San Francisco, CA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "finsterai",
+    "title": "Client Strategy & Operations Associate - Asset Management (New York)",
+    "location": "New York",
+    "url": "https://job-boards.eu.greenhouse.io/finsterai/jobs/4710687101",
+    "department": "Go To Market",
+    "team": "US Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "finsterai",
+    "title": "Client Strategy & Operations Manager (New York)",
+    "location": "New York",
+    "url": "https://job-boards.eu.greenhouse.io/finsterai/jobs/4710691101",
+    "department": "Go To Market",
+    "team": "US Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fireblocks",
+    "title": "Program Manager, Strategic Initiatives",
+    "location": "New York",
+    "url": "https://job-boards.greenhouse.io/fireblocks/jobs/4655528006",
+    "department": "Business Operations",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flagshippioneeringinc",
+    "title": "Senior Director / Vice President Strategy and Operations, Product and Pipeline Innovation (P&PI)",
+    "location": "Cambridge, MA USA",
+    "url": "https://boards.greenhouse.io/flagshippioneeringinc/jobs/8453702002?gh_jid=8453702002",
+    "department": "Operations",
+    "team": "Flagship Pioneering",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "AI & Automation Analyst",
+    "location": "Remote - USA",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5000427007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "Business Systems Analyst, GTM Systems",
+    "location": "Remote - USA",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5056667007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "Chief of Staff, Head of Product Strategy & GTM",
+    "location": "Remote - USA",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5059948007",
+    "department": "General & Administrative",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "Director of Marketing Operations",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5073199007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "GTM Onboarding Manager",
+    "location": "Remote - USA",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5052366007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "Revenue Operations Manager, Expansion and Retention",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5065440007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "Senior Analytics Engineer - Auto Integrate ",
+    "location": "Remote - USA, CAN, MEX",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5070772007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fleetio",
+    "title": "Senior Analytics Engineer - Fleetio",
+    "location": "Remote - USA, CAN, MEX",
+    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5054939007",
+    "department": "Business Operations",
+    "team": "Remote",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": " Director, Revenue Strategy and Operations (New Verticals)",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4668418005",
+    "department": "Revenue Operations",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": "Director, Revenue Strategy and Operations (New Verticals)",
+    "location": "San Francisco, California, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4668430005",
+    "department": "Revenue Operations",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": "Director, Strategy & Operations (Housing)",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4658319005",
+    "department": "Executive",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": "Senior Manager, Partnerships Strategy & Operations",
+    "location": "San Francisco, California, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4647045005",
+    "department": "Business Development",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": "Senior Manager, Partnerships Strategy & Operations",
+    "location": "Salt Lake City, Utah, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4647046005",
+    "department": "Business Development",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": "Senior Manager, Partnerships Strategy & Operations",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4647044005",
+    "department": "Business Development",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flex",
+    "title": "Senior Manager, Strategy & Operations (Consumer Protection Team)",
+    "location": "New York, New York, United States",
+    "url": "https://job-boards.greenhouse.io/flex/jobs/4646987005",
+    "department": "Executive",
+    "team": "New York, NY",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flexport",
+    "title": " Senior Manager, Strategic Initiatives (Fulfillment)",
+    "location": "Dallas, Texas, United States",
+    "url": "https://boards.greenhouse.io/flexport/jobs/7238381?gh_jid=7238381",
+    "department": "Fulfillment",
+    "team": "San Bernardino Warehouse",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flexport",
+    "title": "Business Operations Manager",
+    "location": "San Francisco, California, United States",
+    "url": "https://boards.greenhouse.io/flexport/jobs/7166036?gh_jid=7166036",
+    "department": "Office of CEO",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flexport",
+    "title": "Senior Manager, Strategic Initiatives (Fulfillment)",
+    "location": "Atlanta, Georgia, United States",
+    "url": "https://boards.greenhouse.io/flexport/jobs/7449131?gh_jid=7449131",
+    "department": "Fulfillment",
+    "team": "San Bernardino Warehouse",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "flexport",
+    "title": "Senior Manager, Strategic Initiatives (Fulfillment)",
+    "location": "Los Angeles Warehouse",
+    "url": "https://boards.greenhouse.io/flexport/jobs/7288888?gh_jid=7288888",
+    "department": "Fulfillment",
+    "team": "San Bernardino Warehouse",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "formationbio",
+    "title": "Director, Business Operations & Strategy ",
+    "location": "New York, NY; Boston, MA",
+    "url": "https://job-boards.greenhouse.io/formationbio/jobs/7519509",
+    "department": "Business Operations & Strategy",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "formationbio",
+    "title": "Senior Manager, Business Operations & Strategy",
+    "location": "New York, NY; Boston, MA",
+    "url": "https://job-boards.greenhouse.io/formationbio/jobs/7583781",
+    "department": "Business Operations & Strategy",
+    "team": "New York",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fschumacherco",
+    "title": "Hospitality Intern - Business Operations",
+    "location": "New York, New York",
+    "url": "https://job-boards.greenhouse.io/fschumacherco/jobs/5022997008",
+    "department": "Hospitality",
+    "team": "875",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "fschumacherco",
+    "title": "Sampling Strategy and Operations Associate",
+    "location": "Soho, New York City ",
+    "url": "https://job-boards.greenhouse.io/fschumacherco/jobs/5141361008",
+    "department": "Corporate",
+    "team": "459",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "garnerhealth",
+    "title": "Director, Strategy & Operations",
+    "location": "New York City, New York",
+    "url": "https://job-boards.greenhouse.io/garnerhealth/jobs/5802339004",
+    "department": "Office of the CEO",
+    "team": "Headquarters",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "garnerhealth",
+    "title": "Strategy & Operations Manager",
+    "location": "New York City, New York",
+    "url": "https://job-boards.greenhouse.io/garnerhealth/jobs/5774982004",
+    "department": "Office of the CEO",
+    "team": "Headquarters",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "gelbergroup",
+    "title": "Accounts Payable Specialist ",
+    "location": "Chicago, IL",
+    "url": "https://job-boards.greenhouse.io/gelbergroup/jobs/4646259006",
+    "department": "Business Operations",
+    "team": "Gelber Chicago (HQ)",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "globalhealthcareexchangeinc",
+    "title": "Strategic Initiatives Business Analyst",
+    "location": "Hyderabad, Telangana, India",
+    "url": "https://job-boards.greenhouse.io/globalhealthcareexchangeinc/jobs/4641555005",
+    "department": "108 - Support Operations",
+    "team": "India Hyderabad",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "glossgenius",
+    "title": "Strategy & Operations Associate",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/glossgenius/jobs/7636412003",
+    "department": "Strategy Operations",
+    "team": "NYC HQ - In Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "glossgenius",
+    "title": "Strategy & Operations Manager, Customer Strategy",
+    "location": "New York, NY",
+    "url": "https://job-boards.greenhouse.io/glossgenius/jobs/7525810003",
+    "department": "Strategy Operations",
+    "team": "NYC HQ - In Office",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "gocardless",
+    "title": "Commercial Strategy Manager",
+    "location": "London, UK",
+    "url": "https://job-boards.greenhouse.io/gocardless/jobs/7461896",
+    "department": "Strategy & BizOps",
+    "team": "London",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "gofundme",
+    "title": "Staff Data Scientist, Finance",
+    "location": "San Francisco, CA",
+    "url": "https://job-boards.greenhouse.io/gofundme/jobs/7379251",
+    "department": "Business Operations",
+    "team": "San Francisco, California",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "gomotive",
+    "title": "Business Strategy & Operations Analyst II-4",
+    "location": "Hybrid - Lahore",
+    "url": "https://job-boards.greenhouse.io/gomotive/jobs/8307807002",
+    "department": "GTM Strategy and Sales Operations",
+    "team": "Pakistan",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "gomotive",
+    "title": "Business Strategy and Operations Analyst II",
+    "location": "Hybrid - Islamabad",
+    "url": "https://job-boards.greenhouse.io/gomotive/jobs/7761424002",
+    "department": "GTM Strategy and Sales Operations",
+    "team": "Pakistan",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "goodfire",
+    "title": "Business Operations Manager",
+    "location": "San Francisco, CA",
+    "url": "https://job-boards.greenhouse.io/goodfire/jobs/5075058008",
+    "department": "General",
+    "team": "San Francisco",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "grafanalabs",
+    "title": "Director, Global Sales Strategy & Operations | United Kingdom | Remote",
+    "location": "United Kingdom (Remote)",
+    "url": "https://job-boards.greenhouse.io/grafanalabs/jobs/5718842004",
+    "department": "Sales Operations",
+    "team": "EMEA",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "grammarly",
+    "title": "Legal Program Manager - Product, Privacy, and Policy",
+    "location": "San Francisco; Hybrid",
+    "url": "https://job-boards.greenhouse.io/grammarly/jobs/7359372",
+    "department": "Strategy and Operations",
+    "team": "Job Posting - Remote - United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "grammarly",
+    "title": "Sr. Technical Program Manager, Growth",
+    "location": "San Francisco",
+    "url": "https://job-boards.greenhouse.io/grammarly/jobs/7387760",
+    "department": "Strategy and Operations",
+    "team": "Job Posting - Remote - United States",
+    "employment_type": ""
+  },
+  {
+    "platform": "greenhouse",
+    "company": "grammarly",
+    "title": "Staff Technical Program Manager, Coda",
+    "location": "San Francisco",
+    "url": "https://job-boards.greenhouse.io/grammarly/jobs/7387759",
+    "department": "Strategy and Operations",
+    "team": "Job Posting - Remote - United States",
+    "employment_type": ""
+  }
+]
