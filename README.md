@@ -46,10 +46,11 @@ Version 1 of a free, keyword-based jobs pipeline.
 
 ## Source CSV format
 
-The CSV should include (at minimum):
-- `slug` (or `company_slug`)
-- `vendor` (or `platform`/`source`) with values containing `Ashby`, `Greenhouse`, or `Lever`
-- `open_jobs` (or `job_count`)
+The merged CSV used by the scraper contains:
+- `slug`
+- `vendor`
+- `company`
+- `open_jobs`
 
 Only supported vendors are loaded. Duplicate `(vendor, slug)` pairs are deduplicated.
 
@@ -59,7 +60,9 @@ Workflow is in `.github/workflows/daily.yml` and runs:
 - Daily via cron
 - On manual trigger (`workflow_dispatch`)
 
-It can optionally download a source list first when repo variable `SOURCES_CSV_URL` is set.
+It prepares `data/company_slugs.csv` in one of two ways:
+- If repo variable `SOURCES_CSV_URL` is set, it downloads that combined CSV directly.
+- Otherwise it auto-merges Greenhouse + Lever + Ashby company lists using `src/build_sources.py`.
 
 ### Required repo settings
 
@@ -73,6 +76,14 @@ It can optionally download a source list first when repo variable `SOURCES_CSV_U
    - Settings → Pages → Source: **Deploy from branch**
    - Branch: `main`
    - Folder: `/docs`
+
+4. **Source list variables (optional)**
+   - `SOURCES_CSV_URL` (recommended if you already have one combined CSV)
+   - Or set one/more of these to override defaults used by `src/build_sources.py`:
+     - `GREENHOUSE_SOURCES_URL`
+     - `LEVER_SOURCES_URL`
+     - `ASHBY_SOURCES_URL`
+   - If these are not set, the workflow uses default ATS-Scrapers URLs.
 
 ## Optional SMTP email
 
