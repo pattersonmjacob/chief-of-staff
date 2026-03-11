@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+from json import JSONDecodeError
 import os
 import smtplib
 import ssl
@@ -13,12 +14,6 @@ from urllib.request import Request, urlopen
 from render import render_html
 from scrapers import CompanySource, fetch_jobs_for_source
 from sources import load_sources_from_csv
-from email.message import EmailMessage
-from pathlib import Path
-from typing import Any
-
-from render import render_html
-from scrapers import CompanySource, fetch_jobs_for_source
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "config.json"
@@ -28,12 +23,21 @@ JOBS_CSV = ROOT / "jobs.csv"
 DOCS_HTML = ROOT / "docs" / "index.html"
 
 
+def _load_json_file(path: Path) -> dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except JSONDecodeError as exc:
+        raise ValueError(
+            f"Invalid JSON in {path.name} at line {exc.lineno}, column {exc.colno}: {exc.msg}"
+        ) from exc
+
+
 def load_config() -> dict[str, Any]:
     if CONFIG_PATH.exists():
-        return json.loads(CONFIG_PATH.read_text())
+        return _load_json_file(CONFIG_PATH)
     if CONFIG_EXAMPLE_PATH.exists():
         print("[warn] config.json not found, using config.example.json")
-        return json.loads(CONFIG_EXAMPLE_PATH.read_text())
+        return _load_json_file(CONFIG_EXAMPLE_PATH)
     raise FileNotFoundError("No config.json or config.example.json found.")
 
 
@@ -78,10 +82,6 @@ def filter_jobs(
 ) -> list[dict[str, Any]]:
     includes = [k.strip().lower() for k in include_keywords if k.strip()]
     excludes = [k.strip().lower() for k in exclude_keywords if k.strip()]
-def filter_jobs(jobs: list[dict[str, Any]], keywords: list[str]) -> list[dict[str, Any]]:
-    normalized_keywords = [k.strip().lower() for k in keywords if k.strip()]
-    if not normalized_keywords:
-        return jobs
 
     filtered = []
     for job in jobs:
@@ -100,8 +100,6 @@ def filter_jobs(jobs: list[dict[str, Any]], keywords: list[str]) -> list[dict[st
         if include_match and not exclude_match:
             filtered.append(job)
 
-        if any(keyword in haystack for keyword in normalized_keywords):
-            filtered.append(job)
     return filtered
 
 
@@ -173,8 +171,6 @@ def main() -> None:
     maybe_download_sources_csv(cfg)
 
     sources = get_sources(cfg)
-
-    sources = [CompanySource(**item) for item in cfg.get("sources", [])]
     all_jobs = []
     for source in sources:
         all_jobs.extend(fetch_jobs_for_source(source))
@@ -183,7 +179,6 @@ def main() -> None:
     exclude_keywords = cfg.get("keywords_exclude", [])
     filtered_jobs = filter_jobs(all_jobs, include_keywords, exclude_keywords)
 
-    filtered_jobs = filter_jobs(all_jobs, cfg.get("keywords", []))
     unique_jobs = {job.get("url") or f"{job.get('company')}:{job.get('title')}": job for job in filtered_jobs}
     jobs = sorted(unique_jobs.values(), key=lambda j: (j.get("company", ""), j.get("title", "")))
 

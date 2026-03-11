@@ -39,11 +39,6 @@ Version 1 of a free, keyword-based jobs pipeline.
    - `keywords_exclude`: terms to drop after include matching.
 
 4. Run locally:
-2. Edit `config.json`:
-   - Add your desired keyword list.
-   - Add known company slugs under `sources`.
-
-3. Run locally:
 
    ```bash
    python src/main.py
@@ -78,15 +73,6 @@ It can optionally download a source list first when repo variable `SOURCES_CSV_U
    - Settings → Pages → Source: **Deploy from branch**
    - Branch: `main`
    - Folder: `/docs`
-It commits generated `jobs.json`, `jobs.csv`, and `docs/index.html` back to the default branch.
-
-## GitHub Pages
-
-Set GitHub Pages source to:
-- Branch: `main`
-- Folder: `/docs`
-
-Then your digest page is served from `docs/index.html`.
 
 ## Optional SMTP email
 
@@ -108,10 +94,15 @@ If secrets are missing, the script logs a warning and skips sending.
   - Confirm vendor names map to supported platforms (`Ashby`, `Greenhouse`, `Lever`).
   - Check keyword filters are not overly restrictive.
 
+- If the run fails with `JSONDecodeError`:
+  - Open `config.json` (or `config.example.json` if using fallback).
+  - Fix JSON syntax near the reported line/column (missing comma/trailing quote are common).
+  - You can validate locally with: `python -m json.tool config.json`.
+
+- If you hit frequent merge conflicts on generated artifacts (`jobs.json`, `jobs.csv`, `docs/index.html`):
+  - Pull latest `main`, rerun `python src/main.py`, then commit only the regenerated outputs.
+  - Keep feature/code changes separate from generated-output update commits.
+  - This repo marks generated outputs in `.gitattributes` to reduce repeated conflicts during merges.
+
 - If workflow fails to push updated artifacts:
   - Recheck Actions write permissions and branch protection settings.
-## Notes
-
-- ATS slugs are manually maintained in v1.
-- Deduplication is per-run only.
-- Filtering is keyword-only.
