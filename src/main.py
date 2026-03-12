@@ -28,8 +28,8 @@ JOBS_CSV = ROOT / "jobs.csv"
 DOCS_HTML = ROOT / "docs" / "index.html"
 RUN_META_JSON = ROOT / "data" / "run_meta.json"
 DO_NOT_CHECK_JSON = ROOT / "data" / "do_not_check.json"
-
-
+JOBS_CHIEF_JSON = ROOT / "jobs_chief_of_staff.json"
+JOBS_CHIEF_CSV = ROOT / "jobs_chief_of_staff.csv"
 
 
 def utc_now_iso() -> str:
@@ -150,6 +150,45 @@ def validate_and_filter_jobs_by_link(
     return checked
 
 
+def _parse_iso_datetime(value: Any) -> datetime | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    normalized = raw.replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def filter_jobs_by_max_age_days(jobs: list[dict[str, Any]], max_age_days: int) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    if max_age_days <= 0:
+        return jobs, {"input": len(jobs), "excluded_missing_or_invalid_date": 0, "excluded_too_old": 0, "output": len(jobs)}
+
+    now = datetime.now(timezone.utc)
+    cutoff = now.timestamp() - (max_age_days * 86400)
+    kept: list[dict[str, Any]] = []
+    stats = {"input": len(jobs), "excluded_missing_or_invalid_date": 0, "excluded_too_old": 0, "output": 0}
+
+    for job in jobs:
+        posted = _parse_iso_datetime(job.get("posted_at"))
+        updated = _parse_iso_datetime(job.get("updated_at"))
+        reference = posted or updated
+        if reference is None:
+            stats["excluded_missing_or_invalid_date"] += 1
+            continue
+        if reference.timestamp() < cutoff:
+            stats["excluded_too_old"] += 1
+            continue
+        kept.append(job)
+
+    stats["output"] = len(kept)
+    return kept, stats
+
+
 def classify_job_function(job: dict[str, Any]) -> str:
     text = " ".join([str(job.get("title", "")), str(job.get("department", "")), str(job.get("team", ""))]).lower()
     mapping = [
@@ -206,11 +245,12 @@ def load_previous_jobs() -> list[dict[str, Any]]:
         return []
 
 
-def write_run_meta(run_at: str, total_jobs: int, new_jobs: int) -> None:
+def write_run_meta(run_at: str, total_jobs: int, chief_of_staff_jobs: int, new_jobs: int) -> None:
     RUN_META_JSON.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "last_run_at": run_at,
         "total_jobs": total_jobs,
+        "chief_of_staff_jobs": chief_of_staff_jobs,
         "new_jobs": new_jobs,
     }
     RUN_META_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -328,6 +368,8 @@ def fetch_all_jobs(
     health_ready = False
     failed_sources = 0
     rate_limited_sources = 0
+    failures_by_platform: dict[str, int] = {}
+    jobs_by_platform: dict[str, int] = {}
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_source = {executor.submit(fetch_jobs_for_source_status, source): source for source in sources}
         for future in as_completed(future_to_source):
@@ -339,8 +381,10 @@ def fetch_all_jobs(
                 print(f"[warn] {source.platform}:{source.company} failed unexpectedly: {exc}")
 
             all_jobs.extend(result.jobs)
+            jobs_by_platform[source.platform] = jobs_by_platform.get(source.platform, 0) + len(result.jobs)
             if result.error:
                 failed_sources += 1
+                failures_by_platform[source.platform] = failures_by_platform.get(source.platform, 0) + 1
             if result.http_status == 429 or "429" in str(result.error):
                 rate_limited_sources += 1
             do_not_check_state, non_404_streak, health_ready = update_404_block_state(
@@ -360,6 +404,10 @@ def fetch_all_jobs(
                 )
 
     print(f"[info] Source fetch summary: total={len(sources)} failed={failed_sources} rate_limited={rate_limited_sources} jobs={len(all_jobs)}")
+    if jobs_by_platform:
+        print("[info] Jobs by platform: " + ", ".join(f"{p}={jobs_by_platform.get(p, 0)}" for p in ["greenhouse", "lever", "ashby"]))
+    if failures_by_platform:
+        print("[info] Failures by platform: " + ", ".join(f"{p}={failures_by_platform.get(p, 0)}" for p in sorted(failures_by_platform)))
     return all_jobs, do_not_check_state
 
 
@@ -382,6 +430,7 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     env_max_sources_per_platform = os.getenv("MAX_SOURCES_PER_PLATFORM", "").strip()
     env_validate_job_links = os.getenv("VALIDATE_JOB_LINKS", "").strip().lower()
     env_link_check_delay_seconds = os.getenv("LINK_CHECK_DELAY_SECONDS", "").strip()
+    env_max_job_age_days = os.getenv("MAX_JOB_AGE_DAYS", "").strip()
 
     if env_sources_csv:
         updated["sources_csv"] = env_sources_csv
@@ -410,6 +459,10 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     if env_link_check_delay_seconds:
         updated["link_check_delay_seconds"] = float(env_link_check_delay_seconds)
         print(f"[info] Using LINK_CHECK_DELAY_SECONDS override: {env_link_check_delay_seconds}")
+
+    if env_max_job_age_days:
+        updated["max_job_age_days"] = int(env_max_job_age_days)
+        print(f"[info] Using MAX_JOB_AGE_DAYS override: {env_max_job_age_days}")
 
     if not updated.get("sources_csv"):
         default_sources_csv = ROOT / "data" / "company_slugs.csv"
@@ -498,15 +551,45 @@ def dedupe_sources(sources: list[CompanySource]) -> list[CompanySource]:
     return deduped
 
 
+def is_chief_of_staff_job(
+    job: dict[str, Any],
+    include_keywords: list[str],
+    exclude_keywords: list[str],
+) -> tuple[bool, str]:
+    includes = [k.strip().lower() for k in include_keywords if k.strip()]
+    excludes = [k.strip().lower() for k in exclude_keywords if k.strip()]
+    chief_of_staff_pattern = re.compile(r"\bchief\b.*\bstaff\b", re.IGNORECASE)
+
+    title = str(job.get("title", ""))
+    if not chief_of_staff_pattern.search(title):
+        return False, "excluded_missing_chief_of_staff_title"
+
+    haystack = " ".join(
+        [
+            title,
+            str(job.get("department", "")),
+            str(job.get("team", "")),
+            str(job.get("location", "")),
+            str(job.get("description", "")),
+        ]
+    ).lower()
+
+    include_match = True if not includes else any(keyword in haystack for keyword in includes)
+    if not include_match:
+        return False, "excluded_missing_include"
+
+    exclude_match = any(keyword in haystack for keyword in excludes)
+    if exclude_match:
+        return False, "excluded_by_exclude"
+
+    return True, "included"
+
+
 def filter_jobs(
     jobs: list[dict[str, Any]],
     include_keywords: list[str],
     exclude_keywords: list[str],
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    includes = [k.strip().lower() for k in include_keywords if k.strip()]
-    excludes = [k.strip().lower() for k in exclude_keywords if k.strip()]
-    chief_of_staff_pattern = re.compile(r"\bchief\b.*\bstaff\b", re.IGNORECASE)
-
     filtered = []
     stats = {
         "input": len(jobs),
@@ -516,32 +599,11 @@ def filter_jobs(
         "output": 0,
     }
     for job in jobs:
-        title = str(job.get("title", ""))
-        if not chief_of_staff_pattern.search(title):
-            stats["excluded_missing_chief_of_staff_title"] += 1
+        keep, reason = is_chief_of_staff_job(job, include_keywords, exclude_keywords)
+        if keep:
+            filtered.append(job)
             continue
-
-        haystack = " ".join(
-            [
-                title,
-                str(job.get("department", "")),
-                str(job.get("team", "")),
-                str(job.get("location", "")),
-                str(job.get("description", "")),
-            ]
-        ).lower()
-
-        include_match = True if not includes else any(keyword in haystack for keyword in includes)
-        if not include_match:
-            stats["excluded_missing_include"] += 1
-            continue
-
-        exclude_match = any(keyword in haystack for keyword in excludes)
-        if exclude_match:
-            stats["excluded_by_exclude"] += 1
-            continue
-
-        filtered.append(job)
+        stats[reason] += 1
 
     stats["output"] = len(filtered)
     return filtered, stats
@@ -565,10 +627,8 @@ def resolve_github_pages_url(cfg: dict[str, Any]) -> str:
 
     return ""
 
-def write_outputs(jobs: list[dict[str, Any]], github_pages_url: str = "") -> None:
-    JOBS_JSON.write_text(json.dumps(jobs, indent=2))
-
-    with JOBS_CSV.open("w", newline="", encoding="utf-8") as f:
+def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as f:
         fieldnames = [
             "title",
             "company",
@@ -579,6 +639,7 @@ def write_outputs(jobs: list[dict[str, Any]], github_pages_url: str = "") -> Non
             "employment_type",
             "job_function",
             "is_technical",
+            "is_chief_of_staff",
             "posted_at",
             "updated_at",
             "first_seen_at",
@@ -591,8 +652,16 @@ def write_outputs(jobs: list[dict[str, Any]], github_pages_url: str = "") -> Non
         for job in jobs:
             writer.writerow({name: job.get(name, "") for name in fieldnames})
 
+
+def write_outputs(all_jobs: list[dict[str, Any]], chief_jobs: list[dict[str, Any]], github_pages_url: str = "") -> None:
+    JOBS_JSON.write_text(json.dumps(all_jobs, indent=2))
+    JOBS_CHIEF_JSON.write_text(json.dumps(chief_jobs, indent=2))
+
+    _write_csv(JOBS_CSV, all_jobs)
+    _write_csv(JOBS_CHIEF_CSV, chief_jobs)
+
     DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
-    DOCS_HTML.write_text(render_html(jobs, github_pages_url=github_pages_url), encoding="utf-8")
+    DOCS_HTML.write_text(render_html(all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
 
 
 def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> None:
@@ -656,17 +725,15 @@ def main() -> None:
         verbose=verbose_sources,
     )
 
-    print(f"[info] Total fetched jobs before filtering: {len(all_jobs)}")
+    print(f"[info] Total fetched jobs before dedupe: {len(all_jobs)}")
 
     previous_jobs = load_previous_jobs()
 
-    include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
-    exclude_keywords = cfg.get("keywords_exclude", [])
-    filtered_jobs, filter_stats = filter_jobs(all_jobs, include_keywords, exclude_keywords)
+    jobs = _dedupe_and_collate_jobs(all_jobs)
+    max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
+    jobs, age_filter_stats = filter_jobs_by_max_age_days(jobs, max_job_age_days=max_job_age_days)
+    print(f"[info] Age filter stats ({max_job_age_days}d): input={age_filter_stats['input']}, missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}")
 
-    print(f"[info] Filter stats: input={filter_stats['input']}, missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
-
-    jobs = _dedupe_and_collate_jobs(filtered_jobs)
     validate_links = bool(cfg.get("validate_job_links", True))
     link_check_delay_seconds = float(cfg.get("link_check_delay_seconds", 0.8) or 0.8)
     jobs = validate_and_filter_jobs_by_link(jobs, enabled=validate_links, delay_seconds=link_check_delay_seconds)
@@ -674,12 +741,21 @@ def main() -> None:
     run_at = utc_now_iso()
     jobs, run_stats = enrich_jobs_with_history_and_flags(jobs, previous_jobs, run_at)
 
+    include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
+    exclude_keywords = cfg.get("keywords_exclude", [])
+    filtered_jobs, filter_stats = filter_jobs(jobs, include_keywords, exclude_keywords)
+    for job in jobs:
+        is_match, _ = is_chief_of_staff_job(job, include_keywords, exclude_keywords)
+        job["is_chief_of_staff"] = is_match
+
+    print(f"[info] Filter stats: input={filter_stats['input']}, missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
+
     github_pages_url = resolve_github_pages_url(cfg)
-    write_outputs(jobs, github_pages_url=github_pages_url)
-    write_run_meta(run_at, total_jobs=len(jobs), new_jobs=run_stats["new_count"])
+    write_outputs(jobs, filtered_jobs, github_pages_url=github_pages_url)
+    write_run_meta(run_at, total_jobs=len(jobs), chief_of_staff_jobs=len(filtered_jobs), new_jobs=run_stats["new_count"])
     write_do_not_check_state(do_not_check_state)
-    maybe_send_email(jobs, cfg.get("email", {}))
-    print(f"[info] Wrote {len(jobs)} jobs to jobs.json, jobs.csv, and docs/index.html")
+    maybe_send_email(filtered_jobs, cfg.get("email", {}))
+    print(f"[info] Wrote {len(jobs)} total jobs and {len(filtered_jobs)} chief-of-staff jobs to JSON/CSV plus docs/index.html")
     print(f"[info] New since last run: {run_stats['new_count']}")
     if github_pages_url:
         print(f"[info] GitHub Pages URL: {github_pages_url}")

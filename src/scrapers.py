@@ -4,6 +4,7 @@ import json
 import os
 import random
 import re
+import socket
 import ssl
 import threading
 import time
@@ -33,6 +34,15 @@ def _to_float(value: str, default: float) -> float:
 
 def _min_request_interval_seconds() -> float:
     return max(0.0, _to_float(os.getenv("MIN_REQUEST_INTERVAL_SECONDS", ""), DEFAULT_MIN_REQUEST_INTERVAL))
+
+
+def _request_timeout_seconds(platform: str = "") -> float:
+    platform_key = platform.strip().upper()
+    if platform_key:
+        value = os.getenv(f"{platform_key}_TIMEOUT_SECONDS", "")
+        if value:
+            return max(1.0, _to_float(value, DEFAULT_TIMEOUT))
+    return max(1.0, _to_float(os.getenv("REQUEST_TIMEOUT_SECONDS", ""), DEFAULT_TIMEOUT))
 
 
 def _respect_request_interval(host_key: str) -> None:
@@ -114,7 +124,7 @@ def _api_url(platform: str, company_slug: str) -> str:
     return ""
 
 
-def _fetch_json(url: str) -> Any:
+def _fetch_json(url: str, timeout_seconds: float | None = None) -> Any:
     cache_key = f"GET::{url}"
     with _REQUEST_CACHE_LOCK:
         if cache_key in _REQUEST_CACHE:
@@ -123,10 +133,11 @@ def _fetch_json(url: str) -> Any:
     host_key = urlparse(url).netloc.lower() or "default"
     request = Request(url, headers={"User-Agent": USER_AGENT})
     context = ssl.create_default_context()
+    timeout = timeout_seconds if timeout_seconds is not None else _request_timeout_seconds()
     for attempt in range(MAX_RETRIES + 1):
         try:
             _respect_request_interval(host_key)
-            with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
+            with urlopen(request, timeout=timeout, context=context) as response:  # nosec B310
                 payload = response.read().decode("utf-8")
             data = json.loads(payload)
             with _REQUEST_CACHE_LOCK:
@@ -143,7 +154,7 @@ def _fetch_json(url: str) -> Any:
             if exc.code == 429:
                 print(f"[warn] Rate limited on {host_key}; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
             time.sleep(delay)
-        except URLError as exc:
+        except (URLError, TimeoutError, socket.timeout) as exc:
             if attempt >= MAX_RETRIES:
                 raise
             delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
@@ -203,21 +214,39 @@ def fetch_greenhouse(company_slug: str) -> list[dict[str, Any]]:
 
 
 def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
-    url = _api_url("lever", company_slug)
-    data = _fetch_json(url)
-    jobs = []
-    for raw_job in data:
-        fields = {
-            "department": raw_job.get("categories", {}).get("team", ""),
-            "team": raw_job.get("categories", {}).get("department", ""),
-            "employment_type": raw_job.get("categories", {}).get("commitment", ""),
-            "location": raw_job.get("categories", {}).get("location", ""),
-            "description": raw_job.get("descriptionPlain") or raw_job.get("description") or "",
-            "posted_at": raw_job.get("createdAt") or "",
-            "updated_at": raw_job.get("updatedAt") or "",
-        }
-        jobs.append(_normalize_job("lever", company_slug, raw_job, fields))
-    return jobs
+    candidate_urls = [
+        _api_url("lever", company_slug),
+        f"https://jobs.lever.co/{quote(company_slug)}?mode=json",
+    ]
+    last_error: Exception | None = None
+    for idx, url in enumerate(candidate_urls):
+        try:
+            data = _fetch_json(url)
+            jobs = []
+            for raw_job in data:
+                fields = {
+                    "department": raw_job.get("categories", {}).get("team", ""),
+                    "team": raw_job.get("categories", {}).get("department", ""),
+                    "employment_type": raw_job.get("categories", {}).get("commitment", ""),
+                    "location": raw_job.get("categories", {}).get("location", ""),
+                    "description": raw_job.get("descriptionPlain") or raw_job.get("description") or "",
+                    "posted_at": raw_job.get("createdAt") or "",
+                    "updated_at": raw_job.get("updatedAt") or "",
+                }
+                jobs.append(_normalize_job("lever", company_slug, raw_job, fields))
+            if idx > 0:
+                print(f"[info] Lever fallback endpoint succeeded for {company_slug}: {url}")
+            return jobs
+        except (HTTPError, URLError, TimeoutError, socket.timeout, ValueError) as exc:
+            last_error = exc
+            if idx < len(candidate_urls) - 1:
+                print(f"[warn] Lever endpoint failed for {company_slug}: {url} ({exc}); trying fallback")
+                continue
+            raise
+
+    if last_error:
+        raise last_error
+    return []
 
 
 def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
@@ -246,7 +275,13 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
     request = Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": USER_AGENT,
+            "Origin": f"https://jobs.ashbyhq.com/{quote(company_slug)}",
+            "Referer": f"https://jobs.ashbyhq.com/{quote(company_slug)}",
+        },
         method="POST",
     )
     cache_key = f"POST::{url}::{company_slug}"
@@ -256,11 +291,12 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
             return _ashby_jobs_from_data(company_slug, data)
 
     context = ssl.create_default_context()
+    timeout_seconds = _request_timeout_seconds("ashby")
     data = None
     for attempt in range(MAX_RETRIES + 1):
         try:
             _respect_request_interval("jobs.ashbyhq.com")
-            with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
+            with urlopen(request, timeout=timeout_seconds, context=context) as response:  # nosec B310
                 data = json.loads(response.read().decode("utf-8"))
             break
         except HTTPError as exc:
@@ -274,7 +310,7 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
             if exc.code == 429:
                 print(f"[warn] Rate limited on jobs.ashbyhq.com; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
             time.sleep(delay)
-        except URLError as exc:
+        except (URLError, TimeoutError, socket.timeout) as exc:
             if attempt >= MAX_RETRIES:
                 raise
             delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
