@@ -14,13 +14,14 @@ from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 
 DEFAULT_TIMEOUT = 20
-USER_AGENT = "chief-of-staff-jobs-bot/1.0"
+USER_AGENT = "Mozilla/5.0 (compatible; ChiefOfStaffJobsBot/1.1; +https://github.com/)"
 MAX_RETRIES = 3
 BACKOFF_SECONDS = 1.5
-DEFAULT_MIN_REQUEST_INTERVAL = 0.35
-DEFAULT_MIN_REQUEST_INTERVAL = 0.2
+DEFAULT_MIN_REQUEST_INTERVAL = 0.5
 _REQUEST_TIMES_LOCK = threading.Lock()
 _NEXT_ALLOWED_REQUEST_AT: dict[str, float] = {}
+_REQUEST_CACHE_LOCK = threading.Lock()
+_REQUEST_CACHE: dict[str, Any] = {}
 
 
 def _to_float(value: str, default: float) -> float:
@@ -92,6 +93,11 @@ def _normalize_company_slug(platform: str, company: str) -> str:
 
 
 def _fetch_json(url: str) -> Any:
+    cache_key = f"GET::{url}"
+    with _REQUEST_CACHE_LOCK:
+        if cache_key in _REQUEST_CACHE:
+            return _REQUEST_CACHE[cache_key]
+
     host_key = urlparse(url).netloc.lower() or "default"
     request = Request(url, headers={"User-Agent": USER_AGENT})
     context = ssl.create_default_context()
@@ -100,7 +106,10 @@ def _fetch_json(url: str) -> Any:
             _respect_request_interval(host_key)
             with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
                 payload = response.read().decode("utf-8")
-            return json.loads(payload)
+            data = json.loads(payload)
+            with _REQUEST_CACHE_LOCK:
+                _REQUEST_CACHE[cache_key] = data
+            return data
         except HTTPError as exc:
             if exc.code not in {429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
                 raise
@@ -109,6 +118,14 @@ def _fetch_json(url: str) -> Any:
                 delay = float(retry_after)
             else:
                 delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            if exc.code == 429:
+                print(f"[warn] Rate limited on {host_key}; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
+            time.sleep(delay)
+        except URLError as exc:
+            if attempt >= MAX_RETRIES:
+                raise
+            delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            print(f"[warn] Network error on {host_key}: {exc}; retrying in {delay:.2f}s")
             time.sleep(delay)
 
 
@@ -210,6 +227,29 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
         headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
         method="POST",
     )
+    cache_key = f"POST::{url}::{company_slug}"
+    with _REQUEST_CACHE_LOCK:
+        if cache_key in _REQUEST_CACHE:
+            data = _REQUEST_CACHE[cache_key]
+            teams = data.get("data", {}).get("jobBoardWithTeams", {}).get("teams", [])
+            jobs: list[dict[str, Any]] = []
+            for team in teams:
+                team_name = team.get("name", "")
+                for raw_job in team.get("jobs", []):
+                    job = {
+                        "title": raw_job.get("title", ""),
+                        "location": raw_job.get("location", {}).get("name", ""),
+                        "hostedUrl": raw_job.get("applyUrl", ""),
+                    }
+                    fields = {
+                        "team": team_name,
+                        "employment_type": raw_job.get("employmentType", ""),
+                        "posted_at": raw_job.get("publishedDate") or "",
+                        "updated_at": raw_job.get("updatedAt") or "",
+                    }
+                    jobs.append(_normalize_job("ashby", company_slug, job, fields))
+            return jobs
+
     context = ssl.create_default_context()
     data = None
     for attempt in range(MAX_RETRIES + 1):
@@ -226,10 +266,21 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
                 delay = float(retry_after)
             else:
                 delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            if exc.code == 429:
+                print(f"[warn] Rate limited on jobs.ashbyhq.com; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
+            time.sleep(delay)
+        except URLError as exc:
+            if attempt >= MAX_RETRIES:
+                raise
+            delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            print(f"[warn] Network error on jobs.ashbyhq.com: {exc}; retrying in {delay:.2f}s")
             time.sleep(delay)
 
     if data is None:
         return []
+
+    with _REQUEST_CACHE_LOCK:
+        _REQUEST_CACHE[cache_key] = data
 
     teams = data.get("data", {}).get("jobBoardWithTeams", {}).get("teams", [])
     jobs: list[dict[str, Any]] = []
