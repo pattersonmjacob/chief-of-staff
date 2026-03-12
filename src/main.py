@@ -83,8 +83,6 @@ def _dedupe_and_collate_jobs(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]
         for field in ["location", "department", "team", "employment_type"]:
             current[field] = _merge_pipe_values(current.get(field, ""), job.get(field, ""))
         current["url"] = _select_primary_url(current.get("url", ""), job.get("url", ""))
-        for field in ["location", "department", "team", "employment_type", "url"]:
-            current[field] = _merge_pipe_values(current.get(field, ""), job.get(field, ""))
 
         current_description = str(current.get("description") or "")
         incoming_description = str(job.get("description") or "")
