@@ -8,6 +8,7 @@ from json import JSONDecodeError
 import os
 import re
 import smtplib
+import time
 import ssl
 from email.message import EmailMessage
 from pathlib import Path
@@ -37,6 +38,116 @@ def utc_now_iso() -> str:
 
 def _job_key(job: dict[str, Any]) -> str:
     return str(job.get("url") or f"{job.get('platform')}:{job.get('company')}:{job.get('title')}")
+
+
+def _merge_pipe_values(*values: Any) -> str:
+    parts: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        raw = str(value or "").strip()
+        if not raw:
+            continue
+        for part in [piece.strip() for piece in raw.split("|")]:
+            lowered = part.lower()
+            if part and lowered not in seen:
+                parts.append(part)
+                seen.add(lowered)
+    return " | ".join(parts)
+
+
+def _split_pipe_values(value: Any) -> list[str]:
+    raw = str(value or "").strip()
+    if not raw:
+        return []
+    return [part.strip() for part in raw.split("|") if part.strip()]
+
+
+def _select_primary_url(*values: Any) -> str:
+    for value in values:
+        for candidate in _split_pipe_values(value):
+            if candidate.startswith("http://") or candidate.startswith("https://"):
+                return candidate
+    return ""
+
+
+def _dedupe_and_collate_jobs(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+
+    for job in jobs:
+        key = f"{str(job.get('platform', '')).lower()}::{str(job.get('company', '')).lower()}::{str(job.get('title', '')).strip().lower()}"
+        current = merged.get(key)
+        if current is None:
+            merged[key] = dict(job)
+            continue
+
+        for field in ["location", "department", "team", "employment_type"]:
+            current[field] = _merge_pipe_values(current.get(field, ""), job.get(field, ""))
+        current["url"] = _select_primary_url(current.get("url", ""), job.get("url", ""))
+
+        current_description = str(current.get("description") or "")
+        incoming_description = str(job.get("description") or "")
+        if len(incoming_description) > len(current_description):
+            current["description"] = incoming_description
+
+        posted_values = [str(v) for v in [current.get("posted_at", ""), job.get("posted_at", "")] if str(v or "").strip()]
+        if posted_values:
+            current["posted_at"] = min(posted_values)
+
+        updated_values = [str(v) for v in [current.get("updated_at", ""), job.get("updated_at", "")] if str(v or "").strip()]
+        if updated_values:
+            current["updated_at"] = max(updated_values)
+
+    return sorted(merged.values(), key=lambda j: (str(j.get("company", "")), str(j.get("title", ""))))
+
+
+def validate_and_filter_jobs_by_link(
+    jobs: list[dict[str, Any]],
+    enabled: bool = True,
+    delay_seconds: float = 0.8,
+    timeout_seconds: int = 15,
+) -> list[dict[str, Any]]:
+    if not enabled:
+        return jobs
+
+    blocked_markers = [
+        "job board you were viewing is no longer active",
+        "page not found",
+        "job not available",
+        "job is no longer available",
+        "no longer accepting applications",
+    ]
+
+    checked: list[dict[str, Any]] = []
+    dropped = 0
+    for idx, job in enumerate(jobs, start=1):
+        url = str(job.get("url", "")).strip()
+        print(f"[info] URL check {idx}/{len(jobs)}: {url or '<empty>'}")
+        if not url:
+            dropped += 1
+            print(f"[warn] Dropping job with empty URL: {job.get('company')} | {job.get('title')}")
+            continue
+
+        request = Request(url, headers={"User-Agent": "chief-of-staff-jobs-bot/1.0"})
+        try:
+            with urlopen(request, timeout=timeout_seconds) as response:  # nosec B310
+                status = int(getattr(response, "status", 200) or 200)
+                body = response.read(220_000).decode("utf-8", errors="ignore").lower()
+            print(f"[info] URL check result {status}: {url}")
+            if status >= 400 or any(marker in body for marker in blocked_markers):
+                dropped += 1
+                print(f"[warn] Dropping unavailable job link ({status}): {url}")
+            else:
+                checked.append(job)
+        except Exception as exc:
+            checked.append(job)
+            print(f"[warn] URL check skipped for {url}: {exc}")
+
+        if idx < len(jobs) and delay_seconds > 0:
+            time.sleep(delay_seconds)
+
+    if dropped:
+        print(f"[info] Link validation removed {dropped} jobs; {len(checked)} remain")
+    return checked
 
 
 def classify_job_function(job: dict[str, Any]) -> str:
@@ -261,6 +372,9 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     env_sources_csv_url = os.getenv("SOURCES_CSV_URL", "").strip()
     env_max_sources = os.getenv("MAX_SOURCES", "").strip()
     env_source_offset = os.getenv("SOURCE_OFFSET", "").strip()
+    env_max_sources_per_platform = os.getenv("MAX_SOURCES_PER_PLATFORM", "").strip()
+    env_validate_job_links = os.getenv("VALIDATE_JOB_LINKS", "").strip().lower()
+    env_link_check_delay_seconds = os.getenv("LINK_CHECK_DELAY_SECONDS", "").strip()
 
     if env_sources_csv:
         updated["sources_csv"] = env_sources_csv
@@ -277,6 +391,18 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     if env_source_offset:
         updated["source_offset"] = int(env_source_offset)
         print(f"[info] Using SOURCE_OFFSET override: {env_source_offset}")
+
+    if env_max_sources_per_platform:
+        updated["max_sources_per_platform"] = int(env_max_sources_per_platform)
+        print(f"[info] Using MAX_SOURCES_PER_PLATFORM override: {env_max_sources_per_platform}")
+
+    if env_validate_job_links in {"true", "false", "1", "0", "yes", "no"}:
+        updated["validate_job_links"] = env_validate_job_links in {"true", "1", "yes"}
+        print(f"[info] Using VALIDATE_JOB_LINKS override: {updated['validate_job_links']}")
+
+    if env_link_check_delay_seconds:
+        updated["link_check_delay_seconds"] = float(env_link_check_delay_seconds)
+        print(f"[info] Using LINK_CHECK_DELAY_SECONDS override: {env_link_check_delay_seconds}")
 
     if not updated.get("sources_csv"):
         default_sources_csv = ROOT / "data" / "company_slugs.csv"
@@ -323,6 +449,25 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
             print(f"[info] Loaded {len(source_rows)} sources from {sources_csv} (offset={source_offset}, max={max_sources_int})")
         except FileNotFoundError:
             print(f"[warn] sources_csv not found at {sources_csv}; falling back to config.sources")
+
+    max_per_platform = int(cfg.get("max_sources_per_platform", 0) or 0)
+    if max_per_platform > 0:
+        platform_counts: dict[str, int] = {}
+        limited_rows: list[dict[str, Any]] = []
+        for item in source_rows:
+            platform = str(item.get("platform", "")).lower().strip()
+            if platform not in {"greenhouse", "lever", "ashby"}:
+                continue
+            count = platform_counts.get(platform, 0)
+            if count >= max_per_platform:
+                continue
+            limited_rows.append(item)
+            platform_counts[platform] = count + 1
+        source_rows = limited_rows
+        print(
+            "[info] Applied per-platform cap: "
+            + ", ".join(f"{p}={platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby"])
+        )
 
     return [CompanySource(**item) for item in source_rows]
 
@@ -494,8 +639,10 @@ def main() -> None:
 
     print(f"[info] Filter stats: input={filter_stats['input']}, missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
 
-    unique_jobs = {job.get("url") or f"{job.get('company')}:{job.get('title')}": job for job in filtered_jobs}
-    jobs = sorted(unique_jobs.values(), key=lambda j: (j.get("company", ""), j.get("title", "")))
+    jobs = _dedupe_and_collate_jobs(filtered_jobs)
+    validate_links = bool(cfg.get("validate_job_links", True))
+    link_check_delay_seconds = float(cfg.get("link_check_delay_seconds", 0.8) or 0.8)
+    jobs = validate_and_filter_jobs_by_link(jobs, enabled=validate_links, delay_seconds=link_check_delay_seconds)
 
     run_at = utc_now_iso()
     jobs, run_stats = enrich_jobs_with_history_and_flags(jobs, previous_jobs, run_at)

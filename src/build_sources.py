@@ -62,6 +62,7 @@ def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[di
             raw_slug = _pick(row, ["slug", "company_slug", "board_token", "path", "hostedJobsUrl", "url"])
             slug = _normalize_slug(vendor, raw_slug)
             company = _pick(row, ["company", "name", "title", "organization", "company_name"])
+            source_url = _pick(row, ["hostedJobsUrl", "url", "jobs_url", "careers_url"])
 
             if not slug:
                 continue
@@ -75,6 +76,7 @@ def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[di
                     "slug": slug,
                     "vendor": vendor,
                     "company": company or slug,
+                    "url": source_url,
                     "open_jobs": "1",
                 }
             )
@@ -88,7 +90,7 @@ def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[di
 def write_sources_csv(rows: list[dict[str, str]], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["slug", "vendor", "company", "open_jobs"])
+        writer = csv.DictWriter(f, fieldnames=["slug", "vendor", "company", "url", "open_jobs"])
         writer.writeheader()
         writer.writerows(rows)
 
