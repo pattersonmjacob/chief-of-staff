@@ -731,7 +731,7 @@ def main() -> None:
 
     jobs = _dedupe_and_collate_jobs(all_jobs)
     max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
-    jobs, age_filter_stats = filter_jobs_by_max_age_days(jobs, max_job_age_days=max_job_age_days)
+    jobs, age_filter_stats = filter_jobs_by_max_age_days(jobs, max_age_days=max_job_age_days)
     print(f"[info] Age filter stats ({max_job_age_days}d): input={age_filter_stats['input']}, missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}")
 
     validate_links = bool(cfg.get("validate_job_links", True))
