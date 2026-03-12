@@ -158,6 +158,7 @@ If secrets are missing, the script logs a warning and skips sending.
   - Pull latest `main`, rerun `python src/main.py`, then commit only the regenerated outputs.
   - Keep feature/code changes separate from generated-output update commits.
   - This repo marks generated outputs in `.gitattributes` to reduce repeated conflicts during merges.
+  - CI aggregation logic is centralized in `src/aggregate_chunks.py` (instead of a long inline workflow script) to reduce workflow-file merge conflicts.
 
 - If workflow fails to push updated artifacts:
   - Recheck Actions write permissions and branch protection settings.
