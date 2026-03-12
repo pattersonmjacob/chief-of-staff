@@ -12,7 +12,7 @@
     "posted_at": "2026-03-11T14:22:13-04:00",
     "updated_at": "2026-03-11T14:22:13-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
@@ -30,7 +30,7 @@
     "posted_at": "2025-12-03T09:29:19-05:00",
     "updated_at": "2025-12-03T09:29:19-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "other"
@@ -48,7 +48,7 @@
     "posted_at": "2026-02-08T19:27:59-05:00",
     "updated_at": "2026-02-08T19:27:59-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "people-hr"
@@ -66,7 +66,7 @@
     "posted_at": "2026-03-06T18:16:30-05:00",
     "updated_at": "2026-03-06T18:16:30-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
@@ -84,7 +84,7 @@
     "posted_at": "2026-03-09T16:57:29-04:00",
     "updated_at": "2026-03-09T16:57:29-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -102,7 +102,7 @@
     "posted_at": "2026-03-05T21:27:35-05:00",
     "updated_at": "2026-03-05T21:27:35-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -120,7 +120,7 @@
     "posted_at": "2026-02-27T21:10:19-05:00",
     "updated_at": "2026-02-27T21:10:19-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
@@ -138,7 +138,7 @@
     "posted_at": "2026-03-05T21:29:40-05:00",
     "updated_at": "2026-03-05T21:29:40-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -153,10 +153,10 @@
     "team": "San Jose, CA",
     "employment_type": "",
     "description": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;&lt;span data-teams=&quot;true&quot;&gt;Astera Labs (NASDAQ: ALAB) provides rack-scale AI infrastructure through purpose-built connectivity solutions. By collaborating with hyperscalers and ecosystem partners, Astera Labs enables organizations to unlock the full potential of modern AI. Astera Labs\u2019 Intelligent Connectivity Platform integrates CXL\u00ae, Ethernet, NVLink, PCIe\u00ae, and UALink\u2122 semiconductor-based technologies with the company\u2019s COSMOS software suite to unify diverse components into cohesive, flexible systems that deliver end-to-end scale-up, and scale-out connectivity. The company\u2019s custom connectivity solutions business complements its standards-based portfolio, enabling customers to deploy tailored architectures to meet their unique infrastructure requirements. Discover more at &lt;a id=&quot;menurhut&quot; class=&quot;fui-Link ___1q1shib f2hkw1w f3rmtva f1ewtqcl fyind8e f1k6fduh f1w7gpdv fk6fouc fjoy568 figsok6 f1s184ao f1mk8lai fnbmjn9 f1o700av f13mvf36 f1cmlufx f9n3di6 f1ids18y f1tx3yz7 f1deo86v f1eh06m1 f1iescvh fhgqx19 f1olyrje f1p93eir f1nev41a f1h8hb77 f1lqvz6u f10aw75t fsle3fq f17ae5zn&quot; href=&quot;http://www.asteralabs.com/&quot; target=&quot;_blank&quot;&gt;www.asteralabs.com&lt;/a&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Role Summary&lt;/strong&gt;&lt;br&gt;We are seeking a technically strong Chief of Staff to the Head of Engineering who will also lead Engineering Program Management across Silicon Engineering. This role is a force-multiplier for Engineering leadership \u2014 driving org scale, decision velocity, and execution rigor. The ideal candidate brings deep technical fluency, structured problem-solving, and the ability to drive outcomes through influence rather than hierarchy. The role is fully in person in San Jose.&lt;br&gt;&lt;br&gt;&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;Responsibilities \u2014 What You Will Own&lt;/strong&gt;&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;1) Chief of Staff to Head of Engineering&lt;/strong&gt;&lt;/p&gt;\n&lt;p style=&quot;padding-left: 40px;&quot;&gt;\u2022 &amp;nbsp; &amp;nbsp;Drive operational cadence: engineering all hands, staff meetings, agenda/material prep, tech talks, university engagements, action follow-through, and leadership syncs.&amp;nbsp;&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Frame and resolve high-leverage decisions \u2014 proactively surface blockers (technical, operational, organizational) before they escalate.&amp;nbsp;&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Manage escalations and organizational friction \u2014 diagnose root causes, coordinate resolution paths, and ensure durable fixes.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Partner cross-functionally with Hardware, Product, and Quality teams to ensure clarity of communication, alignment on priorities, and disciplined follow-through on decisions.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Support org design, headcount planning, and hiring prioritization for engineering teams.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Maintain alignment across functions through clear messaging and communication, validate exitance and validation of processes&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Navigate org dynamics, build trust, and constructively challenge assumptions; maintain psychological safety.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Support the head of engineering with administrative and org related activities&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;2) Lead ASIC Tape out Management &amp;nbsp;(Silicon Programs)&lt;/strong&gt;&lt;/p&gt;\n&lt;p style=&quot;padding-left: 40px;&quot;&gt;\u2022 &amp;nbsp; &amp;nbsp;Status management \u2014 collect and track status across functions contributing to ASIC tapeouts.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Milestone tracking \u2014 maintain methodology checklists and boundary agreements to ensure schedule adherence.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;IP and vendor tracking \u2014 own visibility into IP deliveries, version inventory, vendor issues, and escalation loops.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Quality &amp;amp; documentation \u2014 monitor quality KPIs, ensure engineering documentation completeness.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Requirements tracking \u2014 ensure PRDs/features are captured, tracked, baselined.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Resource monitoring \u2014 track compute, hardware, storage consumption and thresholds.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Internal reporting \u2014 generate status reporting for Silicon Engineering leadership.&lt;/p&gt;\n&lt;p&gt;&lt;br&gt;&lt;strong&gt;3) Influence Without Authority&lt;/strong&gt;&lt;/p&gt;\n&lt;p style=&quot;padding-left: 40px;&quot;&gt;\u2022 &amp;nbsp; &amp;nbsp;Drive cross-engineering outcomes through credibility, clarity, and follow-through \u2014 not hierarchy.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Create order in ambiguous spaces; shape scope where it is undefined.&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;Qualifications&lt;/strong&gt;&lt;/p&gt;\n&lt;p style=&quot;padding-left: 40px;&quot;&gt;\u2022 &amp;nbsp; &amp;nbsp;10+ years in semiconductor/SoC/ASIC or adjacent high-complexity engineering environment (e.g., CPU/IP/System companies).&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Proven success in Chief of Staff, Staff Program Manager, TPM Director, or similar technical leadership-enablement role. &amp;nbsp;&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Strong technical acumen \u2014 able to understand engineering trade-offs and make decisions with limited information, challenge assumptions, and earn credibility with senior ICs.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Demonstrated experience running program cadence for complex silicon programs (tapeout, IP integration, etc.).&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Proven ability to organize complex workflows and drive consistent follow-through.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;High EQ and organizational awareness; can navigate tension and align diverse viewpoints.&amp;nbsp;&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Exceptional written/verbal communication, structured thinking, and execution discipline.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Prior experience in leading RTL2GDSII chip design is a huge plus.&lt;br&gt;&lt;br&gt;&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;What Success Looks Like&lt;/strong&gt;&lt;/p&gt;\n&lt;p style=&quot;padding-left: 40px;&quot;&gt;\u2022 &amp;nbsp; &amp;nbsp;Engineering leadership spends more time on strategic and technical decisions, less on coordination.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Milestones hit with fewer escalations and clearer accountability.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Status, risks, and decisions are crisp \u2014 never ad hoc or late.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Teams feel supported, not policed \u2014 trust increases, friction decreases without compromising on accountability &amp;nbsp;.&lt;br&gt;\u2022 &amp;nbsp; &amp;nbsp;Ambiguity decreases over time as clarity and execution rhythm scale with the org.&lt;/p&gt;\n&lt;p&gt;Salary range is $216,000 to $300,000 depending on experience, level, and business need. This role may be eligible for discretionary bonus, incentives and benefits.&lt;/p&gt;&lt;div class=&quot;content-conclusion&quot;&gt;&lt;p&gt;We know that creativity and innovation happen more often when teams include diverse ideas, backgrounds, and experiences, and we actively encourage everyone with relevant experience to apply, including people of color, LGBTQ+ and non-binary people, veterans, parents, and individuals with disabilities.&lt;/p&gt;&lt;/div&gt;",
-    "posted_at": "2026-03-10T17:53:51-04:00",
-    "updated_at": "2026-03-10T17:53:51-04:00",
+    "posted_at": "2026-03-11T16:45:21-04:00",
+    "updated_at": "2026-03-11T16:45:21-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
@@ -174,7 +174,7 @@
     "posted_at": "2026-03-11T08:01:10-04:00",
     "updated_at": "2026-03-11T08:01:10-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "finance"
@@ -192,7 +192,7 @@
     "posted_at": "2026-02-25T08:38:11-05:00",
     "updated_at": "2026-02-25T08:38:11-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -210,7 +210,7 @@
     "posted_at": "2026-02-25T08:38:11-05:00",
     "updated_at": "2026-02-25T08:38:11-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -228,7 +228,7 @@
     "posted_at": "2026-03-06T12:44:49-05:00",
     "updated_at": "2026-03-06T12:44:49-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -246,7 +246,7 @@
     "posted_at": "2026-03-10T16:48:30-04:00",
     "updated_at": "2026-03-10T16:48:30-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -264,8 +264,8 @@
     "posted_at": "2026-03-02T11:27:03-05:00",
     "updated_at": "2026-03-02T11:37:11-05:00",
     "first_seen_at": "2026-03-11T18:55:50Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
-    "is_new": true,
+    "last_seen_at": "2026-03-12T01:33:21Z",
+    "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
   },
@@ -282,7 +282,7 @@
     "posted_at": "2026-03-11T08:44:13-04:00",
     "updated_at": "2026-03-11T08:44:13-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "people-hr"
@@ -300,8 +300,8 @@
     "posted_at": "2026-02-11T06:31:25-05:00",
     "updated_at": "2026-02-11T06:31:25-05:00",
     "first_seen_at": "2026-03-11T18:55:50Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
-    "is_new": true,
+    "last_seen_at": "2026-03-12T01:33:21Z",
+    "is_new": false,
     "is_technical": false,
     "job_function": "other"
   },
@@ -318,7 +318,7 @@
     "posted_at": "2026-02-11T06:31:25-05:00",
     "updated_at": "2026-02-11T06:31:25-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -336,7 +336,7 @@
     "posted_at": "2026-03-05T07:22:12-05:00",
     "updated_at": "2026-03-05T07:22:12-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -354,7 +354,7 @@
     "posted_at": "2026-03-05T07:22:12-05:00",
     "updated_at": "2026-03-05T07:22:12-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "business-operations"
@@ -372,7 +372,7 @@
     "posted_at": "2025-02-18T11:37:35-05:00",
     "updated_at": "2025-02-18T11:37:35-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -390,7 +390,7 @@
     "posted_at": "2026-02-27T00:00:34-05:00",
     "updated_at": "2026-02-27T00:00:34-05:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -408,28 +408,10 @@
     "posted_at": "2026-03-09T12:53:21-04:00",
     "updated_at": "2026-03-09T12:53:21-04:00",
     "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
+    "last_seen_at": "2026-03-12T01:33:21Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
-  },
-  {
-    "platform": "greenhouse",
-    "company": "fleetio",
-    "title": "Chief of Staff, Head of Product Strategy & GTM",
-    "location": "Remote - USA",
-    "url": "https://job-boards.greenhouse.io/fleetio/jobs/5059948007",
-    "department": "General & Administrative",
-    "team": "Remote",
-    "employment_type": "",
-    "description": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;A little about us\u2026Fleetio is a modern software platform that helps thousands of organizations worldwide manage their fleet operations. Transportation technology is a hot market, and we\u2019re leading the charge with raving fans and new customers signing up every day. We raised $450M in our Series D funding round in March of 2025 and are on an exciting trajectory as a company. Fleetio is also a proud &lt;a href=&quot;https://rubyonrails.org/foundation&quot;&gt;founding member of the Rails Foundation&lt;/a&gt;!&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;More about our team and company:&lt;/strong&gt;&lt;/p&gt;\n&lt;ul&gt;\n&lt;li&gt;Fleetio overview video:&amp;nbsp;&lt;a href=&quot;https://www.youtube.com/watch?v=IlvIbwZT3oU&quot;&gt;https://www.youtube.com/watch?v=IlvIbwZT3oU&lt;/a&gt;&lt;/li&gt;\n&lt;li&gt;Our careers page:&amp;nbsp;&lt;a href=&quot;https://www.fleetio.com/careers&quot;&gt;https://www.fleetio.com/careers&lt;/a&gt;&lt;/li&gt;\n&lt;/ul&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;About Fleetio &amp;amp; Auto Integrate&lt;/strong&gt;&lt;/p&gt;\n&lt;p&gt;Fleetio is a modern fleet operations platform used by thousands of organizations worldwide to manage vehicles, equipment, and drivers. Auto Integrate, acquired by Fleetio in 2025, is a leading global maintenance authorization network that supports fleets that choose to outsource their service, maintenance, and repair needs.&amp;nbsp; The business is managed by a small, global team within Fleetio, combining the resources of a scaled SaaS company with the agility of a niche market leader.\u200b&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;Who you are&lt;/strong&gt;&lt;/p&gt;\n&lt;p&gt;We are hiring a senior leader to serve as the chief of staff to the business unit president and to own product strategy and go-to-market for Fleetio\u2019s Auto Integrate proprietary maintenance authorization network. This role reports to the president of the business unit and will operate in a small, entrepreneurial environment while being responsible for enhancing and appropriately pricing a service that supports many of the US\u2019s largest fleets.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;You will support end-to-end product strategy, monetization, and go-to-market for all Auto Integrate products. You will partner closely with Sales, Product, Engineering, Finance, and Operations leadership to set the multiyear vision, define and execute pricing and packaging changes, and drive adoption of all new product functionality in the market. You must be located in Eastern Standard Time.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;Key objectives:&lt;/p&gt;\n&lt;ul&gt;\n&lt;li&gt;Define and evangelize the 3-year growth strategy for Auto Integrate, including segment, use case, and geographic expansion.&lt;/li&gt;\n&lt;li&gt;Lead pricing, packaging, and monetization strategy to appropriately balance customer value delivery with revenue maximization, while remaining simple and scalable.&lt;/li&gt;\n&lt;li&gt;Support product marketing, positioning, and go-to-market motions to drive new logo acquisition, product activation, and expansion/upsell.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p&gt;&lt;strong&gt;Your Impact&lt;/strong&gt;&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;Chief of staff &amp;amp; product strategy&lt;/strong&gt;&lt;/p&gt;\n&lt;ul&gt;\n&lt;li&gt;Prepare materials and recommendations for executive team and board-level discussions on business unit strategy, including product, pricing, and market expansion.&lt;/li&gt;\n&lt;li&gt;Define and maintain executive dashboards, KPI frameworks, and leading indicators to monitor product performance, pricing impact, and GTM effectiveness.&lt;/li&gt;\n&lt;li&gt;Support setting the product vision and multiyear roadmap for Auto Integrate, working with executive leadership and Product to align on strategic bets and sequencing.&lt;/li&gt;\n&lt;li&gt;Define target customer segments, use cases, and vertical focus; clarify where we win versus competitors and adjacent solutions in fleet, logistics, and broader B2B SaaS.&lt;/li&gt;\n&lt;li&gt;In partnership with the product team. ensure market, customer, and competitive insights are translated into clear product requirements, investment cases, and prioritization frameworks.&lt;/li&gt;\n&lt;li&gt;Support ownership of the Auto Integrate and payments business model, including 3-year financial plans, scenario analyses, and investment cases for new initiatives.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p&gt;&lt;strong&gt;Pricing &amp;amp; packaging&lt;/strong&gt;&lt;/p&gt;\n&lt;ul&gt;\n&lt;li&gt;Own the quantitative analysis underpinning pricing and packaging decisions for Auto Integrate, using customer cohort data, product usage, and transaction-level patterns to identify opportunities to improve revenue, margin, and adoption.&lt;/li&gt;\n&lt;li&gt;Build and maintain robust pricing and monetization models (e.g., unit economics, CLTV, payback, elasticity, sensitivity analyses) that directly inform changes to list pricing, discounting guardrails, value metrics, and packaging constructs.&lt;/li&gt;\n&lt;li&gt;Mine product and payments telemetry (e.g., active usage, feature adoption, TPV, invoice/transaction volume, interchange yield) to design and iterate on usage-based and transaction-based monetization levers.&lt;/li&gt;\n&lt;li&gt;Create clear, executive-ready pricing and monetization reporting: track and communicate key KPIs (ARPU, attach rate, adoption/activation, gross margin, churn/expansion by price point) and proactively flag risks and opportunities.&lt;/li&gt;\n&lt;li&gt;Maintain a source-of-truth pricing and packaging framework, ensuring that analytical logic, assumptions, and metrics are well documented, reproducible, and easy for stakeholders to understand and apply.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p&gt;&lt;strong&gt;Go To Market&lt;/strong&gt;&lt;/p&gt;\n&lt;ul&gt;\n&lt;li&gt;Support product marketing for Auto Integrate, including positioning, messaging, narrative, and sales enablement across self-serve, inside sales, and field motions.&lt;/li&gt;\n&lt;li&gt;Partner with Product to ensure launches and roadmap investments are deeply tied to monetization opportunities and measurable business outcomes.&lt;/li&gt;\n&lt;li&gt;Own integrated go-to-market plans for major launches and campaigns, partnering with Sales, Marketing, and Partnerships to hit pipeline, activation, and revenue targets.&lt;/li&gt;\n&lt;li&gt;Drive adoption and growth programs to increase Auto Integrate participation among existing Fleetio customers and expand usage within current accounts.&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p&gt;&lt;strong&gt;Your Experience&lt;/strong&gt;&lt;/p&gt;\n&lt;ul&gt;\n&lt;li&gt;7-10+ years of experience in a network business, B2B SaaS and/or payments across product, product marketing, strategy, or pricing/monetization; with meaningful experience successfully enhancing pricing and GTM decisions for a material product line.&lt;/li&gt;\n&lt;li&gt;Proven track record owning product strategy and roadmap for a material product line or business unit, ideally with network or transaction-driven models.&lt;/li&gt;\n&lt;li&gt;Deep pricing expertise, including usage-based models, transaction economics, and multiproduct monetization.&lt;/li&gt;\n&lt;li&gt;Strong product marketing and GTM experience; able to craft compelling narratives, launch products at scale, and enable sales to win in competitive markets.&lt;/li&gt;\n&lt;li&gt;Exceptional analytical and financial acumen, with the ability to build and interpret models, evaluate tradeoffs, and tie product decisions to P&amp;amp;L impact.&lt;/li&gt;\n&lt;li&gt;2+ years experience at a top-tier consulting firm advising on areas of product strategy and pricing preferred.&lt;/li&gt;\n&lt;li&gt;Experience in fleet, logistics, mobility, or other \u201cphysical economy\u201d verticals is a plus, but not required.&lt;/li&gt;\n&lt;li&gt;Entrepreneurial, low ego operating style, comfortable with ambiguity, and excited to run fast in a rapidly scaling business.&lt;/li&gt;\n&lt;/ul&gt;&lt;div class=&quot;content-conclusion&quot;&gt;&lt;h3&gt;Benefits&amp;nbsp;&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Multiple health/dental coverage options (100% coverage for employee, 50% for family)&lt;/li&gt;\n&lt;li&gt;Vision insurance&lt;/li&gt;\n&lt;li&gt;Incentive stock options&lt;/li&gt;\n&lt;li&gt;401(k) match of 4%&lt;/li&gt;\n&lt;li&gt;PTO - 4 weeks (increases at year two!)&lt;/li&gt;\n&lt;li&gt;12 company holidays + 2 floating holidays&lt;/li&gt;\n&lt;li&gt;Parental leave - birthing parent (16 weeks paid) non-birthing (4 weeks paid)&lt;/li&gt;\n&lt;li&gt;FSA &amp;amp; HSA options&lt;/li&gt;\n&lt;li&gt;Short and long term disability (short term 100% paid)&lt;/li&gt;\n&lt;li&gt;Community service funds&lt;/li&gt;\n&lt;li&gt;Professional development funds&lt;/li&gt;\n&lt;li&gt;Wellbeing fund - $150 quarterly&lt;/li&gt;\n&lt;li&gt;Business expense stipend - $125 quarterly&lt;/li&gt;\n&lt;li&gt;Mac laptop + new hire equipment stipend&lt;/li&gt;\n&lt;li&gt;Fully stocked kitchen with tons of drinks &amp;amp;&amp;nbsp;snacks (BHM only)&lt;/li&gt;\n&lt;li&gt;Remote working friendly since 2012 #LI-REMOTE&lt;/li&gt;\n&lt;/ul&gt;\n&lt;p&gt;&lt;em&gt;Fleetio provides equal employment opportunities to all employees and applicants and prohibits discrimination and harassment. We celebrate diversity and are committed to creating an inclusive environment for all. All employment is decided on the basis of qualifications, merit and business need.&lt;/em&gt;&lt;/p&gt;\n&lt;p&gt;&lt;em&gt;This application is not intended to and does not create a contract or offer of employment. Employment with Fleetio is at will.&lt;/em&gt;&lt;/p&gt;\n&lt;p&gt;&lt;em&gt;If you have a disability or a special need that requires an accommodation to fill out the online application, please let us know by calling (205) 718-7500.&lt;/em&gt;&lt;/p&gt;&lt;/div&gt;",
-    "posted_at": "2026-02-25T11:02:36-05:00",
-    "updated_at": "2026-02-25T11:02:36-05:00",
-    "first_seen_at": "2026-03-11T16:08:12Z",
-    "last_seen_at": "2026-03-11T18:55:50Z",
-    "is_new": false,
-    "is_technical": false,
-    "job_function": "business-operations"
   },
   {
     "platform": "greenhouse",
@@ -444,8 +426,8 @@
     "posted_at": "2026-02-25T15:16:14-05:00",
     "updated_at": "2026-02-26T14:26:30-05:00",
     "first_seen_at": "2026-03-11T18:55:55Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
-    "is_new": true,
+    "last_seen_at": "2026-03-12T01:33:14Z",
+    "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
   },
@@ -462,7 +444,7 @@
     "posted_at": "2026-02-05T17:20:43-05:00",
     "updated_at": "2026-02-05T17:20:43-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -480,7 +462,7 @@
     "posted_at": "2026-02-26T18:31:38-05:00",
     "updated_at": "2026-02-26T18:31:38-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -498,7 +480,7 @@
     "posted_at": "2026-03-09T13:03:07-04:00",
     "updated_at": "2026-03-09T13:03:07-04:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -516,7 +498,7 @@
     "posted_at": "2026-01-26T19:22:25-05:00",
     "updated_at": "2026-01-26T19:22:25-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "program-management"
@@ -525,16 +507,16 @@
     "platform": "greenhouse",
     "company": "later",
     "title": "Chief of Staff, CRO",
-    "location": "Chicago, Illinois, United States | New York, New York, United States | Boston, MA | Los Angeles, California, United States",
-    "url": "https://job-boards.greenhouse.io/later/jobs/8378501002 | https://job-boards.greenhouse.io/later/jobs/8378500002 | https://job-boards.greenhouse.io/later/jobs/8355479002 | https://job-boards.greenhouse.io/later/jobs/8378499002",
+    "location": "Chicago, Illinois, United States | Boston, MA | New York, New York, United States | Los Angeles, California, United States",
+    "url": "https://job-boards.greenhouse.io/later/jobs/8378501002 | https://job-boards.greenhouse.io/later/jobs/8355479002 | https://job-boards.greenhouse.io/later/jobs/8378500002 | https://job-boards.greenhouse.io/later/jobs/8378499002",
     "department": "Sales",
     "team": "Boston",
     "employment_type": "",
     "description": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Later is the world\u2019s most intelligent influencer marketing company, built to give brands the confidence to create unforgettable campaigns. By combining real creator relationships, trusted intelligence, and expert guidance, Later removes fear and guesswork from one of marketing\u2019s most visible investments.&lt;/p&gt;\n&lt;p&gt;Built on a native, AI-powered platform and more than a decade of proprietary data\u2014including billions of social interactions, impressions, and $2.4B+ in verified influencer-driven purchases\u2014Later helps teams understand what will work before they launch.&lt;/p&gt;\n&lt;p&gt;By combining trusted insight with expert guidance, Later removes guesswork from influencer marketing, enabling brands to choose the right creators, execute fully managed campaigns, and drive meaningful growth across awareness, engagement, and revenue. Trusted by leading enterprise brands including Nike, Wayfair, Unilever, and Southwest Airlines, Later bridges creativity and performance so campaigns don\u2019t just look good\u2014they deliver results. Learn more at &lt;a href=&quot;https://later.com/&quot;&gt;later.com&lt;/a&gt;.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;&lt;strong&gt;About this position:&lt;/strong&gt;&lt;/h2&gt;\n&lt;p&gt;The Chief of Staff to the CRO is a critical force multiplier across the Revenue organization. This role exists to amplify the impact of the CRO by ensuring strategy turns into execution, priorities stay focused, and the operating rhythm of the Sales leadership org runs with discipline, urgency, and clarity.&lt;/p&gt;\n&lt;p&gt;You\u2019ll operate at the intersection of strategy, execution, and communication\u2014managing the engine of the CRO\u2019s office while connecting dots across a fast-growing business. This is a high-trust, high-impact role for someone who can see around corners, drive outcomes without authority, and bring structure to complexity. Part strategist, part operator, part project quarterback\u2014and 100% accountable for impact.&lt;/p&gt;\n&lt;h2&gt;&lt;strong&gt;What you&#39;ll be doing:&lt;/strong&gt;&lt;/h2&gt;\n&lt;h3&gt;&lt;strong&gt;Strategy&lt;/strong&gt;&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Partner closely with the CRO to translate revenue strategy into clear priorities, action plans, and measurable outcomes across the Sales leadership org&lt;/li&gt;\n&lt;li&gt;Pressure-test ideas, surface risks and opportunities early, and provide data-backed insights to inform executive decision-making&lt;/li&gt;\n&lt;li&gt;Help shape quarterly and annual planning, ensuring alignment between revenue goals, operating plans, and cross-functional initiatives&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;&lt;strong&gt;Technical/ Execution&lt;/strong&gt;&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Own execution of the highest-priority, cross-functional initiatives sponsored by the CRO\u2014from conception through delivery&lt;/li&gt;\n&lt;li&gt;Establish operating cadences, dashboards, and tracking mechanisms to ensure visibility, accountability, and follow-through on strategic goals&lt;/li&gt;\n&lt;li&gt;Prepare high-quality materials for executive, board, and sales leadership meetings, ensuring the CRO is always informed and prepared&lt;/li&gt;\n&lt;li&gt;Identify inefficiencies across processes, systems, and workflows; design and implement improvements that increase speed and effectiveness&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;&lt;strong&gt;Team / Collaboration&lt;/strong&gt;&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Act as a central integrator across Sales, Marketing, RevOps, Product, Finance, and Customer teams to drive alignment and momentum&lt;/li&gt;\n&lt;li&gt;Serve as a communication bridge between the CRO, the Sales leadership team, and broader stakeholders\u2014ensuring clarity, consistency, and context&lt;/li&gt;\n&lt;li&gt;Build strong, trust-based relationships that allow you to influence outcomes without direct authority&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;&lt;strong&gt;Leadership&lt;/strong&gt;&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Operate as a trusted advisor, sounding board, and thought partner to the CRO&lt;/li&gt;\n&lt;li&gt;Represent the CRO in select meetings or communications, acting as a proxy when appropriate&lt;/li&gt;\n&lt;li&gt;Protect the CRO\u2019s time and focus by acting as a \u201cgoalkeeper\u201d\u2014filtering inputs, prioritizing issues, and escalating what truly matters&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;&lt;strong&gt;Research/Best Practices&lt;/strong&gt;&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Bring a consulting-grade, analytical mindset to problem-solving and decision framing&lt;/li&gt;\n&lt;li&gt;Continuously assess how high-performing revenue organizations operate and apply best practices to Later\u2019s context&lt;/li&gt;\n&lt;li&gt;Use data and structured analysis to identify trends, diagnose issues, and recommend actions&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;&lt;strong&gt;What success looks like:&lt;/strong&gt;&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;The CRO\u2019s strategic priorities are clearly defined, well-communicated, and consistently executed against&lt;/li&gt;\n&lt;li&gt;Cross-functional revenue initiatives move faster, with fewer blockers and stronger alignment&lt;/li&gt;\n&lt;li&gt;The Sales leadership org operates with greater clarity, discipline, and accountability&lt;/li&gt;\n&lt;li&gt;Executive meetings are focused, decision-oriented, and well-prepared&lt;/li&gt;\n&lt;li&gt;Risks and opportunities are surfaced early, not reactively&lt;/li&gt;\n&lt;li&gt;The CRO\u2019s time is protected and spent on the highest-leverage work&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;&lt;strong&gt;What you bring:&lt;/strong&gt;&lt;/h2&gt;\n&lt;ul&gt;\n&lt;li&gt;8\u201312+ years of progressive experience in strategy, operations, consulting, revenue operations, or a Chief of Staff\u2013type role in a high-growth environment&lt;/li&gt;\n&lt;li&gt;Experience operating at the executive or senior leadership level, supporting a CRO, CCO, COO, or equivalent&lt;/li&gt;\n&lt;li&gt;Proven track record of driving complex, cross-functional initiatives from ambiguity to execution&lt;/li&gt;\n&lt;li&gt;Demonstrated ability to influence without authority and build trust across senior stakeholders&lt;/li&gt;\n&lt;li&gt;Strong operational and project management capabilities, with a track record of building scalable processes and driving execution across multiple, cross-functional workstreams&lt;/li&gt;\n&lt;li&gt;Strong analytical skills with the ability to synthesize data into clear recommendations and narratives&lt;/li&gt;\n&lt;li&gt;Exceptional written and verbal communication skills; able to tailor messaging for execs, operators, and cross-functional partners&lt;/li&gt;\n&lt;li&gt;High level of discretion, judgment, and comfort handling sensitive information&lt;/li&gt;\n&lt;li&gt;Bias for action, strong ownership mentality, and comfort operating in fast-paced, changing environments&lt;/li&gt;\n&lt;li&gt;Nice to have: experience in the creator economy&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h2&gt;&lt;strong&gt;How you work:&amp;nbsp;&lt;/strong&gt;&lt;/h2&gt;\n&lt;p&gt;&lt;strong data-start=&quot;102&quot; data-end=&quot;123&quot;&gt;Driven by Impact:&lt;/strong&gt; You deliver results that matter\u2014prioritizing high-value work, meeting deadlines, and adapting quickly while keeping outcomes clear.&lt;/p&gt;\n&lt;p&gt;&lt;strong data-start=&quot;259&quot; data-end=&quot;292&quot;&gt;Strategic &amp;amp; Customer-Centric:&lt;/strong&gt; You anticipate risks and opportunities, connect decisions to long-term growth, and build trust through proactive insights.&lt;/p&gt;\n&lt;p&gt;&lt;strong data-start=&quot;419&quot; data-end=&quot;449&quot;&gt;Curious &amp;amp; Growth-Oriented:&lt;/strong&gt; You seek knowledge, ask sharp questions, and apply learnings fast\u2014challenging the status quo with a mindset of improvement.&lt;/p&gt;\n&lt;p&gt;&lt;strong data-start=&quot;577&quot; data-end=&quot;607&quot;&gt;Collaborative &amp;amp; Resilient:&lt;/strong&gt; You thrive in change by staying resourceful, solution-focused, and positive\u2014removing roadblocks, sharing insights, and keeping morale high.&lt;/p&gt;\n&lt;p&gt;&lt;strong data-start=&quot;751&quot; data-end=&quot;776&quot;&gt;Accountable &amp;amp; Honest:&lt;/strong&gt; You own your work, hold yourself and others to a high bar, and use transparent feedback to drive growth.&lt;/p&gt;\n&lt;p&gt;&lt;strong data-start=&quot;885&quot; data-end=&quot;913&quot;&gt;Emotionally Intelligent:&lt;/strong&gt; You build trust through empathy and collaboration, foster inclusion, and inspire others with grit, optimism, and integrity.&lt;/p&gt;\n&lt;h2&gt;&lt;strong&gt;Our approach to compensation:&lt;/strong&gt;&lt;/h2&gt;\n&lt;p&gt;We take a market-based &amp;amp; data-driven approach to compensation. We leverage data from trusted third-party compensation sources to help us understand the market value of a role based on function, level, geographic location, and scope. We evaluate compensation bi-annually, including performance and market-related factors.&lt;/p&gt;\n&lt;p&gt;Our salaries are benchmarked against market Total Cash Compensation for the geographic location of our job posting. Compensation for some roles is structured as On Target Earnings (OTE = base + commission/variable) while for others it is structured as Salary only.&lt;/p&gt;\n&lt;p&gt;To comply with local legislation and ensure transparency, we share salary ranges on all job postings. Skills, experience and other factors help determine the final salary we offer which may vary from the original range posted.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;Additionally, all permanent team members are eligible to participate in various benefits plans as part of their overall compensation package.&lt;/p&gt;\n&lt;p&gt;Salary Range:&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;$150,000 - 200,000 OTE&lt;/p&gt;\n&lt;p&gt;&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;#LI-Hybrid&amp;nbsp;&amp;nbsp;&lt;/strong&gt;&lt;/p&gt;&lt;div class=&quot;content-conclusion&quot;&gt;&lt;h2&gt;&lt;strong&gt;Where we work:&lt;/strong&gt;&lt;/h2&gt;\n&lt;p&gt;We have offices in Boston, MA; Vancouver, BC; Chicago, IL; and Vancouver, WA. For select positions, we are open to hiring fully remote candidates. We post our positions in the location(s) where we are open to having the successful candidate be located.&amp;nbsp;&lt;/p&gt;\n&lt;h2&gt;&lt;strong&gt;Diversity, inclusion, and accessibility:&lt;/strong&gt;&lt;/h2&gt;\n&lt;p&gt;At Later, we are committed to fostering a culture rooted in an &lt;strong&gt;inclusion-first mindset at every level&lt;/strong&gt; of the company, embracing the importance of hiring and &lt;strong&gt;building teams for culture add rather than culture fit&lt;/strong&gt;. We openly build and maintain unbiased hiring, pay, and promotion practices to create a foundation for an equitable workplace, paving the way for systemic change.&lt;/p&gt;\n&lt;p&gt;We are committed to creating a &lt;strong&gt;diverse environment&lt;/strong&gt; and are proud to be an&lt;strong&gt; equal opportunity employer&lt;/strong&gt;. All applications will receive consideration for employment without regard to race, color, religion, gender, gender identity or expression, national origin, disability, or age. Please let us know if you require any accommodations or support during the recruitment process.&lt;/p&gt;&lt;/div&gt;",
     "posted_at": "2026-01-16T12:38:57-05:00",
     "updated_at": "2026-01-16T12:40:48-05:00",
-    "first_seen_at": "2026-03-11T18:55:55Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "first_seen_at": "2026-03-12T01:33:14Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": true,
     "is_technical": false,
     "job_function": "other"
@@ -552,7 +534,7 @@
     "posted_at": "2026-01-12T18:08:37-05:00",
     "updated_at": "2026-01-12T18:08:37-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -570,7 +552,7 @@
     "posted_at": "2026-01-05T17:15:36-05:00",
     "updated_at": "2026-01-05T17:15:36-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -588,7 +570,7 @@
     "posted_at": "2026-02-23T15:07:17-05:00",
     "updated_at": "2026-02-23T15:07:17-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -606,7 +588,7 @@
     "posted_at": "2026-03-05T12:34:16-05:00",
     "updated_at": "2026-03-05T12:34:16-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -624,7 +606,7 @@
     "posted_at": "2026-03-01T15:46:38-05:00",
     "updated_at": "2026-03-01T15:46:38-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -642,7 +624,7 @@
     "posted_at": "2026-03-11T01:01:02-04:00",
     "updated_at": "2026-03-11T01:01:02-04:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "people-hr"
@@ -660,7 +642,7 @@
     "posted_at": "2026-02-24T14:55:43-05:00",
     "updated_at": "2026-02-24T14:55:43-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -678,7 +660,7 @@
     "posted_at": "2026-03-06T12:44:34-05:00",
     "updated_at": "2026-03-06T12:44:34-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
@@ -696,7 +678,7 @@
     "posted_at": "2026-01-19T09:43:42-05:00",
     "updated_at": "2026-01-19T09:43:42-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -714,7 +696,7 @@
     "posted_at": "2026-01-27T22:26:04-05:00",
     "updated_at": "2026-01-27T22:26:04-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -732,7 +714,7 @@
     "posted_at": "2026-03-06T00:01:12-05:00",
     "updated_at": "2026-03-06T00:01:12-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -750,7 +732,7 @@
     "posted_at": "2026-03-11T10:50:34-04:00",
     "updated_at": "2026-03-11T10:50:34-04:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "program-management"
@@ -768,7 +750,7 @@
     "posted_at": "2026-03-04T12:36:27-05:00",
     "updated_at": "2026-03-04T12:36:27-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -786,7 +768,7 @@
     "posted_at": "2026-01-15T10:50:46-05:00",
     "updated_at": "2026-01-15T10:50:46-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -804,7 +786,7 @@
     "posted_at": "2026-03-05T19:12:07-05:00",
     "updated_at": "2026-03-05T19:12:07-05:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "business-operations"
@@ -822,7 +804,7 @@
     "posted_at": "2026-03-09T17:46:18-04:00",
     "updated_at": "2026-03-09T17:46:18-04:00",
     "first_seen_at": "2026-03-11T18:26:09Z",
-    "last_seen_at": "2026-03-11T18:55:55Z",
+    "last_seen_at": "2026-03-12T01:33:14Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -840,7 +822,7 @@
     "posted_at": "2026-02-20T16:15:14-05:00",
     "updated_at": "2026-02-20T16:15:14-05:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "product"
@@ -858,7 +840,7 @@
     "posted_at": "2026-03-06T18:52:06-05:00",
     "updated_at": "2026-03-06T18:52:06-05:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -876,7 +858,7 @@
     "posted_at": "2026-02-18T10:27:36-05:00",
     "updated_at": "2026-02-18T10:27:36-05:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -894,7 +876,7 @@
     "posted_at": "2026-02-27T16:15:44-05:00",
     "updated_at": "2026-02-27T16:15:44-05:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -912,7 +894,7 @@
     "posted_at": "2026-02-20T07:47:52-05:00",
     "updated_at": "2026-02-20T07:47:52-05:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -930,7 +912,7 @@
     "posted_at": "2025-09-23T10:56:05-04:00",
     "updated_at": "2025-09-23T10:56:05-04:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": false,
     "job_function": "other"
@@ -948,7 +930,7 @@
     "posted_at": "2025-06-16T10:26:25-04:00",
     "updated_at": "2025-06-16T10:26:25-04:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
@@ -966,7 +948,7 @@
     "posted_at": "2025-06-16T10:26:25-04:00",
     "updated_at": "2025-06-16T10:26:25-04:00",
     "first_seen_at": "2026-03-11T18:26:51Z",
-    "last_seen_at": "2026-03-11T18:59:34Z",
+    "last_seen_at": "2026-03-12T01:37:07Z",
     "is_new": false,
     "is_technical": true,
     "job_function": "engineering"
