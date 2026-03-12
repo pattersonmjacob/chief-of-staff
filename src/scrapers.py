@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
+import random
 import re
 import ssl
+import threading
+import time
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -11,12 +15,41 @@ from urllib.request import Request, urlopen
 
 DEFAULT_TIMEOUT = 20
 USER_AGENT = "chief-of-staff-jobs-bot/1.0"
+MAX_RETRIES = 3
+BACKOFF_SECONDS = 1.5
+DEFAULT_MIN_REQUEST_INTERVAL = 0.35
+_REQUEST_TIMES_LOCK = threading.Lock()
+_NEXT_ALLOWED_REQUEST_AT: dict[str, float] = {}
+
+
+def _to_float(value: str, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _min_request_interval_seconds() -> float:
+    return max(0.0, _to_float(os.getenv("MIN_REQUEST_INTERVAL_SECONDS", ""), DEFAULT_MIN_REQUEST_INTERVAL))
+
+
+def _respect_request_interval(host_key: str) -> None:
+    min_interval = _min_request_interval_seconds()
+    now = time.monotonic()
+    with _REQUEST_TIMES_LOCK:
+        next_allowed = _NEXT_ALLOWED_REQUEST_AT.get(host_key, 0.0)
+        wait_seconds = max(0.0, next_allowed - now)
+        _NEXT_ALLOWED_REQUEST_AT[host_key] = max(now, next_allowed) + min_interval
+
+    if wait_seconds > 0:
+        time.sleep(wait_seconds)
 
 
 @dataclass
 class CompanySource:
     platform: str
     company: str
+    url: str = ""
 
 
 @dataclass
@@ -58,11 +91,24 @@ def _normalize_company_slug(platform: str, company: str) -> str:
 
 
 def _fetch_json(url: str) -> Any:
+    host_key = urlparse(url).netloc.lower() or "default"
     request = Request(url, headers={"User-Agent": USER_AGENT})
     context = ssl.create_default_context()
-    with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
-        payload = response.read().decode("utf-8")
-    return json.loads(payload)
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            _respect_request_interval(host_key)
+            with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
+                payload = response.read().decode("utf-8")
+            return json.loads(payload)
+        except HTTPError as exc:
+            if exc.code not in {429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
+                raise
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            if retry_after and retry_after.isdigit():
+                delay = float(retry_after)
+            else:
+                delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            time.sleep(delay)
 
 
 def _strip_html(value: Any) -> str:
@@ -164,8 +210,25 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
         method="POST",
     )
     context = ssl.create_default_context()
-    with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
-        data = json.loads(response.read().decode("utf-8"))
+    data = None
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            _respect_request_interval("jobs.ashbyhq.com")
+            with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
+                data = json.loads(response.read().decode("utf-8"))
+            break
+        except HTTPError as exc:
+            if exc.code not in {429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
+                raise
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            if retry_after and retry_after.isdigit():
+                delay = float(retry_after)
+            else:
+                delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            time.sleep(delay)
+
+    if data is None:
+        return []
 
     teams = data.get("data", {}).get("jobBoardWithTeams", {}).get("teams", [])
     jobs: list[dict[str, Any]] = []
@@ -189,32 +252,48 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
 
 def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
     normalized_company = _normalize_company_slug(source.platform, source.company)
+    fallback_company = _normalize_company_slug(source.platform, source.url) if source.url else ""
     if normalized_company != source.company:
         print(f"[info] Normalized {source.platform} source: {source.company} -> {normalized_company}")
+    candidates = [normalized_company]
+    if fallback_company and fallback_company not in candidates:
+        candidates.append(fallback_company)
 
-    try:
-        if source.platform == "greenhouse":
-            jobs = fetch_greenhouse(normalized_company)
-        elif source.platform == "lever":
-            jobs = fetch_lever(normalized_company)
-        elif source.platform == "ashby":
-            jobs = fetch_ashby(normalized_company)
-        else:
-            raise ValueError(f"Unsupported platform: {source.platform}")
-        return FetchResult(source=source, normalized_company=normalized_company, jobs=jobs)
-    except HTTPError as exc:
-        details = ""
+    for idx, company_candidate in enumerate(candidates):
         try:
-            error_body = exc.read().decode("utf-8", errors="ignore").strip()
-            if error_body:
-                details = f" body={error_body[:240]}"
-        except Exception:
-            pass
-        print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
-        return FetchResult(source=source, normalized_company=normalized_company, jobs=[], http_status=exc.code, error=f"HTTP {exc.code}")
-    except (URLError, TimeoutError, ValueError) as exc:
-        print(f"[warn] {source.platform}:{source.company} failed: {exc}")
-        return FetchResult(source=source, normalized_company=normalized_company, jobs=[], error=str(exc))
+            if source.platform == "greenhouse":
+                jobs = fetch_greenhouse(company_candidate)
+            elif source.platform == "lever":
+                jobs = fetch_lever(company_candidate)
+            elif source.platform == "ashby":
+                jobs = fetch_ashby(company_candidate)
+            else:
+                raise ValueError(f"Unsupported platform: {source.platform}")
+            if idx > 0:
+                print(f"[info] Recovered via URL fallback for {source.platform}:{source.company} -> {company_candidate}")
+            return FetchResult(source=source, normalized_company=company_candidate, jobs=jobs)
+        except HTTPError as exc:
+            details = ""
+            try:
+                error_body = exc.read().decode("utf-8", errors="ignore").strip()
+                if error_body:
+                    details = f" body={error_body[:240]}"
+            except Exception:
+                pass
+            can_retry_with_fallback = idx < len(candidates) - 1 and exc.code in {400, 404}
+            if can_retry_with_fallback:
+                print(f"[warn] {source.platform}:{company_candidate} failed HTTP {exc.code}; retrying with fallback identifier")
+                continue
+            print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
+            return FetchResult(source=source, normalized_company=company_candidate, jobs=[], http_status=exc.code, error=f"HTTP {exc.code}")
+        except (URLError, TimeoutError, ValueError) as exc:
+            if idx < len(candidates) - 1:
+                print(f"[warn] {source.platform}:{company_candidate} failed: {exc}; trying URL fallback")
+                continue
+            print(f"[warn] {source.platform}:{source.company} failed: {exc}")
+            return FetchResult(source=source, normalized_company=company_candidate, jobs=[], error=str(exc))
+
+    return FetchResult(source=source, normalized_company=normalized_company, jobs=[], error="all_candidates_failed")
 
 
 def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
