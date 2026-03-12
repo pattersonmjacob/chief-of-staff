@@ -25,6 +25,7 @@ env:
   ASHBY_TIMEOUT_SECONDS: 35
   VALIDATE_JOB_LINKS: "false"
   LINK_CHECK_DELAY_SECONDS: 0.8
+  MAX_JOB_AGE_DAYS: 7
 
 jobs:
   scrape-and-publish:
@@ -128,7 +129,8 @@ jobs:
           python src/aggregate_chunks.py \
             --chunks-dir chunk-artifacts \
             --repository "${{ github.repository }}" \
-            --link-check-delay-seconds "${LINK_CHECK_DELAY_SECONDS}"
+            --link-check-delay-seconds "${LINK_CHECK_DELAY_SECONDS}" \
+            --max-job-age-days "${MAX_JOB_AGE_DAYS}"
 
       - name: Merge chunk outputs and rebuild artifacts (link validation disabled)
         if: steps.link_mode.outputs.validate_links != 'true'

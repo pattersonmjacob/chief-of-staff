@@ -38,6 +38,7 @@ Version 1 of a free, keyword-based jobs pipeline.
        - `scrape_concurrency` (default `1`; set to `1` for no in-process concurrency)
        - `validate_job_links` (default `true`; verifies job URLs before publishing and removes unavailable postings)
        - `link_check_delay_seconds` (default `0.8`; delay between URL checks to avoid rate limits)
+       - `max_job_age_days` (default `7`; keeps only roles posted/updated within the last N days)
        - `verbose_sources` (default `false`; when true logs every source result)
 
    - **Manual source list:**
@@ -180,7 +181,7 @@ If secrets are missing, the script logs a warning and skips sending.
 
 ## Filtering behavior
 
-- Full feed (`jobs.json` / `jobs.csv`) keeps all fetched roles after dedupe + optional link validation.
+- Full feed (`jobs.json` / `jobs.csv`) keeps all fetched roles after dedupe + age filter (`max_job_age_days`, default 7) + optional link validation.
 - Chief-of-Staff subset (`jobs_chief_of_staff.*`) requires title to match `chief ... staff` (case-insensitive) and then applies include/exclude checks against title, department, team, location, and description text.
 - GitHub Pages shows the full feed but enables **Chief of Staff only** by default via a UI toggle.
 - Duplicate jobs from the same platform/company/title are merged into one record, collating differences like locations/teams/departments/URLs.

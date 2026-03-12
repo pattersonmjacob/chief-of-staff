@@ -44,5 +44,6 @@
   "verbose_sources": false,
   "validate_job_links": true,
   "link_check_delay_seconds": 0.8,
+  "max_job_age_days": 7,
   "max_sources_per_platform": 500
 }

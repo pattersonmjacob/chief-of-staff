@@ -150,6 +150,45 @@ def validate_and_filter_jobs_by_link(
     return checked
 
 
+def _parse_iso_datetime(value: Any) -> datetime | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    normalized = raw.replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def filter_jobs_by_max_age_days(jobs: list[dict[str, Any]], max_age_days: int) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    if max_age_days <= 0:
+        return jobs, {"input": len(jobs), "excluded_missing_or_invalid_date": 0, "excluded_too_old": 0, "output": len(jobs)}
+
+    now = datetime.now(timezone.utc)
+    cutoff = now.timestamp() - (max_age_days * 86400)
+    kept: list[dict[str, Any]] = []
+    stats = {"input": len(jobs), "excluded_missing_or_invalid_date": 0, "excluded_too_old": 0, "output": 0}
+
+    for job in jobs:
+        posted = _parse_iso_datetime(job.get("posted_at"))
+        updated = _parse_iso_datetime(job.get("updated_at"))
+        reference = posted or updated
+        if reference is None:
+            stats["excluded_missing_or_invalid_date"] += 1
+            continue
+        if reference.timestamp() < cutoff:
+            stats["excluded_too_old"] += 1
+            continue
+        kept.append(job)
+
+    stats["output"] = len(kept)
+    return kept, stats
+
+
 def classify_job_function(job: dict[str, Any]) -> str:
     text = " ".join([str(job.get("title", "")), str(job.get("department", "")), str(job.get("team", ""))]).lower()
     mapping = [
@@ -391,6 +430,7 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     env_max_sources_per_platform = os.getenv("MAX_SOURCES_PER_PLATFORM", "").strip()
     env_validate_job_links = os.getenv("VALIDATE_JOB_LINKS", "").strip().lower()
     env_link_check_delay_seconds = os.getenv("LINK_CHECK_DELAY_SECONDS", "").strip()
+    env_max_job_age_days = os.getenv("MAX_JOB_AGE_DAYS", "").strip()
 
     if env_sources_csv:
         updated["sources_csv"] = env_sources_csv
@@ -419,6 +459,10 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     if env_link_check_delay_seconds:
         updated["link_check_delay_seconds"] = float(env_link_check_delay_seconds)
         print(f"[info] Using LINK_CHECK_DELAY_SECONDS override: {env_link_check_delay_seconds}")
+
+    if env_max_job_age_days:
+        updated["max_job_age_days"] = int(env_max_job_age_days)
+        print(f"[info] Using MAX_JOB_AGE_DAYS override: {env_max_job_age_days}")
 
     if not updated.get("sources_csv"):
         default_sources_csv = ROOT / "data" / "company_slugs.csv"
@@ -686,6 +730,10 @@ def main() -> None:
     previous_jobs = load_previous_jobs()
 
     jobs = _dedupe_and_collate_jobs(all_jobs)
+    max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
+    jobs, age_filter_stats = filter_jobs_by_max_age_days(jobs, max_job_age_days=max_job_age_days)
+    print(f"[info] Age filter stats ({max_job_age_days}d): input={age_filter_stats['input']}, missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}")
+
     validate_links = bool(cfg.get("validate_job_links", True))
     link_check_delay_seconds = float(cfg.get("link_check_delay_seconds", 0.8) or 0.8)
     jobs = validate_and_filter_jobs_by_link(jobs, enabled=validate_links, delay_seconds=link_check_delay_seconds)
