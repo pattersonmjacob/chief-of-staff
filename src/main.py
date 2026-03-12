@@ -611,6 +611,32 @@ def filter_jobs(
 
 
 
+def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
+    """Drop bulky/non-essential fields to keep published artifacts small."""
+    allowed_fields = [
+        "title",
+        "company",
+        "platform",
+        "location",
+        "department",
+        "team",
+        "employment_type",
+        "job_function",
+        "is_technical",
+        "is_chief_of_staff",
+        "posted_at",
+        "updated_at",
+        "first_seen_at",
+        "last_seen_at",
+        "is_new",
+        "url",
+    ]
+    compact: dict[str, Any] = {}
+    for field in allowed_fields:
+        compact[field] = job.get(field, "")
+    return compact
+
+
 def resolve_github_pages_url(cfg: dict[str, Any]) -> str:
     configured_url = str(cfg.get("github_pages_url", "")).strip()
     if configured_url:
@@ -654,14 +680,17 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
 
 
 def write_outputs(all_jobs: list[dict[str, Any]], chief_jobs: list[dict[str, Any]], github_pages_url: str = "") -> None:
-    JOBS_JSON.write_text(json.dumps(all_jobs, indent=2))
-    JOBS_CHIEF_JSON.write_text(json.dumps(chief_jobs, indent=2))
+    compact_all_jobs = [_compact_job_for_output(job) for job in all_jobs]
+    compact_chief_jobs = [_compact_job_for_output(job) for job in chief_jobs]
 
-    _write_csv(JOBS_CSV, all_jobs)
-    _write_csv(JOBS_CHIEF_CSV, chief_jobs)
+    JOBS_JSON.write_text(json.dumps(compact_all_jobs, indent=2))
+    JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, indent=2))
+
+    _write_csv(JOBS_CSV, compact_all_jobs)
+    _write_csv(JOBS_CHIEF_CSV, compact_chief_jobs)
 
     DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
-    DOCS_HTML.write_text(render_html(all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
+    DOCS_HTML.write_text(render_html(compact_all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
 
 
 def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> None:

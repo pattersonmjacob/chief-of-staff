@@ -182,6 +182,7 @@ If secrets are missing, the script logs a warning and skips sending.
 ## Filtering behavior
 
 - Full feed (`jobs.json` / `jobs.csv`) keeps all fetched roles after dedupe + age filter (`max_job_age_days`, default 7) + optional link validation.
+- Published artifacts intentionally omit the raw `description` body to keep file sizes below GitHub push limits (the description is only used during filtering in-memory).
 - Chief-of-Staff subset (`jobs_chief_of_staff.*`) requires title to match `chief ... staff` (case-insensitive) and then applies include/exclude checks against title, department, team, location, and description text.
 - GitHub Pages shows the full feed but enables **Chief of Staff only** by default via a UI toggle.
 - Duplicate jobs from the same platform/company/title are merged into one record, collating differences like locations/teams/departments/URLs.
