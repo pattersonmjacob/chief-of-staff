@@ -11,13 +11,6 @@ permissions:
 jobs:
   scrape-and-publish:
     runs-on: ubuntu-latest
-    env:
-      SOURCES_CSV: data/company_slugs.csv
-      SCRAPE_CONCURRENCY: 1
-      MIN_REQUEST_INTERVAL_SECONDS: 0.35
-      MAX_SOURCES_PER_PLATFORM: 500
-      VALIDATE_JOB_LINKS: "true"
-      LINK_CHECK_DELAY_SECONDS: 0.8
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -39,11 +32,6 @@ jobs:
             source_offset: 6000
           - chunk_index: 7
             source_offset: 7000
-    env:
-      SOURCES_CSV: data/company_slugs.csv
-      MAX_SOURCES: 1000
-      SOURCE_OFFSET: ${{ matrix.source_offset }}
-      SCRAPE_CONCURRENCY: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,7 +42,16 @@ jobs:
           python-version: "3.11"
 
       - name: Run scraper digest
-        run: python src/main.py
+        run: |
+          SOURCES_CSV=data/company_slugs.csv \
+          MAX_SOURCES=1000 \
+          SOURCE_OFFSET=${{ matrix.source_offset }} \
+          SCRAPE_CONCURRENCY=8 \
+          MIN_REQUEST_INTERVAL_SECONDS=0.35 \
+          MAX_SOURCES_PER_PLATFORM=500 \
+          VALIDATE_JOB_LINKS=true \
+          LINK_CHECK_DELAY_SECONDS=0.8 \
+          python src/main.py
 
       - name: Save chunk outputs
         run: |
@@ -70,7 +67,7 @@ jobs:
 
   aggregate-and-publish:
     runs-on: ubuntu-latest
-    needs: scrape-chunks
+    needs: scrape-and-publish
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -89,96 +86,22 @@ jobs:
 
       - name: Merge chunk outputs and rebuild artifacts
         run: |
-          python - <<'PY'
-          import csv
-          import json
-          from pathlib import Path
-          import sys
-
-          ROOT = Path('.')
-          sys.path.append(str(ROOT / 'src'))
-          from render import render_html
-
-          chunk_files = sorted((ROOT / 'chunk-artifacts').glob('jobs_*.json'))
-          all_jobs = []
-          for path in chunk_files:
-            try:
-              data = json.loads(path.read_text(encoding='utf-8'))
-              if isinstance(data, list):
-                all_jobs.extend(data)
-            except Exception as exc:
-              print(f"[warn] Skipping invalid chunk file {path}: {exc}")
-
-          def merge_pipe_values(*values):
-            parts = []
-            seen = set()
-            for value in values:
-              raw = str(value or '').strip()
-              if not raw:
-                continue
-              for part in [p.strip() for p in raw.split('|')]:
-                lowered = part.lower()
-                if part and lowered not in seen:
-                  parts.append(part)
-                  seen.add(lowered)
-            return ' | '.join(parts)
-
-          merged = {}
-          for job in all_jobs:
-            key = f"{str(job.get('platform', '')).lower()}::{str(job.get('company', '')).lower()}::{str(job.get('title', '')).strip().lower()}"
-            current = merged.get(key)
-            if current is None:
-              merged[key] = dict(job)
-              continue
-
-            for field in ['location', 'department', 'team', 'employment_type', 'url']:
-              current[field] = merge_pipe_values(current.get(field, ''), job.get(field, ''))
-
-            current_description = str(current.get('description') or '')
-            incoming_description = str(job.get('description') or '')
-            if len(incoming_description) > len(current_description):
-              current['description'] = incoming_description
-
-            posted_values = [str(v) for v in [current.get('posted_at', ''), job.get('posted_at', '')] if str(v or '').strip()]
-            if posted_values:
-              current['posted_at'] = min(posted_values)
-
-            updated_values = [str(v) for v in [current.get('updated_at', ''), job.get('updated_at', '')] if str(v or '').strip()]
-            if updated_values:
-              current['updated_at'] = max(updated_values)
-
-          jobs = sorted(merged.values(), key=lambda j: (j.get('company', ''), j.get('title', '')))
-          (ROOT / 'jobs.json').write_text(json.dumps(jobs, indent=2), encoding='utf-8')
-
-          fields = [
-            'title', 'company', 'platform', 'location', 'department', 'team', 'employment_type',
-            'job_function', 'is_technical', 'posted_at', 'updated_at', 'first_seen_at', 'last_seen_at', 'is_new', 'url'
-          ]
-          with (ROOT / 'jobs.csv').open('w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            for job in jobs:
-              writer.writerow({name: job.get(name, '') for name in fields})
-
-          github_pages_url = ''
-          repository = '${{ github.repository }}'
-          if '/' in repository:
-            owner, repo = repository.split('/', 1)
-            github_pages_url = f"https://{owner}.github.io/{repo}/"
-
-          (ROOT / 'docs' / 'index.html').write_text(render_html(jobs, github_pages_url=github_pages_url), encoding='utf-8')
-          print(f"[info] Aggregated {len(chunk_files)} chunk files into {len(jobs)} unique jobs")
-          PY
+          python src/aggregate_chunks.py \
+            --chunks-dir chunk-artifacts \
+            --repository "${{ github.repository }}" \
+            --disable-link-validation
 
       - name: Commit generated files
-        env:
-          SMTP_FROM: ${{ secrets.SMTP_FROM }}
-          SMTP_TO: ${{ secrets.SMTP_TO }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
         run: |
+          SMTP_FROM="${{ secrets.SMTP_FROM }}"
+          SMTP_TO="${{ secrets.SMTP_TO }}"
+          SMTP_HOST="${{ secrets.SMTP_HOST }}"
+          SMTP_PORT="${{ secrets.SMTP_PORT }}"
+          SMTP_USER="${{ secrets.SMTP_USER }}"
+          SMTP_PASS="${{ secrets.SMTP_PASS }}"
+
+          export SMTP_FROM SMTP_TO SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add jobs.json jobs.csv docs/index.html
