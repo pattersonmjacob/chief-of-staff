@@ -129,7 +129,7 @@ def validate_and_filter_jobs_by_link(
             print(f"[warn] Dropping job with empty URL: {job.get('company')} | {job.get('title')}")
             continue
 
-        request = Request(url, headers={"User-Agent": "chief-of-staff-jobs-bot/1.0"})
+        request = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; ChiefOfStaffJobsBot/1.1; +https://github.com/)"})
         try:
             with urlopen(request, timeout=timeout_seconds) as response:  # nosec B310
                 status = int(getattr(response, "status", 200) or 200)
@@ -308,10 +308,10 @@ def _to_int(value: Any, default: int) -> int:
 def get_scrape_concurrency(cfg: dict[str, Any], source_count: int) -> int:
     env_value = os.getenv("SCRAPE_CONCURRENCY", "").strip()
     if env_value:
-        return max(1, _to_int(env_value, 24))
+        return max(1, _to_int(env_value, 4))
 
-    configured = cfg.get("scrape_concurrency", 24)
-    workers = max(1, _to_int(configured, 24))
+    configured = cfg.get("scrape_concurrency", 4)
+    workers = max(1, _to_int(configured, 4))
     return min(workers, max(1, source_count))
 
 
@@ -328,6 +328,8 @@ def fetch_all_jobs(
     completed = 0
     non_404_streak = 0
     health_ready = False
+    failed_sources = 0
+    rate_limited_sources = 0
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_source = {executor.submit(fetch_jobs_for_source_status, source): source for source in sources}
         for future in as_completed(future_to_source):
@@ -339,6 +341,10 @@ def fetch_all_jobs(
                 print(f"[warn] {source.platform}:{source.company} failed unexpectedly: {exc}")
 
             all_jobs.extend(result.jobs)
+            if result.error:
+                failed_sources += 1
+            if result.http_status == 429 or "429" in str(result.error):
+                rate_limited_sources += 1
             do_not_check_state, non_404_streak, health_ready = update_404_block_state(
                 state=do_not_check_state,
                 result=result,
@@ -355,6 +361,7 @@ def fetch_all_jobs(
                     f"{source.platform}:{source.company} status={status} jobs={len(result.jobs)}"
                 )
 
+    print(f"[info] Source fetch summary: total={len(sources)} failed={failed_sources} rate_limited={rate_limited_sources} jobs={len(all_jobs)}")
     return all_jobs, do_not_check_state
 
 
@@ -424,7 +431,7 @@ def maybe_download_sources_csv(cfg: dict[str, Any]) -> None:
     target = ROOT / path_value
     target.parent.mkdir(parents=True, exist_ok=True)
 
-    request = Request(url, headers={"User-Agent": "chief-of-staff-jobs-bot/1.0"})
+    request = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; ChiefOfStaffJobsBot/1.1; +https://github.com/)"})
     context = ssl.create_default_context()
     with urlopen(request, timeout=30, context=context) as response:  # nosec B310
         target.write_bytes(response.read())
@@ -472,6 +479,25 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         )
 
     return [CompanySource(**item) for item in source_rows]
+
+
+
+
+def dedupe_sources(sources: list[CompanySource]) -> list[CompanySource]:
+    seen: set[str] = set()
+    deduped: list[CompanySource] = []
+    skipped = 0
+    for source in sources:
+        key = source_key(source.platform, source.company.strip().lower())
+        if key in seen:
+            skipped += 1
+            continue
+        seen.add(key)
+        deduped.append(source)
+
+    if skipped:
+        print(f"[info] Removed {skipped} duplicate sources before scraping")
+    return deduped
 
 
 def filter_jobs(
@@ -618,6 +644,7 @@ def main() -> None:
     sources = get_sources(cfg)
     do_not_check_state = load_do_not_check_state()
     sources = apply_do_not_check_filter(sources, do_not_check_state)
+    sources = dedupe_sources(sources)
     print(f"[info] Using {len(sources)} sources")
 
     scrape_concurrency = get_scrape_concurrency(cfg, len(sources))
