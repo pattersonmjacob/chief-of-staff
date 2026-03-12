@@ -5,13 +5,14 @@ Version 1 of a free, keyword-based jobs pipeline.
 ## What it does
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
-- Filters jobs with keyword include/exclude matching (no AI/ranking yet).
-- Hard-requires job title to match `chief ... staff` (case-insensitive wildcard) before other include/exclude filtering.
-- Filters jobs with simple keyword matching (no AI/ranking yet).
+- Stores the full ATS job feed across Greenhouse / Lever / Ashby.
+- Computes a Chief-of-Staff subset using title + include/exclude keyword matching.
 - Writes output files:
-  - `jobs.json`
-  - `jobs.csv`
-  - `docs/index.html` (for GitHub Pages)
+  - `jobs.json` (full feed)
+  - `jobs.csv` (full feed)
+  - `jobs_chief_of_staff.json` (Chief-of-Staff subset)
+  - `jobs_chief_of_staff.csv` (Chief-of-Staff subset)
+  - `docs/index.html` (GitHub Pages UI with a default **Chief of Staff only** filter toggle)
   - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
 - Automatically tracks repeated HTTP 404 sources in `data/do_not_check.json` and skips them on future runs (after 3+ 404s and a healthy non-404 streak guard).
   - Optional GitHub Pages link banner in output (set `github_pages_url` or let Actions auto-detect).
@@ -179,8 +180,9 @@ If secrets are missing, the script logs a warning and skips sending.
 
 ## Filtering behavior
 
-- Hard requirement: title must match `chief ... staff` (case-insensitive).
-- Keyword include/exclude checks run against: title, department, team, location, and description text (when available from the source API).
+- Full feed (`jobs.json` / `jobs.csv`) keeps all fetched roles after dedupe + optional link validation.
+- Chief-of-Staff subset (`jobs_chief_of_staff.*`) requires title to match `chief ... staff` (case-insensitive) and then applies include/exclude checks against title, department, team, location, and description text.
+- GitHub Pages shows the full feed but enables **Chief of Staff only** by default via a UI toggle.
 - Duplicate jobs from the same platform/company/title are merged into one record, collating differences like locations/teams/departments/URLs.
 
 ## Security checklist

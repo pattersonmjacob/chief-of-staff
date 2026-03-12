@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import re
 import sys
 from urllib.parse import quote
 
@@ -34,6 +35,11 @@ def _github_pages_url(repository: str) -> str:
     return ""
 
 
+def _is_chief_of_staff(job: dict) -> bool:
+    title = str(job.get("title", ""))
+    return bool(re.search(r"\bchief\b.*\bstaff\b", title, flags=re.IGNORECASE))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Aggregate chunked job artifacts and rebuild outputs")
     parser.add_argument("--chunks-dir", default="chunk-artifacts")
@@ -51,9 +57,13 @@ def main() -> None:
         delay_seconds=max(0.0, args.link_check_delay_seconds),
     )
 
+    chief_jobs = [job for job in jobs if _is_chief_of_staff(job)]
+    for job in jobs:
+        job["is_chief_of_staff"] = _is_chief_of_staff(job)
+
     pages_url = _github_pages_url(args.repository)
-    write_outputs(jobs, github_pages_url=pages_url)
-    print(f"[info] Aggregated {len(jobs)} unique jobs")
+    write_outputs(jobs, chief_jobs, github_pages_url=pages_url)
+    print(f"[info] Aggregated {len(jobs)} unique jobs (chief_of_staff={len(chief_jobs)})")
 
 
 if __name__ == "__main__":
