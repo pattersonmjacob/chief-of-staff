@@ -33,7 +33,10 @@ Version 1 of a free, keyword-based jobs pipeline.
      - Optional controls:
        - `min_open_jobs` (default `1`)
        - `max_sources` (optional; leave empty or `null` for no cap)
-       - `scrape_concurrency` (default `24`; increase/decrease parallel source fetch workers)
+       - `max_sources_per_platform` (default `500`; cap applied independently to Greenhouse/Lever/Ashby)
+       - `scrape_concurrency` (default `1`; set to `1` for no in-process concurrency)
+       - `validate_job_links` (default `true`; verifies job URLs before publishing and removes unavailable postings)
+       - `link_check_delay_seconds` (default `0.8`; delay between URL checks to avoid rate limits)
        - `verbose_sources` (default `false`; when true logs every source result)
 
    - **Manual source list:**
@@ -59,6 +62,7 @@ Version 1 of a free, keyword-based jobs pipeline.
    Optional request pacing override (useful for very large lists):
 
    ```bash
+   MIN_REQUEST_INTERVAL_SECONDS=0.35 SCRAPE_CONCURRENCY=6 python src/main.py
    MIN_REQUEST_INTERVAL_SECONDS=0.25 SCRAPE_CONCURRENCY=8 python src/main.py
    ```
 
@@ -68,6 +72,9 @@ The CSV should include (at minimum):
 - `slug`
 - `vendor` (`Ashby`, `Greenhouse`, `Lever`)
 - `open_jobs` (or `job_count`)
+
+Optional but recommended:
+- `url` (the hosted jobs page or board URL for fallback parsing)
 
 Only supported vendors are loaded. Duplicate `(vendor, slug)` pairs are deduplicated.
 
@@ -105,6 +112,21 @@ This gives you a stable, versioned source list in-repo that is refreshed weekly 
 ## Avoiding rate limits
 
 - Lower parallelism in your runtime config if you see HTTP 429s:
+  - Set `"scrape_concurrency": 1` in `config.json`, or run with `SCRAPE_CONCURRENCY=1` for fully sequential requests.
+- Add per-request pacing for big source lists:
+  - Set `MIN_REQUEST_INTERVAL_SECONDS=0.35` to add a small cross-thread gap between requests per host.
+- Keep chunk jobs from overloading providers:
+  - The daily workflow runs a single sequential digest job (`SCRAPE_CONCURRENCY=1`) and caps sources at `MAX_SOURCES_PER_PLATFORM=500`.
+- Retries are built in for temporary provider limits/errors:
+  - Scraper requests now back off and retry for `429/5xx` responses.
+- Source-identifier fallback is enabled:
+  - If a slug fails (for example malformed/stale slug), the scraper retries using the parsed `url` identifier when available.
+- Publish-time link checks are enabled:
+  - Jobs whose URLs return errors or “no longer active / page not found” pages are removed before writing outputs.
+
+### Large-list tuning playbook (fast + fewer rate limits)
+
+- Start with `SCRAPE_CONCURRENCY=1`, `MAX_SOURCES_PER_PLATFORM=500`, and `MIN_REQUEST_INTERVAL_SECONDS=0.35`.
   - Set `"scrape_concurrency": 8` (or lower) in `config.json`, or run with `SCRAPE_CONCURRENCY=8`.
 - Add per-request pacing for big source lists:
   - Set `MIN_REQUEST_INTERVAL_SECONDS=0.2` to add a small cross-thread gap between requests per host.
@@ -149,6 +171,7 @@ If secrets are missing, the script logs a warning and skips sending.
   - Pull latest `main`, rerun `python src/main.py`, then commit only the regenerated outputs.
   - Keep feature/code changes separate from generated-output update commits.
   - This repo marks generated outputs in `.gitattributes` to reduce repeated conflicts during merges.
+  - CI aggregation logic is centralized in `src/aggregate_chunks.py` (instead of a long inline workflow script) to reduce workflow-file merge conflicts.
 
 - If workflow fails to push updated artifacts:
   - Recheck Actions write permissions and branch protection settings.

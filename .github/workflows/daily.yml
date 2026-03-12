@@ -9,8 +9,15 @@ permissions:
   contents: write
 
 jobs:
-  scrape-chunks:
+  scrape-and-publish:
     runs-on: ubuntu-latest
+    env:
+      SOURCES_CSV: data/company_slugs.csv
+      SCRAPE_CONCURRENCY: 1
+      MIN_REQUEST_INTERVAL_SECONDS: 0.35
+      MAX_SOURCES_PER_PLATFORM: 500
+      VALIDATE_JOB_LINKS: "true"
+      LINK_CHECK_DELAY_SECONDS: 0.8
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -46,7 +53,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run scraper chunk
+      - name: Run scraper digest
         run: python src/main.py
 
       - name: Save chunk outputs

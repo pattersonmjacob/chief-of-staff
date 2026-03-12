@@ -17,6 +17,7 @@ DEFAULT_TIMEOUT = 20
 USER_AGENT = "chief-of-staff-jobs-bot/1.0"
 MAX_RETRIES = 3
 BACKOFF_SECONDS = 1.5
+DEFAULT_MIN_REQUEST_INTERVAL = 0.35
 DEFAULT_MIN_REQUEST_INTERVAL = 0.2
 _REQUEST_TIMES_LOCK = threading.Lock()
 _NEXT_ALLOWED_REQUEST_AT: dict[str, float] = {}
@@ -49,6 +50,7 @@ def _respect_request_interval(host_key: str) -> None:
 class CompanySource:
     platform: str
     company: str
+    url: str = ""
 
 
 @dataclass
@@ -251,32 +253,52 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
 
 def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
     normalized_company = _normalize_company_slug(source.platform, source.company)
+    fallback_company = _normalize_company_slug(source.platform, source.url) if source.url else ""
     if normalized_company != source.company:
         print(f"[info] Normalized {source.platform} source: {source.company} -> {normalized_company}")
+    candidates = [normalized_company]
+    if fallback_company and fallback_company not in candidates:
+        candidates.append(fallback_company)
 
-    try:
-        if source.platform == "greenhouse":
-            jobs = fetch_greenhouse(normalized_company)
-        elif source.platform == "lever":
-            jobs = fetch_lever(normalized_company)
-        elif source.platform == "ashby":
-            jobs = fetch_ashby(normalized_company)
-        else:
-            raise ValueError(f"Unsupported platform: {source.platform}")
-        return FetchResult(source=source, normalized_company=normalized_company, jobs=jobs)
-    except HTTPError as exc:
-        details = ""
+    for idx, company_candidate in enumerate(candidates):
+        print(
+            f"[info] Fetch attempt {idx + 1}/{len(candidates)} for {source.platform}:{source.company} "
+            f"candidate={company_candidate} source_url={source.url or '<none>'}"
+        )
         try:
-            error_body = exc.read().decode("utf-8", errors="ignore").strip()
-            if error_body:
-                details = f" body={error_body[:240]}"
-        except Exception:
-            pass
-        print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
-        return FetchResult(source=source, normalized_company=normalized_company, jobs=[], http_status=exc.code, error=f"HTTP {exc.code}")
-    except (URLError, TimeoutError, ValueError) as exc:
-        print(f"[warn] {source.platform}:{source.company} failed: {exc}")
-        return FetchResult(source=source, normalized_company=normalized_company, jobs=[], error=str(exc))
+            if source.platform == "greenhouse":
+                jobs = fetch_greenhouse(company_candidate)
+            elif source.platform == "lever":
+                jobs = fetch_lever(company_candidate)
+            elif source.platform == "ashby":
+                jobs = fetch_ashby(company_candidate)
+            else:
+                raise ValueError(f"Unsupported platform: {source.platform}")
+            if idx > 0:
+                print(f"[info] Recovered via URL fallback for {source.platform}:{source.company} -> {company_candidate}")
+            return FetchResult(source=source, normalized_company=company_candidate, jobs=jobs)
+        except HTTPError as exc:
+            details = ""
+            try:
+                error_body = exc.read().decode("utf-8", errors="ignore").strip()
+                if error_body:
+                    details = f" body={error_body[:240]}"
+            except Exception:
+                pass
+            can_retry_with_fallback = idx < len(candidates) - 1 and exc.code in {400, 404}
+            if can_retry_with_fallback:
+                print(f"[warn] {source.platform}:{company_candidate} failed HTTP {exc.code}; retrying with fallback identifier")
+                continue
+            print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
+            return FetchResult(source=source, normalized_company=company_candidate, jobs=[], http_status=exc.code, error=f"HTTP {exc.code}")
+        except (URLError, TimeoutError, ValueError) as exc:
+            if idx < len(candidates) - 1:
+                print(f"[warn] {source.platform}:{company_candidate} failed: {exc}; trying URL fallback")
+                continue
+            print(f"[warn] {source.platform}:{source.company} failed: {exc}")
+            return FetchResult(source=source, normalized_company=company_candidate, jobs=[], error=str(exc))
+
+    return FetchResult(source=source, normalized_company=normalized_company, jobs=[], error="all_candidates_failed")
 
 
 def fetch_jobs_for_source(source: CompanySource) -> list[dict[str, Any]]:
