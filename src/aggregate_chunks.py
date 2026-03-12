@@ -1,0 +1,60 @@
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import sys
+from urllib.parse import quote
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(ROOT / "src"))
+
+from main import _dedupe_and_collate_jobs, validate_and_filter_jobs_by_link, write_outputs  # noqa: E402
+
+
+def _load_chunk_jobs(chunks_dir: Path) -> list[dict]:
+    chunk_files = sorted(chunks_dir.glob("jobs_*.json"))
+    all_jobs: list[dict] = []
+    for path in chunk_files:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, list):
+                all_jobs.extend(data)
+        except Exception as exc:
+            print(f"[warn] Skipping invalid chunk file {path}: {exc}")
+    print(f"[info] Loaded {len(all_jobs)} raw jobs from {len(chunk_files)} chunk files")
+    return all_jobs
+
+
+def _github_pages_url(repository: str) -> str:
+    repository = repository.strip()
+    if repository and "/" in repository:
+        owner, repo = repository.split("/", 1)
+        return f"https://{owner}.github.io/{quote(repo)}/"
+    return ""
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Aggregate chunked job artifacts and rebuild outputs")
+    parser.add_argument("--chunks-dir", default="chunk-artifacts")
+    parser.add_argument("--repository", default="")
+    parser.add_argument("--link-check-delay-seconds", type=float, default=0.8)
+    parser.add_argument("--disable-link-validation", action="store_true")
+    args = parser.parse_args()
+
+    chunks_dir = ROOT / args.chunks_dir
+    jobs = _load_chunk_jobs(chunks_dir)
+    jobs = _dedupe_and_collate_jobs(jobs)
+    jobs = validate_and_filter_jobs_by_link(
+        jobs,
+        enabled=not args.disable_link_validation,
+        delay_seconds=max(0.0, args.link_check_delay_seconds),
+    )
+
+    pages_url = _github_pages_url(args.repository)
+    write_outputs(jobs, github_pages_url=pages_url)
+    print(f"[info] Aggregated {len(jobs)} unique jobs")
+
+
+if __name__ == "__main__":
+    main()
