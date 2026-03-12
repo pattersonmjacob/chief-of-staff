@@ -32,6 +32,15 @@ jobs:
             source_offset: 6000
           - chunk_index: 7
             source_offset: 7000
+    env:
+      SOURCES_CSV: data/company_slugs.csv
+      MAX_SOURCES: 1000
+      SOURCE_OFFSET: ${{ matrix.source_offset }}
+      SCRAPE_CONCURRENCY: 8
+      MIN_REQUEST_INTERVAL_SECONDS: 0.35
+      MAX_SOURCES_PER_PLATFORM: 500
+      VALIDATE_JOB_LINKS: "true"
+      LINK_CHECK_DELAY_SECONDS: 0.8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,6 +77,8 @@ jobs:
   aggregate-and-publish:
     runs-on: ubuntu-latest
     needs: scrape-and-publish
+    env:
+      LINK_CHECK_DELAY_SECONDS: 0.8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -89,7 +100,7 @@ jobs:
           python src/aggregate_chunks.py \
             --chunks-dir chunk-artifacts \
             --repository "${{ github.repository }}" \
-            --disable-link-validation
+            --link-check-delay-seconds "${LINK_CHECK_DELAY_SECONDS}"
 
       - name: Commit generated files
         run: |
