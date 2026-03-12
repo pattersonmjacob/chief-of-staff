@@ -44,6 +44,7 @@ def load_sources_from_csv(
             vendor = _normalize_vendor(row.get("vendor", ""))
             slug = (row.get("slug", "") or "").strip().lower()
             source_url = (row.get("url") or row.get("hostedJobsUrl") or row.get("hosted_jobs_url") or "").strip()
+            board_url = (row.get("board_url") or "").strip()
             open_jobs = _to_int(row.get("open_jobs") or row.get("job_count"), default=0)
 
             if not vendor or not slug:
@@ -61,8 +62,12 @@ def load_sources_from_csv(
                 continue
 
             source_item: dict[str, str] = {"platform": vendor, "company": slug}
+            if board_url or source_url:
+                source_item["url"] = board_url or source_url
             if source_url:
-                source_item["url"] = source_url
+                source_item["source_url"] = source_url
+            if board_url:
+                source_item["board_url"] = board_url
             sources.append(source_item)
 
             if max_sources is not None and len(sources) >= max_sources:

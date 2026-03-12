@@ -14,13 +14,14 @@ from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 
 DEFAULT_TIMEOUT = 20
-USER_AGENT = "chief-of-staff-jobs-bot/1.0"
+USER_AGENT = "Mozilla/5.0 (compatible; ChiefOfStaffJobsBot/1.1; +https://github.com/)"
 MAX_RETRIES = 3
 BACKOFF_SECONDS = 1.5
-DEFAULT_MIN_REQUEST_INTERVAL = 0.35
-DEFAULT_MIN_REQUEST_INTERVAL = 0.2
+DEFAULT_MIN_REQUEST_INTERVAL = 0.5
 _REQUEST_TIMES_LOCK = threading.Lock()
 _NEXT_ALLOWED_REQUEST_AT: dict[str, float] = {}
+_REQUEST_CACHE_LOCK = threading.Lock()
+_REQUEST_CACHE: dict[str, Any] = {}
 
 
 def _to_float(value: str, default: float) -> float:
@@ -51,6 +52,8 @@ class CompanySource:
     platform: str
     company: str
     url: str = ""
+    source_url: str = ""
+    board_url: str = ""
 
 
 @dataclass
@@ -91,7 +94,32 @@ def _normalize_company_slug(platform: str, company: str) -> str:
     return path_parts[-1]
 
 
+def _board_url(platform: str, company_slug: str) -> str:
+    if platform == "greenhouse":
+        return f"https://job-boards.greenhouse.io/{quote(company_slug)}"
+    if platform == "lever":
+        return f"https://jobs.lever.co/{quote(company_slug)}"
+    if platform == "ashby":
+        return f"https://jobs.ashbyhq.com/{quote(company_slug)}"
+    return ""
+
+
+def _api_url(platform: str, company_slug: str) -> str:
+    if platform == "greenhouse":
+        return f"https://boards-api.greenhouse.io/v1/boards/{quote(company_slug)}/jobs?content=true"
+    if platform == "lever":
+        return f"https://api.lever.co/v0/postings/{quote(company_slug)}?mode=json"
+    if platform == "ashby":
+        return f"https://jobs.ashbyhq.com/api/non-user-graphql?company={quote(company_slug)}"
+    return ""
+
+
 def _fetch_json(url: str) -> Any:
+    cache_key = f"GET::{url}"
+    with _REQUEST_CACHE_LOCK:
+        if cache_key in _REQUEST_CACHE:
+            return _REQUEST_CACHE[cache_key]
+
     host_key = urlparse(url).netloc.lower() or "default"
     request = Request(url, headers={"User-Agent": USER_AGENT})
     context = ssl.create_default_context()
@@ -100,7 +128,10 @@ def _fetch_json(url: str) -> Any:
             _respect_request_interval(host_key)
             with urlopen(request, timeout=DEFAULT_TIMEOUT, context=context) as response:  # nosec B310
                 payload = response.read().decode("utf-8")
-            return json.loads(payload)
+            data = json.loads(payload)
+            with _REQUEST_CACHE_LOCK:
+                _REQUEST_CACHE[cache_key] = data
+            return data
         except HTTPError as exc:
             if exc.code not in {429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
                 raise
@@ -109,6 +140,14 @@ def _fetch_json(url: str) -> Any:
                 delay = float(retry_after)
             else:
                 delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            if exc.code == 429:
+                print(f"[warn] Rate limited on {host_key}; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
+            time.sleep(delay)
+        except URLError as exc:
+            if attempt >= MAX_RETRIES:
+                raise
+            delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            print(f"[warn] Network error on {host_key}: {exc}; retrying in {delay:.2f}s")
             time.sleep(delay)
 
 
@@ -150,7 +189,7 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
 
 
 def fetch_greenhouse(company_slug: str) -> list[dict[str, Any]]:
-    url = f"https://boards-api.greenhouse.io/v1/boards/{quote(company_slug)}/jobs?content=true"
+    url = _api_url("greenhouse", company_slug)
     data = _fetch_json(url)
     jobs = []
     for raw_job in data.get("jobs", []):
@@ -164,7 +203,7 @@ def fetch_greenhouse(company_slug: str) -> list[dict[str, Any]]:
 
 
 def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
-    url = f"https://api.lever.co/v0/postings/{quote(company_slug)}?mode=json"
+    url = _api_url("lever", company_slug)
     data = _fetch_json(url)
     jobs = []
     for raw_job in data:
@@ -182,7 +221,7 @@ def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
 
 
 def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
-    url = f"https://jobs.ashbyhq.com/api/non-user-graphql?company={quote(company_slug)}"
+    url = _api_url("ashby", company_slug)
     payload = {
         "operationName": "ApiJobBoard",
         "variables": {"organizationHostedJobsPageName": company_slug},
@@ -210,6 +249,12 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
         headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
         method="POST",
     )
+    cache_key = f"POST::{url}::{company_slug}"
+    with _REQUEST_CACHE_LOCK:
+        if cache_key in _REQUEST_CACHE:
+            data = _REQUEST_CACHE[cache_key]
+            return _ashby_jobs_from_data(company_slug, data)
+
     context = ssl.create_default_context()
     data = None
     for attempt in range(MAX_RETRIES + 1):
@@ -226,11 +271,26 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
                 delay = float(retry_after)
             else:
                 delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            if exc.code == 429:
+                print(f"[warn] Rate limited on jobs.ashbyhq.com; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
+            time.sleep(delay)
+        except URLError as exc:
+            if attempt >= MAX_RETRIES:
+                raise
+            delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
+            print(f"[warn] Network error on jobs.ashbyhq.com: {exc}; retrying in {delay:.2f}s")
             time.sleep(delay)
 
     if data is None:
         return []
 
+    with _REQUEST_CACHE_LOCK:
+        _REQUEST_CACHE[cache_key] = data
+
+    return _ashby_jobs_from_data(company_slug, data)
+
+
+def _ashby_jobs_from_data(company_slug: str, data: dict[str, Any]) -> list[dict[str, Any]]:
     teams = data.get("data", {}).get("jobBoardWithTeams", {}).get("teams", [])
     jobs: list[dict[str, Any]] = []
     for team in teams:
@@ -256,14 +316,17 @@ def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
     fallback_company = _normalize_company_slug(source.platform, source.url) if source.url else ""
     if normalized_company != source.company:
         print(f"[info] Normalized {source.platform} source: {source.company} -> {normalized_company}")
+
     candidates = [normalized_company]
     if fallback_company and fallback_company not in candidates:
         candidates.append(fallback_company)
 
     for idx, company_candidate in enumerate(candidates):
+        api_url = _api_url(source.platform, company_candidate)
+        board_url = source.board_url or _board_url(source.platform, company_candidate)
         print(
             f"[info] Fetch attempt {idx + 1}/{len(candidates)} for {source.platform}:{source.company} "
-            f"candidate={company_candidate} source_url={source.url or '<none>'}"
+            f"candidate={company_candidate} api_url={api_url} board_url={board_url} source_url={source.source_url or source.url or '<none>'}"
         )
         try:
             if source.platform == "greenhouse":
@@ -274,6 +337,8 @@ def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
                 jobs = fetch_ashby(company_candidate)
             else:
                 raise ValueError(f"Unsupported platform: {source.platform}")
+
+            print(f"[info] {source.platform}:{company_candidate} returned {len(jobs)} jobs ({api_url})")
             if idx > 0:
                 print(f"[info] Recovered via URL fallback for {source.platform}:{source.company} -> {company_candidate}")
             return FetchResult(source=source, normalized_company=company_candidate, jobs=jobs)
@@ -289,13 +354,13 @@ def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
             if can_retry_with_fallback:
                 print(f"[warn] {source.platform}:{company_candidate} failed HTTP {exc.code}; retrying with fallback identifier")
                 continue
-            print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason}{details}")
+            print(f"[warn] {source.platform}:{source.company} failed: HTTP {exc.code} {exc.reason} api_url={api_url}{details}")
             return FetchResult(source=source, normalized_company=company_candidate, jobs=[], http_status=exc.code, error=f"HTTP {exc.code}")
         except (URLError, TimeoutError, ValueError) as exc:
             if idx < len(candidates) - 1:
                 print(f"[warn] {source.platform}:{company_candidate} failed: {exc}; trying URL fallback")
                 continue
-            print(f"[warn] {source.platform}:{source.company} failed: {exc}")
+            print(f"[warn] {source.platform}:{source.company} failed: {exc} api_url={api_url}")
             return FetchResult(source=source, normalized_company=company_candidate, jobs=[], error=str(exc))
 
     return FetchResult(source=source, normalized_company=normalized_company, jobs=[], error="all_candidates_failed")

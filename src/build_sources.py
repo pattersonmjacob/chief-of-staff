@@ -26,7 +26,6 @@ def _pick(row: dict[str, str], keys: list[str]) -> str:
     return ""
 
 
-
 def _normalize_slug(vendor: str, raw_slug: str) -> str:
     value = (raw_slug or "").strip().lower().strip("/")
     if not value:
@@ -53,7 +52,22 @@ def _normalize_slug(vendor: str, raw_slug: str) -> str:
 
     return value
 
-def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[dict[str, str]], ashby_rows: list[dict[str, str]]) -> list[dict[str, str]]:
+
+def _build_board_url(vendor: str, slug: str) -> str:
+    if vendor == "Greenhouse":
+        return f"https://job-boards.greenhouse.io/{slug}"
+    if vendor == "Lever":
+        return f"https://jobs.lever.co/{slug}"
+    if vendor == "Ashby":
+        return f"https://jobs.ashbyhq.com/{slug}"
+    return ""
+
+
+def merge_source_rows(
+    greenhouse_rows: list[dict[str, str]],
+    lever_rows: list[dict[str, str]],
+    ashby_rows: list[dict[str, str]],
+) -> list[dict[str, str]]:
     merged: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
 
@@ -71,12 +85,14 @@ def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[di
                 continue
             seen.add(key)
 
+            board_url = _build_board_url(vendor, slug)
             merged.append(
                 {
                     "slug": slug,
                     "vendor": vendor,
                     "company": company or slug,
                     "url": source_url,
+                    "board_url": board_url,
                     "open_jobs": "1",
                 }
             )
@@ -90,7 +106,7 @@ def merge_source_rows(greenhouse_rows: list[dict[str, str]], lever_rows: list[di
 def write_sources_csv(rows: list[dict[str, str]], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["slug", "vendor", "company", "url", "open_jobs"])
+        writer = csv.DictWriter(f, fieldnames=["slug", "vendor", "company", "url", "board_url", "open_jobs"])
         writer.writeheader()
         writer.writerows(rows)
 

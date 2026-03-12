@@ -27,6 +27,37 @@ jobs:
             --greenhouse-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv \
             --ashby-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv
 
+      - name: Validate and preview source CSV
+        run: |
+          python - <<'PY'
+          import csv
+          from collections import Counter
+
+          path = "data/company_slugs.csv"
+          with open(path, newline="", encoding="utf-8") as f:
+              rows = list(csv.DictReader(f))
+
+          required = ["slug", "vendor", "company", "url", "board_url", "open_jobs"]
+          missing = [c for c in required if c not in (rows[0].keys() if rows else [])]
+          if missing:
+              raise SystemExit(f"Missing required columns: {missing}")
+
+          counts = Counter((r.get("vendor") or "").strip() for r in rows)
+          print(f"[info] Source rows: total={len(rows)} greenhouse={counts.get('Greenhouse',0)} lever={counts.get('Lever',0)} ashby={counts.get('Ashby',0)}")
+
+          missing_source_url = sum(1 for r in rows if not (r.get("url") or "").strip())
+          missing_board_url = sum(1 for r in rows if not (r.get("board_url") or "").strip())
+          print(f"[info] Missing source url rows: {missing_source_url}")
+          print(f"[info] Missing board url rows: {missing_board_url}")
+
+          print("[info] Preview (vendor | slug | source_url | board_url):")
+          for row in rows[:25]:
+              print(
+                  f"[info] {row.get('vendor','')} | {row.get('slug','')} | "
+                  f"{row.get('url','<none>')} | {row.get('board_url','<none>')}"
+              )
+          PY
+
       - name: Commit refreshed source CSV
         run: |
           git config user.name "github-actions[bot]"

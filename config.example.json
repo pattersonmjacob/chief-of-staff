@@ -40,11 +40,9 @@
     "enabled": false
   },
   "github_pages_url": "",
-  "scrape_concurrency": 1,
+  "scrape_concurrency": 4,
   "verbose_sources": false,
   "validate_job_links": true,
   "link_check_delay_seconds": 0.8,
   "max_sources_per_platform": 500
-  "scrape_concurrency": 8,
-  "verbose_sources": false
 }
