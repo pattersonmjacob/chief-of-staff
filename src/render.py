@@ -77,7 +77,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     <section class=\"table-wrap\">
       <table>
         <thead>
-          <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th></tr>
+          <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Summary</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th><th>Details</th></tr>
         </thead>
         <tbody id=\"jobs-body\"></tbody>
       </table>
@@ -93,6 +93,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     let allJobs = [];
     let filteredJobs = [];
     let renderedCount = 0;
+    const detailCache = new Map();
 
     const inHours = (iso, hours) => {
       const t = Date.parse(iso || '');
@@ -119,16 +120,62 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       if (job.is_chief_of_staff) flags.push(badge('Chief of Staff', 'chief'));
       if (job.is_new) flags.push(badge('NEW', 'new'));
 
-      return `<tr>
+      const rowId = `job-${escapeHtml(job.id || '')}`;
+      return `<tr data-job-id="${escapeHtml(job.id || '')}">
         <td>${escapeHtml(job.title || '')}</td>
         <td>${escapeHtml(job.company || '')}</td>
         <td>${escapeHtml(job.platform || '')}</td>
         <td>${escapeHtml(job.location || '')}</td>
+        <td>${escapeHtml(job.summary || '')}</td>
         <td>${escapeHtml(job.posted_at || '—')}</td>
         <td>${escapeHtml(job.first_seen_at || '—')}</td>
         <td>${flags.join('')}</td>
         <td><a href="${escapeHtml(job.url || '')}" target="_blank" rel="noopener noreferrer">Apply</a></td>
-      </tr>`;
+        <td><button type="button" class="secondary-link" data-details-for="${escapeHtml(job.id || '')}" style="padding:.3rem .5rem;">Open</button></td>
+      </tr><tr id="${rowId}" class="detail-row" style="display:none;"><td colspan="10" class="muted">Loading details…</td></tr>`;
+    }
+
+
+    async function loadChunk(chunkName) {
+      if (!chunkName) return [];
+      if (detailCache.has(chunkName)) return detailCache.get(chunkName);
+      const response = await fetch(`../data/jobs/${encodeURIComponent(chunkName)}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const byId = new Map((Array.isArray(data) ? data : []).map((row) => [String(row.id || ''), row]));
+      detailCache.set(chunkName, byId);
+      return byId;
+    }
+
+    async function toggleDetails(button) {
+      const jobId = String(button.getAttribute('data-details-for') || '');
+      const job = allJobs.find((item) => String(item.id || '') === jobId);
+      if (!job) return;
+      const detailRow = document.getElementById(`job-${jobId}`);
+      if (!detailRow) return;
+      if (detailRow.style.display === '') {
+        detailRow.style.display = 'none';
+        button.textContent = 'Open';
+        return;
+      }
+
+      detailRow.style.display = '';
+      button.textContent = 'Close';
+      detailRow.firstElementChild.innerText = 'Loading details…';
+      try {
+        const chunk = await loadChunk(job.detail_chunk || '');
+        const details = chunk.get(jobId) || {};
+        const body = [
+          `Department: ${details.department || '—'}`,
+          `Team: ${details.team || '—'}`,
+          `Employment type: ${details.employment_type || '—'}`,
+          '',
+          String(details.description || 'No additional description available.'),
+        ].join('\n');
+        detailRow.firstElementChild.innerText = body;
+      } catch (err) {
+        detailRow.firstElementChild.innerText = `Failed to load details: ${err}`;
+      }
     }
 
     function applyFilters() {
@@ -185,6 +232,13 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       controls.forEach((el) => el.addEventListener('input', applyFilters));
       controls.forEach((el) => el.addEventListener('change', applyFilters));
       applyFilters();
+
+      q('jobs-body').addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const button = target.closest('button[data-details-for]');
+        if (button instanceof HTMLButtonElement) toggleDetails(button);
+      });
 
       const sentinel = q('scroll-sentinel');
       const observer = new IntersectionObserver((entries) => {

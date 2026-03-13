@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+import gzip
 import json
 from json import JSONDecodeError
 import os
@@ -30,6 +31,8 @@ RUN_META_JSON = ROOT / "data" / "run_meta.json"
 DO_NOT_CHECK_JSON = ROOT / "data" / "do_not_check.json"
 JOBS_CHIEF_JSON = ROOT / "jobs_chief_of_staff.json"
 JOBS_CHIEF_CSV = ROOT / "jobs_chief_of_staff.csv"
+DETAILS_DIR = ROOT / "data" / "jobs"
+SUMMARY_MAX_CHARS = 220
 
 
 def utc_now_iso() -> str:
@@ -614,13 +617,12 @@ def filter_jobs(
 def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
     """Drop bulky/non-essential fields to keep published artifacts small."""
     allowed_fields = [
+        "id",
         "title",
         "company",
         "platform",
         "location",
-        "department",
-        "team",
-        "employment_type",
+        "summary",
         "job_function",
         "is_technical",
         "is_chief_of_staff",
@@ -630,6 +632,7 @@ def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
         "last_seen_at",
         "is_new",
         "url",
+        "detail_chunk",
     ]
     compact: dict[str, Any] = {}
     for field in allowed_fields:
@@ -656,13 +659,12 @@ def resolve_github_pages_url(cfg: dict[str, Any]) -> str:
 def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         fieldnames = [
+            "id",
             "title",
             "company",
             "platform",
             "location",
-            "department",
-            "team",
-            "employment_type",
+            "summary",
             "job_function",
             "is_technical",
             "is_chief_of_staff",
@@ -672,6 +674,7 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             "last_seen_at",
             "is_new",
             "url",
+            "detail_chunk",
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -679,18 +682,80 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             writer.writerow({name: job.get(name, "") for name in fieldnames})
 
 
-def write_outputs(all_jobs: list[dict[str, Any]], chief_jobs: list[dict[str, Any]], github_pages_url: str = "") -> None:
-    compact_all_jobs = [_compact_job_for_output(job) for job in all_jobs]
-    compact_chief_jobs = [_compact_job_for_output(job) for job in chief_jobs]
 
-    JOBS_JSON.write_text(json.dumps(compact_all_jobs, indent=2))
-    JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, indent=2))
+
+def _clean_summary(text: Any, max_chars: int = SUMMARY_MAX_CHARS) -> str:
+    cleaned = re.sub(r"\s+", " ", str(text or "").strip())
+    if not cleaned:
+        return ""
+    return cleaned if len(cleaned) <= max_chars else f"{cleaned[: max_chars - 1].rstrip()}…"
+
+
+def _enrich_for_publication(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    enriched: list[dict[str, Any]] = []
+    for job in jobs:
+        key = _job_key(job)
+        platform = str(job.get("platform", "")).lower() or "unknown"
+        enriched_job = dict(job)
+        enriched_job["id"] = key
+        enriched_job["summary"] = _clean_summary(job.get("description", ""))
+        enriched_job["detail_chunk"] = f"{platform}.json"
+        enriched.append(enriched_job)
+    return enriched
+
+
+def _write_gzip_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(path, "wt", encoding="utf-8") as f:
+        json.dump(payload, f, separators=(",", ":"))
+
+
+def _write_detail_chunks(jobs: list[dict[str, Any]]) -> list[str]:
+    DETAILS_DIR.mkdir(parents=True, exist_ok=True)
+    for existing in DETAILS_DIR.glob("*.json"):
+        existing.unlink()
+    for existing in DETAILS_DIR.glob("*.json.gz"):
+        existing.unlink()
+
+    chunks: dict[str, list[dict[str, Any]]] = {}
+    for job in jobs:
+        chunk_name = str(job.get("detail_chunk") or "unknown.json")
+        detail_entry = {
+            "id": job.get("id", ""),
+            "description": job.get("description", ""),
+            "department": job.get("department", ""),
+            "team": job.get("team", ""),
+            "employment_type": job.get("employment_type", ""),
+        }
+        chunks.setdefault(chunk_name, []).append(detail_entry)
+
+    written: list[str] = []
+    for chunk_name, entries in chunks.items():
+        json_path = DETAILS_DIR / chunk_name
+        json_path.write_text(json.dumps(entries, separators=(",", ":")), encoding="utf-8")
+        _write_gzip_json(Path(f"{json_path}.gz"), entries)
+        written.append(chunk_name)
+
+    return written
+
+def write_outputs(all_jobs: list[dict[str, Any]], chief_jobs: list[dict[str, Any]], github_pages_url: str = "") -> None:
+    publishable_all_jobs = _enrich_for_publication(all_jobs)
+    publishable_chief_jobs = _enrich_for_publication(chief_jobs)
+    compact_all_jobs = [_compact_job_for_output(job) for job in publishable_all_jobs]
+    compact_chief_jobs = [_compact_job_for_output(job) for job in publishable_chief_jobs]
+
+    JOBS_JSON.write_text(json.dumps(compact_all_jobs, separators=(",", ":")), encoding="utf-8")
+    JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, separators=(",", ":")), encoding="utf-8")
+    _write_gzip_json(Path(f"{JOBS_JSON}.gz"), compact_all_jobs)
+    _write_gzip_json(Path(f"{JOBS_CHIEF_JSON}.gz"), compact_chief_jobs)
+    written_chunks = _write_detail_chunks(publishable_all_jobs)
 
     _write_csv(JOBS_CSV, compact_all_jobs)
     _write_csv(JOBS_CHIEF_CSV, compact_chief_jobs)
 
     DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
     DOCS_HTML.write_text(render_html(compact_all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
+    print(f"[info] Wrote {len(written_chunks)} detail chunk(s) under data/jobs/")
 
 
 def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> None:
