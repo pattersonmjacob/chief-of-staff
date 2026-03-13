@@ -4,56 +4,14 @@ from datetime import datetime, timezone
 from html import escape
 
 
-def _badge(text: str, cls: str) -> str:
-    return f'<span class="badge {cls}">{escape(text)}</span>'
-
-
 def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     chief_count = sum(1 for job in jobs if job.get("is_chief_of_staff"))
 
-    rows = []
-    for job in jobs:
-        flags = [
-            _badge("Technical" if job.get("is_technical") else "Non-technical", "tech" if job.get("is_technical") else "non-tech"),
-            _badge(str(job.get("job_function", "other")), "function"),
-        ]
-        if job.get("is_chief_of_staff"):
-            flags.append(_badge("Chief of Staff", "chief"))
-        if job.get("is_new"):
-            flags.append(_badge("NEW", "new"))
-
-        posted = escape(str(job.get("posted_at", "") or "")) or "—"
-        first_seen = escape(str(job.get("first_seen_at", "") or "")) or "—"
-
-        rows.append(
-            "<tr "
-            f"data-title=\"{escape(str(job.get('title', '')).lower())}\" "
-            f"data-company=\"{escape(str(job.get('company', '')).lower())}\" "
-            f"data-platform=\"{escape(str(job.get('platform', '')).lower())}\" "
-            f"data-technical=\"{'yes' if job.get('is_technical') else 'no'}\" "
-            f"data-function=\"{escape(str(job.get('job_function', 'other')).lower())}\" "
-            f"data-chief=\"{'yes' if job.get('is_chief_of_staff') else 'no'}\" "
-            f"data-new=\"{'yes' if job.get('is_new') else 'no'}\" "
-            f"data-first-seen=\"{escape(str(job.get('first_seen_at', '')))}\""
-            ">"
-            f"<td>{escape(job.get('title', ''))}</td>"
-            f"<td>{escape(job.get('company', ''))}</td>"
-            f"<td>{escape(job.get('platform', ''))}</td>"
-            f"<td>{escape(job.get('location', ''))}</td>"
-            f"<td>{posted}</td>"
-            f"<td>{first_seen}</td>"
-            f"<td>{''.join(flags)}</td>"
-            f"<td><a href=\"{escape(job.get('url', ''))}\" target=\"_blank\" rel=\"noopener noreferrer\">Apply</a></td>"
-            "</tr>"
-        )
-
     pages_link = ""
     if github_pages_url:
         safe_link = escape(github_pages_url)
-        pages_link = f"<a class=\"pages-link\" href=\"{safe_link}\" target=\"_blank\" rel=\"noopener noreferrer\">Open GitHub Pages ↗</a>"
-
-    table_rows = "\n".join(rows) if rows else "<tr><td colspan='8'>No jobs found.</td></tr>"
+        pages_link = f'<a class="pages-link" href="{safe_link}" target="_blank" rel="noopener noreferrer">Open GitHub Pages ↗</a>'
 
     html = """<!doctype html>
 <html lang=\"en\">
@@ -69,7 +27,9 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     .header { display:flex; justify-content:space-between; align-items:end; gap:1rem; flex-wrap:wrap; margin-bottom:1rem; background:linear-gradient(130deg,#0f172a,#111827); border:1px solid #33415599; border-radius:18px; padding:1rem 1.1rem; box-shadow: 0 20px 60px #02061780; }
     h1 { margin: 0; font-size: clamp(1.6rem, 2.8vw, 2.4rem); letter-spacing: .2px; }
     .meta { color: var(--muted); margin:.35rem 0 0; }
-    .pages-link { text-decoration:none; color:#04111d; background:linear-gradient(135deg,var(--accent),#67e8f9); padding:.58rem .85rem; border-radius:12px; font-weight:700; box-shadow:0 8px 24px #22d3ee3d; }
+    .header-actions { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+    .pages-link, .secondary-link { text-decoration:none; color:#04111d; background:linear-gradient(135deg,var(--accent),#67e8f9); padding:.58rem .85rem; border-radius:12px; font-weight:700; box-shadow:0 8px 24px #22d3ee3d; }
+    .secondary-link { background:#1f2937; color:#cbd5e1; box-shadow:none; border:1px solid #334155; }
     .toolbar { display:grid; grid-template-columns: 1.6fr repeat(4, 1fr); gap:.55rem; margin:.9rem 0 1rem; background: var(--card); border:1px solid #334155aa; border-radius:16px; padding:.7rem; backdrop-filter: blur(6px); }
     .toolbar input,.toolbar select { padding:.62rem; border:1px solid #334155; border-radius:12px; background:#020617a8; color:var(--text); }
     .toolbar .toggle { display:flex; align-items:center; gap:.4rem; padding:.62rem; border:1px solid #334155; border-radius:12px; background:#020617a8; }
@@ -85,6 +45,8 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     .function { background:#2e1065; color:#c4b5fd; border-color:#5b21b6; }
     .chief { background:#082f49; color:#bae6fd; border-color:#0c4a6e; }
     .new { background:#3f1d2e; color:#f9a8d4; border-color:#9d174d; }
+    .load-status { color:var(--muted); padding:.75rem .1rem .1rem; font-size:.92rem; }
+    .sentinel { height: 1px; }
     a { color:#67e8f9; }
     @media (max-width: 980px) { .toolbar { grid-template-columns: 1fr 1fr; } }
   </style>
@@ -96,7 +58,10 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         <h1>ATS Jobs Tracker</h1>
         <p class=\"meta\">__TOTAL__ total jobs · __CHIEF_TOTAL__ Chief of Staff matches · Generated __GENERATED__</p>
       </div>
-      __PAGES_LINK__
+      <div class=\"header-actions\">
+        <a class=\"secondary-link\" href=\"../jobs.csv\" download>Download CSV</a>
+        __PAGES_LINK__
+      </div>
     </header>
 
     <div class=\"toolbar\">
@@ -107,28 +72,64 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       <select id=\"freshness\"><option value=\"\">All time</option><option value=\"new\">New since last run</option><option value=\"12h\">First seen ≤12h</option><option value=\"24h\">First seen ≤24h</option></select>
       <label class=\"toggle\"><input id=\"chiefOnly\" type=\"checkbox\" checked /> Chief of Staff only</label>
     </div>
-    <p class=\"summary\" id=\"summary\">Showing __CHIEF_TOTAL__ of __TOTAL__ jobs.</p>
+    <p class=\"summary\" id=\"summary\">Loading jobs…</p>
 
     <section class=\"table-wrap\">
       <table>
         <thead>
           <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th></tr>
         </thead>
-        <tbody id=\"jobs-body\">__ROWS__</tbody>
+        <tbody id=\"jobs-body\"></tbody>
       </table>
     </section>
+    <p id=\"load-status\" class=\"load-status\"></p>
+    <div id=\"scroll-sentinel\" class=\"sentinel\"></div>
   </main>
 
   <script>
     const q = (id) => document.getElementById(id);
-    const rows = Array.from(document.querySelectorAll('#jobs-body tr'));
+    const CHUNK_SIZE = 100;
     const controls = ['search','platform','technical','function','freshness','chiefOnly'].map(q);
+    let allJobs = [];
+    let filteredJobs = [];
+    let renderedCount = 0;
 
     const inHours = (iso, hours) => {
       const t = Date.parse(iso || '');
       if (!t) return false;
       return (Date.now() - t) <= (hours * 3600 * 1000);
     };
+
+    const badge = (text, cls) => `<span class="badge ${cls}">${text}</span>`;
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderRow(job) {
+      const flags = [
+        badge(job.is_technical ? 'Technical' : 'Non-technical', job.is_technical ? 'tech' : 'non-tech'),
+        badge(job.job_function || 'other', 'function'),
+      ];
+      if (job.is_chief_of_staff) flags.push(badge('Chief of Staff', 'chief'));
+      if (job.is_new) flags.push(badge('NEW', 'new'));
+
+      return `<tr>
+        <td>${escapeHtml(job.title || '')}</td>
+        <td>${escapeHtml(job.company || '')}</td>
+        <td>${escapeHtml(job.platform || '')}</td>
+        <td>${escapeHtml(job.location || '')}</td>
+        <td>${escapeHtml(job.posted_at || '—')}</td>
+        <td>${escapeHtml(job.first_seen_at || '—')}</td>
+        <td>${flags.join('')}</td>
+        <td><a href="${escapeHtml(job.url || '')}" target="_blank" rel="noopener noreferrer">Apply</a></td>
+      </tr>`;
+    }
 
     function applyFilters() {
       const search = q('search').value.trim().toLowerCase();
@@ -137,31 +138,62 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       const func = q('function').value.toLowerCase();
       const freshness = q('freshness').value;
       const chiefOnly = q('chiefOnly').checked;
-      let shown = 0;
 
-      rows.forEach((row) => {
-        const locationText = (row.children[3]?.innerText || '').toLowerCase();
-        const text = [row.dataset.title || '', row.dataset.company || '', locationText].join(' ');
-        let visible = true;
-        if (search && !text.includes(search)) visible = false;
-        if (platform && row.dataset.platform !== platform) visible = false;
-        if (technical && row.dataset.technical !== technical) visible = false;
-        if (func && row.dataset.function !== func) visible = false;
-        if (freshness === 'new' && row.dataset.new !== 'yes') visible = false;
-        if (freshness === '12h' && !inHours(row.dataset.firstSeen, 12)) visible = false;
-        if (freshness === '24h' && !inHours(row.dataset.firstSeen, 24)) visible = false;
-        if (chiefOnly && row.dataset.chief !== 'yes') visible = false;
-
-        row.style.display = visible ? '' : 'none';
-        if (visible) shown += 1;
+      filteredJobs = allJobs.filter((job) => {
+        const text = [job.title || '', job.company || '', job.location || ''].join(' ').toLowerCase();
+        if (search && !text.includes(search)) return false;
+        if (platform && (job.platform || '').toLowerCase() !== platform) return false;
+        if (technical && (job.is_technical ? 'yes' : 'no') !== technical) return false;
+        if (func && (job.job_function || '').toLowerCase() !== func) return false;
+        if (freshness === 'new' && !job.is_new) return false;
+        if (freshness === '12h' && !inHours(job.first_seen_at, 12)) return false;
+        if (freshness === '24h' && !inHours(job.first_seen_at, 24)) return false;
+        if (chiefOnly && !job.is_chief_of_staff) return false;
+        return true;
       });
 
-      q('summary').innerText = `Showing ${shown} of ${rows.length} jobs.`;
+      q('jobs-body').innerHTML = '';
+      renderedCount = 0;
+      renderNextChunk();
     }
 
-    controls.forEach((el) => el.addEventListener('input', applyFilters));
-    controls.forEach((el) => el.addEventListener('change', applyFilters));
-    applyFilters();
+    function renderNextChunk() {
+      if (renderedCount >= filteredJobs.length) {
+        q('load-status').innerText = `Loaded all ${filteredJobs.length} matching jobs.`;
+        return;
+      }
+
+      const next = filteredJobs.slice(renderedCount, renderedCount + CHUNK_SIZE);
+      q('jobs-body').insertAdjacentHTML('beforeend', next.map(renderRow).join(''));
+      renderedCount += next.length;
+      q('summary').innerText = `Showing ${filteredJobs.length} of ${allJobs.length} jobs.`;
+      q('load-status').innerText = `Rendered ${renderedCount}/${filteredJobs.length} matching jobs (${CHUNK_SIZE} at a time).`;
+    }
+
+    async function loadJobs() {
+      try {
+        const response = await fetch('../jobs.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        allJobs = Array.isArray(data) ? data : [];
+      } catch (err) {
+        q('summary').innerText = 'Failed to load jobs.json.';
+        q('load-status').innerText = `Error: ${err}`;
+        return;
+      }
+
+      controls.forEach((el) => el.addEventListener('input', applyFilters));
+      controls.forEach((el) => el.addEventListener('change', applyFilters));
+      applyFilters();
+
+      const sentinel = q('scroll-sentinel');
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) renderNextChunk();
+      }, { rootMargin: '400px' });
+      observer.observe(sentinel);
+    }
+
+    loadJobs();
   </script>
 </body>
 </html>
@@ -171,6 +203,5 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         html.replace("__TOTAL__", str(len(jobs)))
         .replace("__CHIEF_TOTAL__", str(chief_count))
         .replace("__GENERATED__", generated_at)
-        .replace("__ROWS__", table_rows)
         .replace("__PAGES_LINK__", pages_link)
     )
