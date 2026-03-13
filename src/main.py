@@ -438,6 +438,7 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     env_max_sources = os.getenv("MAX_SOURCES", "").strip()
     env_source_offset = os.getenv("SOURCE_OFFSET", "").strip()
     env_max_sources_per_platform = os.getenv("MAX_SOURCES_PER_PLATFORM", "").strip()
+    env_platform_filter = os.getenv("PLATFORM_FILTER", "").strip().lower()
     env_validate_job_links = os.getenv("VALIDATE_JOB_LINKS", "").strip().lower()
     env_link_check_delay_seconds = os.getenv("LINK_CHECK_DELAY_SECONDS", "").strip()
     env_max_job_age_days = os.getenv("MAX_JOB_AGE_DAYS", "").strip()
@@ -461,6 +462,10 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     if env_max_sources_per_platform:
         updated["max_sources_per_platform"] = int(env_max_sources_per_platform)
         print(f"[info] Using MAX_SOURCES_PER_PLATFORM override: {env_max_sources_per_platform}")
+
+    if env_platform_filter in {"greenhouse", "lever", "ashby"}:
+        updated["platform_filter"] = env_platform_filter
+        print(f"[info] Using PLATFORM_FILTER override: {env_platform_filter}")
 
     if env_validate_job_links in {"true", "false", "1", "0", "yes", "no"}:
         updated["validate_job_links"] = env_validate_job_links in {"true", "1", "yes"}
@@ -509,16 +514,26 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         max_sources = cfg.get("max_sources")
         max_sources_int = int(max_sources) if max_sources is not None else None
         source_offset = int(cfg.get("source_offset", 0))
+        platform_filter = str(cfg.get("platform_filter", "")).strip().lower()
+        if platform_filter and platform_filter not in {"greenhouse", "lever", "ashby"}:
+            platform_filter = ""
+
         try:
             source_rows = load_sources_from_csv(
                 ROOT / sources_csv,
                 min_open_jobs=min_open_jobs,
                 max_sources=max_sources_int,
                 source_offset=source_offset,
+                platform_filter=platform_filter or None,
             )
-            print(f"[info] Loaded {len(source_rows)} sources from {sources_csv} (offset={source_offset}, max={max_sources_int})")
+            print(f"[info] Loaded {len(source_rows)} sources from {sources_csv} (offset={source_offset}, max={max_sources_int}, platform={platform_filter or 'all'})")
         except FileNotFoundError:
             print(f"[warn] sources_csv not found at {sources_csv}; falling back to config.sources")
+
+    platform_filter = str(cfg.get("platform_filter", "")).strip().lower()
+    if platform_filter in {"greenhouse", "lever", "ashby"}:
+        source_rows = [item for item in source_rows if str(item.get("platform", "")).strip().lower() == platform_filter]
+        print(f"[info] Applied platform filter: {platform_filter}={len(source_rows)}")
 
     max_per_platform = int(cfg.get("max_sources_per_platform", 0) or 0)
     if max_per_platform > 0:
