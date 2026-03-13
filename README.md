@@ -55,7 +55,7 @@ _Chief-of-Staff matches: 15 · Snapshot timestamp: 2026-03-12 23:25 UTC_
      - Optional controls:
        - `min_open_jobs` (default `1`)
        - `max_sources` (optional; leave empty or `null` for no cap)
-       - `max_sources_per_platform` (default `500`; cap applied independently to Greenhouse/Lever/Ashby)
+       - `max_sources_per_platform` (optional; leave empty, `null`, or `0` for no per-platform cap)
        - `scrape_concurrency` (default `1`; set to `1` for no in-process concurrency)
        - `validate_job_links` (default `true`; verifies job URLs before publishing and removes unavailable postings)
        - `link_check_delay_seconds` (default `0.8`; delay between URL checks to avoid rate limits)
@@ -139,7 +139,7 @@ This gives you a stable, versioned source list in-repo that is refreshed weekly 
 - Add per-request pacing for big source lists:
   - Set `MIN_REQUEST_INTERVAL_SECONDS=0.35` to add a small cross-thread gap between requests per host.
 - Keep chunk jobs from overloading providers:
-  - The daily workflow runs a single sequential digest job (`SCRAPE_CONCURRENCY=1`) and caps sources at `MAX_SOURCES_PER_PLATFORM=500`.
+  - The daily workflow defaults to uncapped source limits (`MAX_SOURCES` and `MAX_SOURCES_PER_PLATFORM` unset). Use manual dispatch inputs to add temporary caps when needed.
 - Retries are built in for temporary provider limits/errors:
   - Scraper requests now back off and retry for `429/5xx` responses.
 - Source-identifier fallback is enabled:
@@ -149,21 +149,11 @@ This gives you a stable, versioned source list in-repo that is refreshed weekly 
 
 ### Large-list tuning playbook (fast + fewer rate limits)
 
-- Start with `SCRAPE_CONCURRENCY=1`, `MAX_SOURCES_PER_PLATFORM=500`, and `MIN_REQUEST_INTERVAL_SECONDS=0.35`.
-  - Set `"scrape_concurrency": 8` (or lower) in `config.json`, or run with `SCRAPE_CONCURRENCY=8`.
-- Add per-request pacing for big source lists:
-  - Set `MIN_REQUEST_INTERVAL_SECONDS=0.2` to add a small cross-thread gap between requests per host.
-- Keep chunk jobs from overloading providers:
-  - The daily workflow limits chunk fan-out (`max-parallel: 2`) and defaults to `SCRAPE_CONCURRENCY=8`.
-- Retries are built in for temporary provider limits/errors:
-  - Scraper requests now back off and retry for `429/5xx` responses.
-
-### Large-list tuning playbook (fast + fewer rate limits)
-
-- Start with `SCRAPE_CONCURRENCY=8` and `MIN_REQUEST_INTERVAL_SECONDS=0.2`.
-- If you still see many 429s, lower concurrency to `6` then `4` before increasing the interval.
-- If 429s are low and runtime is too slow, increase concurrency gradually (`10`, `12`) while keeping interval in place.
-- Keep chunking enabled (`MAX_SOURCES` + `SOURCE_OFFSET`) so failures are isolated and retries are cheaper.
+- Start with conservative throttle settings: `SCRAPE_CONCURRENCY=1` and `MIN_REQUEST_INTERVAL_SECONDS=0.35`.
+- If you see sustained `429` responses, keep concurrency low and increase interval (`0.5` to `1.0`).
+- If runtime is too slow and `429`s are rare, raise concurrency gradually (`2`, `4`, `6`) while keeping an interval in place.
+- Keep chunking enabled (`SOURCE_OFFSET` with optional `MAX_SOURCES`) so failures are isolated and retries are cheaper.
+- For manual `workflow_dispatch` runs, use `max_sources` / `max_sources_per_platform` inputs as temporary throttles instead of editing workflow code.
 
 ## Optional SMTP email
 

@@ -11,14 +11,24 @@ on:
         required: false
         default: false
         type: boolean
+      max_sources:
+        description: "Optional cap for sources processed per chunk (empty = uncapped)"
+        required: false
+        default: ""
+        type: string
+      max_sources_per_platform:
+        description: "Optional per-platform cap (empty = uncapped)"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
 
 env:
   SOURCES_CSV: data/company_slugs.csv
-  MAX_SOURCES: 1000
-  MAX_SOURCES_PER_PLATFORM: 500
+  MAX_SOURCES: ""
+  MAX_SOURCES_PER_PLATFORM: ""
   SCRAPE_CONCURRENCY: 3
   MIN_REQUEST_INTERVAL_SECONDS: 0.8
   REQUEST_TIMEOUT_SECONDS: 25
@@ -77,6 +87,8 @@ jobs:
         env:
           SOURCE_OFFSET: ${{ matrix.source_offset }}
           VALIDATE_JOB_LINKS: ${{ steps.link_mode.outputs.validate_links }}
+          MAX_SOURCES: ${{ github.event_name == 'workflow_dispatch' && inputs.max_sources || env.MAX_SOURCES }}
+          MAX_SOURCES_PER_PLATFORM: ${{ github.event_name == 'workflow_dispatch' && inputs.max_sources_per_platform || env.MAX_SOURCES_PER_PLATFORM }}
         run: python src/main.py
 
       - name: Save chunk outputs
