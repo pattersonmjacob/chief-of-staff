@@ -37,7 +37,7 @@
   </style>
 </head>
 <body>
-  <main class="container">
+  <main class="container" data-base-path="">
     <header class="header">
       <div>
         <h1>ATS Jobs Tracker</h1>
@@ -74,6 +74,13 @@
 
   <script>
     const q = (id) => document.getElementById(id);
+    const basePath = (document.querySelector('[data-base-path]')?.dataset.basePath || '').trim();
+    const assetUrl = (filename) => {
+      if (basePath) {
+        return `${basePath.replace(/\/$/, '')}/${filename}`;
+      }
+      return `./${filename}`;
+    };
     const CHUNK_SIZE = 100;
     const controls = ['search','platform','technical','function','freshness','showChiefSubset','showStrategyOpsSubset'].map(q);
     let allJobs = [];
@@ -208,6 +215,7 @@
       observer.observe(sentinel);
     }
 
+    q('download-csv').href = assetUrl('jobs.csv');
     loadJobs();
   </script>
 </body>

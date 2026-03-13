@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,13 +48,59 @@ def _sort_key(role: dict) -> tuple[datetime, datetime, str]:
 
 def _format_role_line(role: dict) -> str:
     title = role.get("title") or "Untitled role"
-    company = role.get("company") or "Unknown company"
-    platform = role.get("platform") or "Unknown platform"
-    location = role.get("location") or "Unknown location"
-    posted = role.get("posted_at") or "Unknown"
+    company = role.get("company")
+    platform = role.get("platform")
+    location = role.get("location")
     url = role.get("url") or ""
+    recency = _recency_label(role)
+    summary = _summary_token(role)
 
-    return f"- {title} — {company} ({platform}) — {location} — {posted} — [Link]({url})"
+    role_title = f"[{title}]({url})" if url else title
+    suffix_parts = [part for part in (company, platform, location) if part]
+    suffix = f" — {' · '.join(suffix_parts)}" if suffix_parts else ""
+
+    meta_parts = [part for part in (recency, summary) if part]
+    meta = f" — {' · '.join(meta_parts)}" if meta_parts else ""
+    return f"- {role_title}{suffix}{meta}"
+
+
+def _truncate(value: str, limit: int = 24) -> str:
+    text = " ".join(value.split())
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rstrip() + "…"
+
+
+def _summary_token(role: dict) -> str:
+    token_candidates = [
+        ("team", role.get("team")),
+        ("dept", role.get("department")),
+        ("mode", role.get("work_mode") or role.get("employment_type")),
+        (
+            "comp",
+            role.get("comp")
+            or role.get("compensation")
+            or role.get("salary_range")
+            or role.get("salary"),
+        ),
+    ]
+    tokens = [f"{label}:{_truncate(str(value))}" for label, value in token_candidates if value]
+    if not tokens:
+        return ""
+    return "summary " + " | ".join(tokens)
+
+
+def _recency_label(role: dict) -> str:
+    first_seen = _parse_iso8601(role.get("first_seen_at"))
+    now = datetime.now(timezone.utc)
+
+    if role.get("is_new"):
+        return "new since last run"
+    if first_seen > datetime.min.replace(tzinfo=timezone.utc) and now - first_seen <= timedelta(hours=24):
+        return "opened in last 24h"
+    if first_seen > datetime.min.replace(tzinfo=timezone.utc):
+        return f"opened {first_seen.strftime('%Y-%m-%d')}"
+    return "opened date unknown"
 
 
 def _deterministic_timestamp(roles: list[dict]) -> str:

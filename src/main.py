@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+import gzip
 import json
 from json import JSONDecodeError
 import os
@@ -630,13 +631,12 @@ def filter_jobs(
 def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
     """Drop bulky/non-essential fields to keep published artifacts small."""
     allowed_fields = [
+        "id",
         "title",
         "company",
         "platform",
         "location",
-        "department",
-        "team",
-        "employment_type",
+        "summary",
         "job_function",
         "is_technical",
         "is_chief_of_staff",
@@ -647,6 +647,7 @@ def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
         "last_seen_at",
         "is_new",
         "url",
+        "detail_chunk",
     ]
     compact: dict[str, Any] = {}
     for field in allowed_fields:
@@ -673,13 +674,12 @@ def resolve_github_pages_url(cfg: dict[str, Any]) -> str:
 def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         fieldnames = [
+            "id",
             "title",
             "company",
             "platform",
             "location",
-            "department",
-            "team",
-            "employment_type",
+            "summary",
             "job_function",
             "is_technical",
             "is_chief_of_staff",
@@ -690,6 +690,7 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             "last_seen_at",
             "is_new",
             "url",
+            "detail_chunk",
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -717,6 +718,7 @@ def write_outputs(
 
     DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
     DOCS_HTML.write_text(render_html(compact_all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
+    print(f"[info] Wrote {len(written_chunks)} detail chunk(s) under data/jobs/")
 
 
 def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> None:
