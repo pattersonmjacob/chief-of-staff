@@ -7,6 +7,7 @@ from html import escape
 def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     chief_count = sum(1 for job in jobs if job.get("is_chief_of_staff"))
+    strategy_ops_count = sum(1 for job in jobs if job.get("is_strategy_ops"))
 
     pages_link = ""
     if github_pages_url:
@@ -56,7 +57,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     <header class=\"header\">
       <div>
         <h1>ATS Jobs Tracker</h1>
-        <p class=\"meta\">__TOTAL__ total jobs · __CHIEF_TOTAL__ Chief of Staff matches · Generated __GENERATED__</p>
+        <p class=\"meta\">__TOTAL__ total jobs · __CHIEF_TOTAL__ Chief of Staff matches · __STRATEGY_TOTAL__ adjacent strategy/ops matches · Generated __GENERATED__</p>
       </div>
       <div class=\"header-actions\">
         <a class=\"secondary-link\" href=\"../jobs.csv\" download>Download CSV</a>
@@ -70,7 +71,8 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       <select id=\"technical\"><option value=\"\">All technicality</option><option value=\"yes\">Technical</option><option value=\"no\">Non-technical</option></select>
       <select id=\"function\"><option value=\"\">All functions</option><option>business-operations</option><option>program-management</option><option>product</option><option>engineering</option><option>finance</option><option>people-hr</option><option>other</option></select>
       <select id=\"freshness\"><option value=\"\">All time</option><option value=\"new\">New since last run</option><option value=\"12h\">First seen ≤12h</option><option value=\"24h\">First seen ≤24h</option></select>
-      <label class=\"toggle\"><input id=\"chiefOnly\" type=\"checkbox\" checked /> Chief of Staff only</label>
+      <label class=\"toggle\"><input id=\"showChiefSubset\" type=\"checkbox\" checked /> Chief of Staff subset</label>
+      <label class=\"toggle\"><input id=\"showStrategyOpsSubset\" type=\"checkbox\" checked /> Adjacent roles subset</label>
     </div>
     <p class=\"summary\" id=\"summary\">Loading jobs…</p>
 
@@ -89,8 +91,10 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
   <script>
     const q = (id) => document.getElementById(id);
     const CHUNK_SIZE = 100;
-    const controls = ['search','platform','technical','function','freshness','chiefOnly'].map(q);
+    const controls = ['search','platform','technical','function','freshness','showChiefSubset','showStrategyOpsSubset'].map(q);
     let allJobs = [];
+    let chiefSubsetJobs = [];
+    let strategyOpsSubsetJobs = [];
     let filteredJobs = [];
     let renderedCount = 0;
 
@@ -137,9 +141,20 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       const technical = q('technical').value;
       const func = q('function').value.toLowerCase();
       const freshness = q('freshness').value;
-      const chiefOnly = q('chiefOnly').checked;
+      const showChiefSubset = q('showChiefSubset').checked;
+      const showStrategyOpsSubset = q('showStrategyOpsSubset').checked;
+
+      const subsetUrls = new Set();
+      if (showChiefSubset) {
+        chiefSubsetJobs.forEach((job) => subsetUrls.add(job.url || `chief:${job.platform || ''}:${job.company || ''}:${job.title || ''}`));
+      }
+      if (showStrategyOpsSubset) {
+        strategyOpsSubsetJobs.forEach((job) => subsetUrls.add(job.url || `strategy:${job.platform || ''}:${job.company || ''}:${job.title || ''}`));
+      }
+      const subsetFilteringEnabled = showChiefSubset || showStrategyOpsSubset;
 
       filteredJobs = allJobs.filter((job) => {
+
         const text = [job.title || '', job.company || '', job.location || ''].join(' ').toLowerCase();
         if (search && !text.includes(search)) return false;
         if (platform && (job.platform || '').toLowerCase() !== platform) return false;
@@ -148,7 +163,10 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         if (freshness === 'new' && !job.is_new) return false;
         if (freshness === '12h' && !inHours(job.first_seen_at, 12)) return false;
         if (freshness === '24h' && !inHours(job.first_seen_at, 24)) return false;
-        if (chiefOnly && !job.is_chief_of_staff) return false;
+        if (subsetFilteringEnabled) {
+          const key = job.url || `${job.platform || ""}:${job.company || ""}:${job.title || ""}`;
+          if (!subsetUrls.has(key) && !subsetUrls.has(`chief:${key}`) && !subsetUrls.has(`strategy:${key}`)) return false;
+        }
         return true;
       });
 
@@ -172,12 +190,25 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
 
     async function loadJobs() {
       try {
-        const response = await fetch('../jobs.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        allJobs = Array.isArray(data) ? data : [];
+        const [allResponse, chiefResponse, strategyResponse] = await Promise.all([
+          fetch('../jobs.json', { cache: 'no-store' }),
+          fetch('../jobs_chief_of_staff.json', { cache: 'no-store' }),
+          fetch('../jobs_strategy_ops.json', { cache: 'no-store' }),
+        ]);
+        if (!allResponse.ok) throw new Error(`jobs.json HTTP ${allResponse.status}`);
+        if (!chiefResponse.ok) throw new Error(`jobs_chief_of_staff.json HTTP ${chiefResponse.status}`);
+        if (!strategyResponse.ok) throw new Error(`jobs_strategy_ops.json HTTP ${strategyResponse.status}`);
+
+        const [allData, chiefData, strategyData] = await Promise.all([
+          allResponse.json(),
+          chiefResponse.json(),
+          strategyResponse.json(),
+        ]);
+        allJobs = Array.isArray(allData) ? allData : [];
+        chiefSubsetJobs = Array.isArray(chiefData) ? chiefData : [];
+        strategyOpsSubsetJobs = Array.isArray(strategyData) ? strategyData : [];
       } catch (err) {
-        q('summary').innerText = 'Failed to load jobs.json.';
+        q('summary').innerText = 'Failed to load jobs artifacts.';
         q('load-status').innerText = `Error: ${err}`;
         return;
       }
@@ -202,6 +233,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     return (
         html.replace("__TOTAL__", str(len(jobs)))
         .replace("__CHIEF_TOTAL__", str(chief_count))
+        .replace("__STRATEGY_TOTAL__", str(strategy_ops_count))
         .replace("__GENERATED__", generated_at)
         .replace("__PAGES_LINK__", pages_link)
     )
