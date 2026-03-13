@@ -38,7 +38,7 @@ env:
   MAX_JOB_AGE_DAYS: 7
 
 jobs:
-  scrape-and-publish:
+  scrape-greenhouse:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -70,21 +70,111 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Decide link validation mode
-        id: link_mode
-        run: |
-          VALIDATE="false"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "30 12 * * 0" ]; then
-            VALIDATE="true"
-          fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.validate_links }}" = "true" ]; then
-            VALIDATE="true"
-          fi
-          echo "validate_links=${VALIDATE}" >> "$GITHUB_OUTPUT"
-          echo "[info] Link validation enabled: ${VALIDATE}"
-
-      - name: Run scraper digest
+      - name: Run scraper digest (Greenhouse)
         env:
+          PLATFORM_FILTER: greenhouse
+          SOURCE_OFFSET: ${{ matrix.source_offset }}
+          VALIDATE_JOB_LINKS: "false"
+        run: python src/main.py
+
+      - name: Save chunk outputs
+        run: |
+          mkdir -p chunk
+          cp jobs.json chunk/jobs_greenhouse_${{ matrix.chunk_index }}.json
+
+      - name: Upload chunk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobs-chunk-greenhouse-${{ matrix.chunk_index }}
+          path: chunk/jobs_greenhouse_${{ matrix.chunk_index }}.json
+          if-no-files-found: error
+
+  scrape-lever:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - chunk_index: 0
+            source_offset: 0
+          - chunk_index: 1
+            source_offset: 1000
+          - chunk_index: 2
+            source_offset: 2000
+          - chunk_index: 3
+            source_offset: 3000
+          - chunk_index: 4
+            source_offset: 4000
+          - chunk_index: 5
+            source_offset: 5000
+          - chunk_index: 6
+            source_offset: 6000
+          - chunk_index: 7
+            source_offset: 7000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run scraper digest (Lever)
+        env:
+          PLATFORM_FILTER: lever
+          SOURCE_OFFSET: ${{ matrix.source_offset }}
+          VALIDATE_JOB_LINKS: "false"
+        run: python src/main.py
+
+      - name: Save chunk outputs
+        run: |
+          mkdir -p chunk
+          cp jobs.json chunk/jobs_lever_${{ matrix.chunk_index }}.json
+
+      - name: Upload chunk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobs-chunk-lever-${{ matrix.chunk_index }}
+          path: chunk/jobs_lever_${{ matrix.chunk_index }}.json
+          if-no-files-found: error
+
+  scrape-ashby:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - chunk_index: 0
+            source_offset: 0
+          - chunk_index: 1
+            source_offset: 1000
+          - chunk_index: 2
+            source_offset: 2000
+          - chunk_index: 3
+            source_offset: 3000
+          - chunk_index: 4
+            source_offset: 4000
+          - chunk_index: 5
+            source_offset: 5000
+          - chunk_index: 6
+            source_offset: 6000
+          - chunk_index: 7
+            source_offset: 7000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run scraper digest (Ashby)
+        env:
+          PLATFORM_FILTER: ashby
           SOURCE_OFFSET: ${{ matrix.source_offset }}
           VALIDATE_JOB_LINKS: ${{ steps.link_mode.outputs.validate_links }}
           MAX_SOURCES: ${{ github.event_name == 'workflow_dispatch' && inputs.max_sources || env.MAX_SOURCES }}
@@ -94,18 +184,21 @@ jobs:
       - name: Save chunk outputs
         run: |
           mkdir -p chunk
-          cp jobs.json chunk/jobs_${{ matrix.chunk_index }}.json
+          cp jobs.json chunk/jobs_ashby_${{ matrix.chunk_index }}.json
 
       - name: Upload chunk artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jobs-chunk-${{ matrix.chunk_index }}
-          path: chunk/jobs_${{ matrix.chunk_index }}.json
+          name: jobs-chunk-ashby-${{ matrix.chunk_index }}
+          path: chunk/jobs_ashby_${{ matrix.chunk_index }}.json
           if-no-files-found: error
 
   aggregate-and-publish:
     runs-on: ubuntu-latest
-    needs: scrape-and-publish
+    needs:
+      - scrape-greenhouse
+      - scrape-lever
+      - scrape-ashby
     steps:
       - name: Checkout
         uses: actions/checkout@v4

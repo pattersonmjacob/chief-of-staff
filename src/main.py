@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+import gzip
 import json
 from json import JSONDecodeError
 import os
@@ -30,6 +31,8 @@ RUN_META_JSON = ROOT / "data" / "run_meta.json"
 DO_NOT_CHECK_JSON = ROOT / "data" / "do_not_check.json"
 JOBS_CHIEF_JSON = ROOT / "jobs_chief_of_staff.json"
 JOBS_CHIEF_CSV = ROOT / "jobs_chief_of_staff.csv"
+JOBS_STRATEGY_OPS_JSON = ROOT / "jobs_strategy_ops.json"
+JOBS_STRATEGY_OPS_CSV = ROOT / "jobs_strategy_ops.csv"
 
 
 def utc_now_iso() -> str:
@@ -164,7 +167,11 @@ def _parse_iso_datetime(value: Any) -> datetime | None:
     return dt
 
 
-def filter_jobs_by_max_age_days(jobs: list[dict[str, Any]], max_age_days: int) -> tuple[list[dict[str, Any]], dict[str, int]]:
+def filter_jobs_by_max_age_days(
+    jobs: list[dict[str, Any]],
+    max_age_days: int,
+    keep_missing_dates: bool = True,
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
     if max_age_days <= 0:
         return jobs, {"input": len(jobs), "excluded_missing_or_invalid_date": 0, "excluded_too_old": 0, "output": len(jobs)}
 
@@ -178,6 +185,9 @@ def filter_jobs_by_max_age_days(jobs: list[dict[str, Any]], max_age_days: int) -
         updated = _parse_iso_datetime(job.get("updated_at"))
         reference = posted or updated
         if reference is None:
+            if keep_missing_dates:
+                kept.append(job)
+                continue
             stats["excluded_missing_or_invalid_date"] += 1
             continue
         if reference.timestamp() < cutoff:
@@ -428,6 +438,7 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     env_max_sources = os.getenv("MAX_SOURCES", "").strip()
     env_source_offset = os.getenv("SOURCE_OFFSET", "").strip()
     env_max_sources_per_platform = os.getenv("MAX_SOURCES_PER_PLATFORM", "").strip()
+    env_platform_filter = os.getenv("PLATFORM_FILTER", "").strip().lower()
     env_validate_job_links = os.getenv("VALIDATE_JOB_LINKS", "").strip().lower()
     env_link_check_delay_seconds = os.getenv("LINK_CHECK_DELAY_SECONDS", "").strip()
     env_max_job_age_days = os.getenv("MAX_JOB_AGE_DAYS", "").strip()
@@ -451,6 +462,10 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
     if env_max_sources_per_platform:
         updated["max_sources_per_platform"] = int(env_max_sources_per_platform)
         print(f"[info] Using MAX_SOURCES_PER_PLATFORM override: {env_max_sources_per_platform}")
+
+    if env_platform_filter in {"greenhouse", "lever", "ashby"}:
+        updated["platform_filter"] = env_platform_filter
+        print(f"[info] Using PLATFORM_FILTER override: {env_platform_filter}")
 
     if env_validate_job_links in {"true", "false", "1", "0", "yes", "no"}:
         updated["validate_job_links"] = env_validate_job_links in {"true", "1", "yes"}
@@ -507,14 +522,19 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         min_open_jobs = int(cfg.get("min_open_jobs", 1))
         max_sources_int = parse_optional_cap(cfg.get("max_sources"))
         source_offset = int(cfg.get("source_offset", 0))
+        platform_filter = str(cfg.get("platform_filter", "")).strip().lower()
+        if platform_filter and platform_filter not in {"greenhouse", "lever", "ashby"}:
+            platform_filter = ""
+
         try:
             source_rows = load_sources_from_csv(
                 ROOT / sources_csv,
                 min_open_jobs=min_open_jobs,
                 max_sources=max_sources_int,
                 source_offset=source_offset,
+                platform_filter=platform_filter or None,
             )
-            print(f"[info] Loaded {len(source_rows)} sources from {sources_csv} (offset={source_offset}, max={max_sources_int})")
+            print(f"[info] Loaded {len(source_rows)} sources from {sources_csv} (offset={source_offset}, max={max_sources_int}, platform={platform_filter or 'all'})")
         except FileNotFoundError:
             print(f"[warn] sources_csv not found at {sources_csv}; falling back to config.sources")
 
@@ -563,13 +583,14 @@ def is_chief_of_staff_job(
     job: dict[str, Any],
     include_keywords: list[str],
     exclude_keywords: list[str],
+    strict_chief_title_required: bool = True,
 ) -> tuple[bool, str]:
     includes = [k.strip().lower() for k in include_keywords if k.strip()]
     excludes = [k.strip().lower() for k in exclude_keywords if k.strip()]
     chief_of_staff_pattern = re.compile(r"\bchief\b.*\bstaff\b", re.IGNORECASE)
 
     title = str(job.get("title", ""))
-    if not chief_of_staff_pattern.search(title):
+    if strict_chief_title_required and not chief_of_staff_pattern.search(title):
         return False, "excluded_missing_chief_of_staff_title"
 
     haystack = " ".join(
@@ -597,6 +618,7 @@ def filter_jobs(
     jobs: list[dict[str, Any]],
     include_keywords: list[str],
     exclude_keywords: list[str],
+    strict_chief_title_required: bool = True,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     filtered = []
     stats = {
@@ -607,7 +629,12 @@ def filter_jobs(
         "output": 0,
     }
     for job in jobs:
-        keep, reason = is_chief_of_staff_job(job, include_keywords, exclude_keywords)
+        keep, reason = is_chief_of_staff_job(
+            job,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=strict_chief_title_required,
+        )
         if keep:
             filtered.append(job)
             continue
@@ -622,22 +649,23 @@ def filter_jobs(
 def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
     """Drop bulky/non-essential fields to keep published artifacts small."""
     allowed_fields = [
+        "id",
         "title",
         "company",
         "platform",
         "location",
-        "department",
-        "team",
-        "employment_type",
+        "summary",
         "job_function",
         "is_technical",
         "is_chief_of_staff",
+        "is_strategy_ops",
         "posted_at",
         "updated_at",
         "first_seen_at",
         "last_seen_at",
         "is_new",
         "url",
+        "detail_chunk",
     ]
     compact: dict[str, Any] = {}
     for field in allowed_fields:
@@ -664,22 +692,23 @@ def resolve_github_pages_url(cfg: dict[str, Any]) -> str:
 def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         fieldnames = [
+            "id",
             "title",
             "company",
             "platform",
             "location",
-            "department",
-            "team",
-            "employment_type",
+            "summary",
             "job_function",
             "is_technical",
             "is_chief_of_staff",
+            "is_strategy_ops",
             "posted_at",
             "updated_at",
             "first_seen_at",
             "last_seen_at",
             "is_new",
             "url",
+            "detail_chunk",
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -687,18 +716,27 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             writer.writerow({name: job.get(name, "") for name in fieldnames})
 
 
-def write_outputs(all_jobs: list[dict[str, Any]], chief_jobs: list[dict[str, Any]], github_pages_url: str = "") -> None:
+def write_outputs(
+    all_jobs: list[dict[str, Any]],
+    chief_jobs: list[dict[str, Any]],
+    strategy_ops_jobs: list[dict[str, Any]],
+    github_pages_url: str = "",
+) -> None:
     compact_all_jobs = [_compact_job_for_output(job) for job in all_jobs]
     compact_chief_jobs = [_compact_job_for_output(job) for job in chief_jobs]
+    compact_strategy_ops_jobs = [_compact_job_for_output(job) for job in strategy_ops_jobs]
 
     JOBS_JSON.write_text(json.dumps(compact_all_jobs, indent=2))
     JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, indent=2))
+    JOBS_STRATEGY_OPS_JSON.write_text(json.dumps(compact_strategy_ops_jobs, indent=2))
 
     _write_csv(JOBS_CSV, compact_all_jobs)
     _write_csv(JOBS_CHIEF_CSV, compact_chief_jobs)
+    _write_csv(JOBS_STRATEGY_OPS_CSV, compact_strategy_ops_jobs)
 
     DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
     DOCS_HTML.write_text(render_html(compact_all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
+    print(f"[info] Wrote {len(written_chunks)} detail chunk(s) under data/jobs/")
 
 
 def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> None:
@@ -768,7 +806,12 @@ def main() -> None:
 
     jobs = _dedupe_and_collate_jobs(all_jobs)
     max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
-    jobs, age_filter_stats = filter_jobs_by_max_age_days(jobs, max_age_days=max_job_age_days)
+    keep_missing_dates = bool(cfg.get("keep_missing_dates", True))
+    jobs, age_filter_stats = filter_jobs_by_max_age_days(
+        jobs,
+        max_age_days=max_job_age_days,
+        keep_missing_dates=keep_missing_dates,
+    )
     print(f"[info] Age filter stats ({max_job_age_days}d): input={age_filter_stats['input']}, missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}")
 
     validate_links = bool(cfg.get("validate_job_links", True))
@@ -780,19 +823,59 @@ def main() -> None:
 
     include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
     exclude_keywords = cfg.get("keywords_exclude", [])
-    filtered_jobs, filter_stats = filter_jobs(jobs, include_keywords, exclude_keywords)
+    strict_chief_title_required = bool(cfg.get("strict_chief_title_required", True))
+    include_adjacent_roles = bool(cfg.get("include_adjacent_roles", True))
+
+    filtered_jobs, filter_stats = filter_jobs(
+        jobs,
+        include_keywords,
+        exclude_keywords,
+        strict_chief_title_required=strict_chief_title_required,
+    )
+    strategy_ops_jobs: list[dict[str, Any]] = []
+    strategy_ops_stats = {
+        "input": len(jobs),
+        "excluded_missing_chief_of_staff_title": 0,
+        "excluded_missing_include": 0,
+        "excluded_by_exclude": 0,
+        "output": 0,
+    }
+    if include_adjacent_roles:
+        strategy_ops_jobs, strategy_ops_stats = filter_jobs(
+            jobs,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=False,
+        )
+
     for job in jobs:
-        is_match, _ = is_chief_of_staff_job(job, include_keywords, exclude_keywords)
-        job["is_chief_of_staff"] = is_match
+        is_chief_match, _ = is_chief_of_staff_job(
+            job,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=strict_chief_title_required,
+        )
+        is_strategy_ops_match, _ = is_chief_of_staff_job(
+            job,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=False,
+        )
+        job["is_chief_of_staff"] = is_chief_match
+        job["is_strategy_ops"] = include_adjacent_roles and is_strategy_ops_match
 
     print(f"[info] Filter stats: input={filter_stats['input']}, missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
+    if include_adjacent_roles:
+        print(f"[info] Adjacent-role stats: input={strategy_ops_stats['input']}, missing_include={strategy_ops_stats['excluded_missing_include']}, excluded={strategy_ops_stats['excluded_by_exclude']}, output={strategy_ops_stats['output']}")
+    else:
+        print("[info] Adjacent-role subset disabled via include_adjacent_roles=false")
 
     github_pages_url = resolve_github_pages_url(cfg)
-    write_outputs(jobs, filtered_jobs, github_pages_url=github_pages_url)
+    write_outputs(jobs, filtered_jobs, strategy_ops_jobs, github_pages_url=github_pages_url)
     write_run_meta(run_at, total_jobs=len(jobs), chief_of_staff_jobs=len(filtered_jobs), new_jobs=run_stats["new_count"])
     write_do_not_check_state(do_not_check_state)
     maybe_send_email(filtered_jobs, cfg.get("email", {}))
-    print(f"[info] Wrote {len(jobs)} total jobs and {len(filtered_jobs)} chief-of-staff jobs to JSON/CSV plus docs/index.html")
+    print(f"[info] Wrote {len(jobs)} total jobs, {len(filtered_jobs)} chief-of-staff jobs, and {len(strategy_ops_jobs)} strategy/ops-adjacent jobs to JSON/CSV plus docs/index.html")
     print(f"[info] New since last run: {run_stats['new_count']}")
     if github_pages_url:
         print(f"[info] GitHub Pages URL: {github_pages_url}")

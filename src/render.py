@@ -7,11 +7,14 @@ from html import escape
 def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     chief_count = sum(1 for job in jobs if job.get("is_chief_of_staff"))
+    strategy_ops_count = sum(1 for job in jobs if job.get("is_strategy_ops"))
 
     pages_link = ""
+    base_path = ""
     if github_pages_url:
         safe_link = escape(github_pages_url)
         pages_link = f'<a class="pages-link" href="{safe_link}" target="_blank" rel="noopener noreferrer">Open GitHub Pages ↗</a>'
+        base_path = github_pages_url.rstrip("/") + "/"
 
     html = """<!doctype html>
 <html lang=\"en\">
@@ -52,14 +55,14 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
   </style>
 </head>
 <body>
-  <main class=\"container\">
+  <main class=\"container\" data-base-path="__BASE_PATH__">
     <header class=\"header\">
       <div>
         <h1>ATS Jobs Tracker</h1>
-        <p class=\"meta\">__TOTAL__ total jobs · __CHIEF_TOTAL__ Chief of Staff matches · Generated __GENERATED__</p>
+        <p class=\"meta\">__TOTAL__ total jobs · __CHIEF_TOTAL__ Chief of Staff matches · __STRATEGY_TOTAL__ adjacent strategy/ops matches · Generated __GENERATED__</p>
       </div>
       <div class=\"header-actions\">
-        <a class=\"secondary-link\" href=\"../jobs.csv\" download>Download CSV</a>
+        <a id=\"download-csv\" class=\"secondary-link\" href=\"./jobs.csv\" download>Download CSV</a>
         __PAGES_LINK__
       </div>
     </header>
@@ -70,14 +73,15 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       <select id=\"technical\"><option value=\"\">All technicality</option><option value=\"yes\">Technical</option><option value=\"no\">Non-technical</option></select>
       <select id=\"function\"><option value=\"\">All functions</option><option>business-operations</option><option>program-management</option><option>product</option><option>engineering</option><option>finance</option><option>people-hr</option><option>other</option></select>
       <select id=\"freshness\"><option value=\"\">All time</option><option value=\"new\">New since last run</option><option value=\"12h\">First seen ≤12h</option><option value=\"24h\">First seen ≤24h</option></select>
-      <label class=\"toggle\"><input id=\"chiefOnly\" type=\"checkbox\" checked /> Chief of Staff only</label>
+      <label class=\"toggle\"><input id=\"showChiefSubset\" type=\"checkbox\" checked /> Chief of Staff subset</label>
+      <label class=\"toggle\"><input id=\"showStrategyOpsSubset\" type=\"checkbox\" checked /> Adjacent roles subset</label>
     </div>
     <p class=\"summary\" id=\"summary\">Loading jobs…</p>
 
     <section class=\"table-wrap\">
       <table>
         <thead>
-          <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th></tr>
+          <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Summary</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th><th>Details</th></tr>
         </thead>
         <tbody id=\"jobs-body\"></tbody>
       </table>
@@ -88,11 +92,21 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
 
   <script>
     const q = (id) => document.getElementById(id);
+    const basePath = (document.querySelector('[data-base-path]')?.dataset.basePath || '').trim();
+    const assetUrl = (filename) => {
+      if (basePath) {
+        return `${basePath.replace(/\/$/, '')}/${filename}`;
+      }
+      return `./${filename}`;
+    };
     const CHUNK_SIZE = 100;
-    const controls = ['search','platform','technical','function','freshness','chiefOnly'].map(q);
+    const controls = ['search','platform','technical','function','freshness','showChiefSubset','showStrategyOpsSubset'].map(q);
     let allJobs = [];
+    let chiefSubsetJobs = [];
+    let strategyOpsSubsetJobs = [];
     let filteredJobs = [];
     let renderedCount = 0;
+    const detailCache = new Map();
 
     const inHours = (iso, hours) => {
       const t = Date.parse(iso || '');
@@ -119,16 +133,62 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       if (job.is_chief_of_staff) flags.push(badge('Chief of Staff', 'chief'));
       if (job.is_new) flags.push(badge('NEW', 'new'));
 
-      return `<tr>
+      const rowId = `job-${escapeHtml(job.id || '')}`;
+      return `<tr data-job-id="${escapeHtml(job.id || '')}">
         <td>${escapeHtml(job.title || '')}</td>
         <td>${escapeHtml(job.company || '')}</td>
         <td>${escapeHtml(job.platform || '')}</td>
         <td>${escapeHtml(job.location || '')}</td>
+        <td>${escapeHtml(job.summary || '')}</td>
         <td>${escapeHtml(job.posted_at || '—')}</td>
         <td>${escapeHtml(job.first_seen_at || '—')}</td>
         <td>${flags.join('')}</td>
         <td><a href="${escapeHtml(job.url || '')}" target="_blank" rel="noopener noreferrer">Apply</a></td>
-      </tr>`;
+        <td><button type="button" class="secondary-link" data-details-for="${escapeHtml(job.id || '')}" style="padding:.3rem .5rem;">Open</button></td>
+      </tr><tr id="${rowId}" class="detail-row" style="display:none;"><td colspan="10" class="muted">Loading details…</td></tr>`;
+    }
+
+
+    async function loadChunk(chunkName) {
+      if (!chunkName) return [];
+      if (detailCache.has(chunkName)) return detailCache.get(chunkName);
+      const response = await fetch(`../data/jobs/${encodeURIComponent(chunkName)}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const byId = new Map((Array.isArray(data) ? data : []).map((row) => [String(row.id || ''), row]));
+      detailCache.set(chunkName, byId);
+      return byId;
+    }
+
+    async function toggleDetails(button) {
+      const jobId = String(button.getAttribute('data-details-for') || '');
+      const job = allJobs.find((item) => String(item.id || '') === jobId);
+      if (!job) return;
+      const detailRow = document.getElementById(`job-${jobId}`);
+      if (!detailRow) return;
+      if (detailRow.style.display === '') {
+        detailRow.style.display = 'none';
+        button.textContent = 'Open';
+        return;
+      }
+
+      detailRow.style.display = '';
+      button.textContent = 'Close';
+      detailRow.firstElementChild.innerText = 'Loading details…';
+      try {
+        const chunk = await loadChunk(job.detail_chunk || '');
+        const details = chunk.get(jobId) || {};
+        const body = [
+          `Department: ${details.department || '—'}`,
+          `Team: ${details.team || '—'}`,
+          `Employment type: ${details.employment_type || '—'}`,
+          '',
+          String(details.description || 'No additional description available.'),
+        ].join('\n');
+        detailRow.firstElementChild.innerText = body;
+      } catch (err) {
+        detailRow.firstElementChild.innerText = `Failed to load details: ${err}`;
+      }
     }
 
     function applyFilters() {
@@ -137,9 +197,20 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       const technical = q('technical').value;
       const func = q('function').value.toLowerCase();
       const freshness = q('freshness').value;
-      const chiefOnly = q('chiefOnly').checked;
+      const showChiefSubset = q('showChiefSubset').checked;
+      const showStrategyOpsSubset = q('showStrategyOpsSubset').checked;
+
+      const subsetUrls = new Set();
+      if (showChiefSubset) {
+        chiefSubsetJobs.forEach((job) => subsetUrls.add(job.url || `chief:${job.platform || ''}:${job.company || ''}:${job.title || ''}`));
+      }
+      if (showStrategyOpsSubset) {
+        strategyOpsSubsetJobs.forEach((job) => subsetUrls.add(job.url || `strategy:${job.platform || ''}:${job.company || ''}:${job.title || ''}`));
+      }
+      const subsetFilteringEnabled = showChiefSubset || showStrategyOpsSubset;
 
       filteredJobs = allJobs.filter((job) => {
+
         const text = [job.title || '', job.company || '', job.location || ''].join(' ').toLowerCase();
         if (search && !text.includes(search)) return false;
         if (platform && (job.platform || '').toLowerCase() !== platform) return false;
@@ -148,7 +219,10 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         if (freshness === 'new' && !job.is_new) return false;
         if (freshness === '12h' && !inHours(job.first_seen_at, 12)) return false;
         if (freshness === '24h' && !inHours(job.first_seen_at, 24)) return false;
-        if (chiefOnly && !job.is_chief_of_staff) return false;
+        if (subsetFilteringEnabled) {
+          const key = job.url || `${job.platform || ""}:${job.company || ""}:${job.title || ""}`;
+          if (!subsetUrls.has(key) && !subsetUrls.has(`chief:${key}`) && !subsetUrls.has(`strategy:${key}`)) return false;
+        }
         return true;
       });
 
@@ -172,12 +246,25 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
 
     async function loadJobs() {
       try {
-        const response = await fetch('../jobs.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        allJobs = Array.isArray(data) ? data : [];
+        const [allResponse, chiefResponse, strategyResponse] = await Promise.all([
+          fetch('../jobs.json', { cache: 'no-store' }),
+          fetch('../jobs_chief_of_staff.json', { cache: 'no-store' }),
+          fetch('../jobs_strategy_ops.json', { cache: 'no-store' }),
+        ]);
+        if (!allResponse.ok) throw new Error(`jobs.json HTTP ${allResponse.status}`);
+        if (!chiefResponse.ok) throw new Error(`jobs_chief_of_staff.json HTTP ${chiefResponse.status}`);
+        if (!strategyResponse.ok) throw new Error(`jobs_strategy_ops.json HTTP ${strategyResponse.status}`);
+
+        const [allData, chiefData, strategyData] = await Promise.all([
+          allResponse.json(),
+          chiefResponse.json(),
+          strategyResponse.json(),
+        ]);
+        allJobs = Array.isArray(allData) ? allData : [];
+        chiefSubsetJobs = Array.isArray(chiefData) ? chiefData : [];
+        strategyOpsSubsetJobs = Array.isArray(strategyData) ? strategyData : [];
       } catch (err) {
-        q('summary').innerText = 'Failed to load jobs.json.';
+        q('summary').innerText = 'Failed to load jobs artifacts.';
         q('load-status').innerText = `Error: ${err}`;
         return;
       }
@@ -186,6 +273,13 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       controls.forEach((el) => el.addEventListener('change', applyFilters));
       applyFilters();
 
+      q('jobs-body').addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const button = target.closest('button[data-details-for]');
+        if (button instanceof HTMLButtonElement) toggleDetails(button);
+      });
+
       const sentinel = q('scroll-sentinel');
       const observer = new IntersectionObserver((entries) => {
         if (entries.some((entry) => entry.isIntersecting)) renderNextChunk();
@@ -193,6 +287,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       observer.observe(sentinel);
     }
 
+    q('download-csv').href = assetUrl('jobs.csv');
     loadJobs();
   </script>
 </body>
@@ -202,6 +297,8 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     return (
         html.replace("__TOTAL__", str(len(jobs)))
         .replace("__CHIEF_TOTAL__", str(chief_count))
+        .replace("__STRATEGY_TOTAL__", str(strategy_ops_count))
         .replace("__GENERATED__", generated_at)
+        .replace("__BASE_PATH__", escape(base_path))
         .replace("__PAGES_LINK__", pages_link)
     )
