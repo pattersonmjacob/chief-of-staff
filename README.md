@@ -26,13 +26,16 @@ _Chief-of-Staff matches: 14 · Snapshot timestamp: 2026-03-13 12:01 UTC_
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
 - Stores the full ATS job feed across Greenhouse / Lever / Ashby.
-- Computes a Chief-of-Staff subset using title + include/exclude keyword matching.
+- Computes a strict Chief-of-Staff subset using title regex + include/exclude keyword matching.
+- Computes a broader adjacent strategy/operations subset using include/exclude keyword matching.
 - Writes output files:
   - `jobs.json` (full feed)
   - `jobs.csv` (full feed)
-  - `jobs_chief_of_staff.json` (Chief-of-Staff subset)
-  - `jobs_chief_of_staff.csv` (Chief-of-Staff subset)
-  - `docs/index.html` (GitHub Pages UI with a default **Chief of Staff only** filter toggle)
+  - `jobs_chief_of_staff.json` (strict Chief-of-Staff subset)
+  - `jobs_chief_of_staff.csv` (strict Chief-of-Staff subset)
+  - `jobs_strategy_ops.json` (adjacent strategy/operations subset)
+  - `jobs_strategy_ops.csv` (adjacent strategy/operations subset)
+  - `docs/index.html` (GitHub Pages UI with subset toggles for Chief of Staff and adjacent roles)
   - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
 - Automatically tracks repeated HTTP 404 sources in `data/do_not_check.json` and skips them on future runs (after 3+ 404s and a healthy non-404 streak guard).
   - Optional GitHub Pages link banner in output (set `github_pages_url` or let Actions auto-detect).
@@ -59,6 +62,9 @@ _Chief-of-Staff matches: 14 · Snapshot timestamp: 2026-03-13 12:01 UTC_
        - `validate_job_links` (default `true`; verifies job URLs before publishing and removes unavailable postings)
        - `link_check_delay_seconds` (default `0.8`; delay between URL checks to avoid rate limits)
        - `max_job_age_days` (default `7`; keeps only roles posted/updated within the last N days)
+       - `keep_missing_dates` (default `true`; preserves jobs with missing/invalid dates during age filtering)
+       - `strict_chief_title_required` (default `true`; requires `chief ... staff` in title for `jobs_chief_of_staff.*`)
+       - `include_adjacent_roles` (default `true`; enables the broader `jobs_strategy_ops.*` subset)
        - `verbose_sources` (default `false`; when true logs every source result)
 
    - **Manual source list:**
@@ -203,8 +209,10 @@ If secrets are missing, the script logs a warning and skips sending.
 
 - Full feed (`jobs.json` / `jobs.csv`) keeps all fetched roles after dedupe + age filter (`max_job_age_days`, default 7) + optional link validation.
 - Published artifacts intentionally omit the raw `description` body to keep file sizes below GitHub push limits (the description is only used during filtering in-memory).
-- Chief-of-Staff subset (`jobs_chief_of_staff.*`) requires title to match `chief ... staff` (case-insensitive) and then applies include/exclude checks against title, department, team, location, and description text.
-- GitHub Pages shows the full feed but enables **Chief of Staff only** by default via a UI toggle.
+- Chief-of-Staff subset (`jobs_chief_of_staff.*`) defaults to requiring title match `chief ... staff` (case-insensitive) plus include/exclude checks against title, department, team, location, and description text (controlled by `strict_chief_title_required`).
+- Adjacent-role subset (`jobs_strategy_ops.*`) uses include/exclude checks without requiring the chief-title regex (enabled by `include_adjacent_roles`).
+- Age filtering keeps undated records by default (`keep_missing_dates=true`), while still excluding dated roles older than `max_job_age_days`.
+- GitHub Pages shows the full feed and supports subset toggles for **Chief of Staff subset** and **Adjacent roles subset**.
 - Duplicate jobs from the same platform/company/title are merged into one record, collating differences like locations/teams/departments/URLs.
 
 ## Security checklist
