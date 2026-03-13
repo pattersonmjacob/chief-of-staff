@@ -3,14 +3,23 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-import re
 import sys
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT / "src"))
 
-from main import _dedupe_and_collate_jobs, filter_jobs_by_max_age_days, validate_and_filter_jobs_by_link, write_outputs  # noqa: E402
+from main import (  # noqa: E402
+    RUN_META_JSON,
+    apply_runtime_overrides,
+    load_previous_jobs,
+    load_config,
+    process_jobs_pipeline,
+    write_outputs,
+    write_run_meta,
+)
+
+AGGREGATE_SUMMARY_JSON = ROOT / "data" / "aggregate_summary.json"
 
 
 def _detect_platform_from_name(path: Path) -> str:
@@ -21,11 +30,12 @@ def _detect_platform_from_name(path: Path) -> str:
     return "unknown"
 
 
-def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict[str, int]]:
+def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict[str, int], list[str]]:
     chunk_files = sorted(chunks_dir.glob("jobs_*.json"))
     all_jobs: list[dict] = []
     platform_jobs: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
     platform_files: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
+    invalid_files: list[str] = []
 
     for path in chunk_files:
         platform = _detect_platform_from_name(path)
@@ -35,7 +45,11 @@ def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict
             if isinstance(data, list):
                 all_jobs.extend(data)
                 platform_jobs[platform] = platform_jobs.get(platform, 0) + len(data)
+            else:
+                invalid_files.append(path.name)
+                print(f"[warn] Skipping non-list chunk file {path}")
         except Exception as exc:
+            invalid_files.append(path.name)
             print(f"[warn] Skipping invalid chunk file {path}: {exc}")
 
     print(f"[info] Loaded {len(all_jobs)} raw jobs from {len(chunk_files)} chunk files")
@@ -47,20 +61,54 @@ def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict
         "[info] Raw jobs by platform (from artifact names): "
         + ", ".join(f"{p}={platform_jobs.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
     )
-    return all_jobs, platform_jobs, platform_files
+    return all_jobs, platform_jobs, platform_files, invalid_files
 
 
-def _github_pages_url(repository: str) -> str:
-    repository = repository.strip()
-    if repository and "/" in repository:
+def _build_runtime_cfg(args: argparse.Namespace) -> dict[str, object]:
+    cfg = apply_runtime_overrides(load_config())
+
+    repository = args.repository.strip()
+    pages_url = str(cfg.get("github_pages_url", "")).strip()
+    if not pages_url and repository and "/" in repository:
         owner, repo = repository.split("/", 1)
-        return f"https://{owner}.github.io/{quote(repo)}/"
-    return ""
+        pages_url = f"https://{owner}.github.io/{quote(repo)}/"
+
+    cfg["github_pages_url"] = pages_url
+    cfg["validate_job_links"] = not args.disable_link_validation
+    cfg["link_check_delay_seconds"] = max(0.0, args.link_check_delay_seconds)
+    cfg["max_job_age_days"] = max(0, args.max_job_age_days)
+    return cfg
 
 
-def _is_chief_of_staff(job: dict) -> bool:
-    title = str(job.get("title", ""))
-    return bool(re.search(r"\bchief\b.*\bstaff\b", title, flags=re.IGNORECASE))
+def _write_aggregate_summary(
+    result_jobs: int,
+    chief_jobs: int,
+    strategy_ops_jobs: int,
+    raw_platform_jobs: dict[str, int],
+    raw_platform_files: dict[str, int],
+    invalid_files: list[str],
+    validate_links: bool,
+    repository: str,
+) -> None:
+    AGGREGATE_SUMMARY_JSON.parent.mkdir(parents=True, exist_ok=True)
+    generated_at = ""
+    if RUN_META_JSON.exists():
+        try:
+            generated_at = str(json.loads(RUN_META_JSON.read_text(encoding="utf-8")).get("last_run_at", ""))
+        except Exception:
+            generated_at = ""
+    summary = {
+        "repository": repository,
+        "generated_at": generated_at,
+        "validate_job_links": validate_links,
+        "raw_platform_jobs": raw_platform_jobs,
+        "raw_platform_files": raw_platform_files,
+        "invalid_chunk_files": invalid_files,
+        "total_jobs": result_jobs,
+        "chief_of_staff_jobs": chief_jobs,
+        "strategy_ops_jobs": strategy_ops_jobs,
+    }
+    AGGREGATE_SUMMARY_JSON.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -73,54 +121,46 @@ def main() -> None:
     args = parser.parse_args()
 
     chunks_dir = ROOT / args.chunks_dir
-    jobs, _raw_platform_jobs, _raw_platform_files = _load_chunk_jobs(chunks_dir)
-    jobs = _dedupe_and_collate_jobs(jobs)
-    deduped_platform_counts: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
-    for job in jobs:
+    raw_jobs, raw_platform_jobs, raw_platform_files, invalid_files = _load_chunk_jobs(chunks_dir)
+    raw_platform_counts: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
+    for job in raw_jobs:
         platform = str(job.get("platform", "")).strip().lower()
-        if platform not in deduped_platform_counts:
+        if platform not in raw_platform_counts:
             platform = "unknown"
-        deduped_platform_counts[platform] += 1
+        raw_platform_counts[platform] += 1
     print(
-        "[info] Post-dedupe jobs by platform: "
-        + ", ".join(f"{p}={deduped_platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
+        "[info] Raw merged jobs by platform: "
+        + ", ".join(f"{p}={raw_platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
     )
-    jobs, age_filter_stats = filter_jobs_by_max_age_days(jobs, max_age_days=max(0, args.max_job_age_days))
-    print(f"[info] Age filter stats ({max(0, args.max_job_age_days)}d): input={age_filter_stats['input']}, missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}")
-
-    aged_platform_counts: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
-    for job in jobs:
-        platform = str(job.get("platform", "")).strip().lower()
-        if platform not in aged_platform_counts:
-            platform = "unknown"
-        aged_platform_counts[platform] += 1
+    cfg = _build_runtime_cfg(args)
+    previous_jobs = load_previous_jobs()
+    result = process_jobs_pipeline(raw_jobs, cfg, previous_jobs=previous_jobs)
+    write_outputs(
+        result.jobs,
+        result.chief_jobs,
+        result.strategy_ops_jobs,
+        github_pages_url=str(cfg.get("github_pages_url", "")),
+    )
+    write_run_meta(
+        result.run_at,
+        total_jobs=len(result.jobs),
+        chief_of_staff_jobs=len(result.chief_jobs),
+        new_jobs=result.run_stats["new_count"],
+    )
+    _write_aggregate_summary(
+        result_jobs=len(result.jobs),
+        chief_jobs=len(result.chief_jobs),
+        strategy_ops_jobs=len(result.strategy_ops_jobs),
+        raw_platform_jobs=raw_platform_jobs,
+        raw_platform_files=raw_platform_files,
+        invalid_files=invalid_files,
+        validate_links=result.validate_links,
+        repository=args.repository,
+    )
     print(
-        "[info] Post-age-filter jobs by platform: "
-        + ", ".join(f"{p}={aged_platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
+        f"[info] Aggregated {len(result.jobs)} unique jobs "
+        f"(chief_of_staff={len(result.chief_jobs)}, strategy_ops={len(result.strategy_ops_jobs)})"
     )
-    jobs = validate_and_filter_jobs_by_link(
-        jobs,
-        enabled=not args.disable_link_validation,
-        delay_seconds=max(0.0, args.link_check_delay_seconds),
-    )
-
-    validated_platform_counts: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
-    for job in jobs:
-        platform = str(job.get("platform", "")).strip().lower()
-        if platform not in validated_platform_counts:
-            platform = "unknown"
-        validated_platform_counts[platform] += 1
-    print(
-        "[info] Post-link-validation jobs by platform: "
-        + ", ".join(f"{p}={validated_platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
-    )
-    chief_jobs = [job for job in jobs if _is_chief_of_staff(job)]
-    for job in jobs:
-        job["is_chief_of_staff"] = _is_chief_of_staff(job)
-
-    pages_url = _github_pages_url(args.repository)
-    write_outputs(jobs, chief_jobs, github_pages_url=pages_url)
-    print(f"[info] Aggregated {len(jobs)} unique jobs (chief_of_staff={len(chief_jobs)})")
 
 
 if __name__ == "__main__":

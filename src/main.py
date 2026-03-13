@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import gzip
 import json
@@ -33,6 +34,21 @@ JOBS_CHIEF_JSON = ROOT / "jobs_chief_of_staff.json"
 JOBS_CHIEF_CSV = ROOT / "jobs_chief_of_staff.csv"
 JOBS_STRATEGY_OPS_JSON = ROOT / "jobs_strategy_ops.json"
 JOBS_STRATEGY_OPS_CSV = ROOT / "jobs_strategy_ops.csv"
+
+
+@dataclass
+class ProcessedJobsResult:
+    jobs: list[dict[str, Any]]
+    chief_jobs: list[dict[str, Any]]
+    strategy_ops_jobs: list[dict[str, Any]]
+    run_at: str
+    run_stats: dict[str, int]
+    age_filter_stats: dict[str, int]
+    filter_stats: dict[str, int]
+    strategy_ops_stats: dict[str, int]
+    validate_links: bool
+    strict_chief_title_required: bool
+    include_adjacent_roles: bool
 
 
 def utc_now_iso() -> str:
@@ -666,6 +682,106 @@ def filter_jobs(
     return filtered, stats
 
 
+def process_jobs_pipeline(
+    raw_jobs: list[dict[str, Any]],
+    cfg: dict[str, Any],
+    previous_jobs: list[dict[str, Any]] | None = None,
+    run_at: str | None = None,
+) -> ProcessedJobsResult:
+    jobs = _dedupe_and_collate_jobs(raw_jobs)
+    max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
+    keep_missing_dates = bool(cfg.get("keep_missing_dates", True))
+    jobs, age_filter_stats = filter_jobs_by_max_age_days(
+        jobs,
+        max_age_days=max_job_age_days,
+        keep_missing_dates=keep_missing_dates,
+    )
+    print(
+        f"[info] Age filter stats ({max_job_age_days}d): input={age_filter_stats['input']}, "
+        f"missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, "
+        f"too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}"
+    )
+
+    validate_links = bool(cfg.get("validate_job_links", True))
+    link_check_delay_seconds = float(cfg.get("link_check_delay_seconds", 0.8) or 0.8)
+    jobs = validate_and_filter_jobs_by_link(jobs, enabled=validate_links, delay_seconds=link_check_delay_seconds)
+
+    effective_run_at = run_at or utc_now_iso()
+    jobs, run_stats = enrich_jobs_with_history_and_flags(jobs, previous_jobs or [], effective_run_at)
+
+    include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
+    exclude_keywords = cfg.get("keywords_exclude", [])
+    strict_chief_title_required = bool(cfg.get("strict_chief_title_required", True))
+    include_adjacent_roles = bool(cfg.get("include_adjacent_roles", True))
+
+    chief_jobs, filter_stats = filter_jobs(
+        jobs,
+        include_keywords,
+        exclude_keywords,
+        strict_chief_title_required=strict_chief_title_required,
+    )
+    strategy_ops_jobs: list[dict[str, Any]] = []
+    strategy_ops_stats = {
+        "input": len(jobs),
+        "excluded_missing_chief_of_staff_title": 0,
+        "excluded_missing_include": 0,
+        "excluded_by_exclude": 0,
+        "output": 0,
+    }
+    if include_adjacent_roles:
+        strategy_ops_jobs, strategy_ops_stats = filter_jobs(
+            jobs,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=False,
+        )
+
+    for job in jobs:
+        is_chief_match, _ = is_chief_of_staff_job(
+            job,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=strict_chief_title_required,
+        )
+        is_strategy_ops_match, _ = is_chief_of_staff_job(
+            job,
+            include_keywords,
+            exclude_keywords,
+            strict_chief_title_required=False,
+        )
+        job["is_chief_of_staff"] = is_chief_match
+        job["is_strategy_ops"] = include_adjacent_roles and is_strategy_ops_match
+
+    print(
+        f"[info] Filter stats: input={filter_stats['input']}, "
+        f"missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, "
+        f"missing_include={filter_stats['excluded_missing_include']}, "
+        f"excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}"
+    )
+    if include_adjacent_roles:
+        print(
+            f"[info] Adjacent-role stats: input={strategy_ops_stats['input']}, "
+            f"missing_include={strategy_ops_stats['excluded_missing_include']}, "
+            f"excluded={strategy_ops_stats['excluded_by_exclude']}, output={strategy_ops_stats['output']}"
+        )
+    else:
+        print("[info] Adjacent-role subset disabled via include_adjacent_roles=false")
+
+    return ProcessedJobsResult(
+        jobs=jobs,
+        chief_jobs=chief_jobs,
+        strategy_ops_jobs=strategy_ops_jobs,
+        run_at=effective_run_at,
+        run_stats=run_stats,
+        age_filter_stats=age_filter_stats,
+        filter_stats=filter_stats,
+        strategy_ops_stats=strategy_ops_stats,
+        validate_links=validate_links,
+        strict_chief_title_required=strict_chief_title_required,
+        include_adjacent_roles=include_adjacent_roles,
+    )
+
+
 
 
 def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
@@ -776,7 +892,9 @@ def write_outputs(
 
     DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
     DOCS_HTML.write_text(render_html(compact_all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
-    print(f"[info] Wrote {len(written_chunks)} detail chunk(s) under data/jobs/")
+    detail_chunks_dir = ROOT / "data" / "jobs"
+    written_chunk_count = len(list(detail_chunks_dir.glob("*.json"))) if detail_chunks_dir.exists() else 0
+    print(f"[info] Detail chunk files available under data/jobs/: {written_chunk_count}")
 
 
 def maybe_send_email(jobs: list[dict[str, Any]], email_cfg: dict[str, Any]) -> None:
@@ -843,80 +961,23 @@ def main() -> None:
     print(f"[info] Total fetched jobs before dedupe: {len(all_jobs)}")
 
     previous_jobs = load_previous_jobs()
-
-    jobs = _dedupe_and_collate_jobs(all_jobs)
-    max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
-    keep_missing_dates = bool(cfg.get("keep_missing_dates", True))
-    jobs, age_filter_stats = filter_jobs_by_max_age_days(
-        jobs,
-        max_age_days=max_job_age_days,
-        keep_missing_dates=keep_missing_dates,
-    )
-    print(f"[info] Age filter stats ({max_job_age_days}d): input={age_filter_stats['input']}, missing_or_invalid_date={age_filter_stats['excluded_missing_or_invalid_date']}, too_old={age_filter_stats['excluded_too_old']}, output={age_filter_stats['output']}")
-
-    validate_links = bool(cfg.get("validate_job_links", True))
-    link_check_delay_seconds = float(cfg.get("link_check_delay_seconds", 0.8) or 0.8)
-    jobs = validate_and_filter_jobs_by_link(jobs, enabled=validate_links, delay_seconds=link_check_delay_seconds)
-
-    run_at = utc_now_iso()
-    jobs, run_stats = enrich_jobs_with_history_and_flags(jobs, previous_jobs, run_at)
-
-    include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
-    exclude_keywords = cfg.get("keywords_exclude", [])
-    strict_chief_title_required = bool(cfg.get("strict_chief_title_required", True))
-    include_adjacent_roles = bool(cfg.get("include_adjacent_roles", True))
-
-    filtered_jobs, filter_stats = filter_jobs(
-        jobs,
-        include_keywords,
-        exclude_keywords,
-        strict_chief_title_required=strict_chief_title_required,
-    )
-    strategy_ops_jobs: list[dict[str, Any]] = []
-    strategy_ops_stats = {
-        "input": len(jobs),
-        "excluded_missing_chief_of_staff_title": 0,
-        "excluded_missing_include": 0,
-        "excluded_by_exclude": 0,
-        "output": 0,
-    }
-    if include_adjacent_roles:
-        strategy_ops_jobs, strategy_ops_stats = filter_jobs(
-            jobs,
-            include_keywords,
-            exclude_keywords,
-            strict_chief_title_required=False,
-        )
-
-    for job in jobs:
-        is_chief_match, _ = is_chief_of_staff_job(
-            job,
-            include_keywords,
-            exclude_keywords,
-            strict_chief_title_required=strict_chief_title_required,
-        )
-        is_strategy_ops_match, _ = is_chief_of_staff_job(
-            job,
-            include_keywords,
-            exclude_keywords,
-            strict_chief_title_required=False,
-        )
-        job["is_chief_of_staff"] = is_chief_match
-        job["is_strategy_ops"] = include_adjacent_roles and is_strategy_ops_match
-
-    print(f"[info] Filter stats: input={filter_stats['input']}, missing_chief_of_staff_title={filter_stats['excluded_missing_chief_of_staff_title']}, missing_include={filter_stats['excluded_missing_include']}, excluded={filter_stats['excluded_by_exclude']}, output={filter_stats['output']}")
-    if include_adjacent_roles:
-        print(f"[info] Adjacent-role stats: input={strategy_ops_stats['input']}, missing_include={strategy_ops_stats['excluded_missing_include']}, excluded={strategy_ops_stats['excluded_by_exclude']}, output={strategy_ops_stats['output']}")
-    else:
-        print("[info] Adjacent-role subset disabled via include_adjacent_roles=false")
+    result = process_jobs_pipeline(all_jobs, cfg, previous_jobs=previous_jobs)
 
     github_pages_url = resolve_github_pages_url(cfg)
-    write_outputs(jobs, filtered_jobs, strategy_ops_jobs, github_pages_url=github_pages_url)
-    write_run_meta(run_at, total_jobs=len(jobs), chief_of_staff_jobs=len(filtered_jobs), new_jobs=run_stats["new_count"])
+    write_outputs(result.jobs, result.chief_jobs, result.strategy_ops_jobs, github_pages_url=github_pages_url)
+    write_run_meta(
+        result.run_at,
+        total_jobs=len(result.jobs),
+        chief_of_staff_jobs=len(result.chief_jobs),
+        new_jobs=result.run_stats["new_count"],
+    )
     write_do_not_check_state(do_not_check_state)
-    maybe_send_email(filtered_jobs, cfg.get("email", {}))
-    print(f"[info] Wrote {len(jobs)} total jobs, {len(filtered_jobs)} chief-of-staff jobs, and {len(strategy_ops_jobs)} strategy/ops-adjacent jobs to JSON/CSV plus docs/index.html")
-    print(f"[info] New since last run: {run_stats['new_count']}")
+    maybe_send_email(result.chief_jobs, cfg.get("email", {}))
+    print(
+        f"[info] Wrote {len(result.jobs)} total jobs, {len(result.chief_jobs)} chief-of-staff jobs, "
+        f"and {len(result.strategy_ops_jobs)} strategy/ops-adjacent jobs to JSON/CSV plus docs/index.html"
+    )
+    print(f"[info] New since last run: {result.run_stats['new_count']}")
     if github_pages_url:
         print(f"[info] GitHub Pages URL: {github_pages_url}")
 

@@ -38,8 +38,41 @@ env:
   MAX_JOB_AGE_DAYS: 7
 
 jobs:
+  resolve-run-config:
+    runs-on: ubuntu-latest
+    outputs:
+      validate_links: ${{ steps.resolve.outputs.validate_links }}
+      max_sources: ${{ steps.resolve.outputs.max_sources }}
+      max_sources_per_platform: ${{ steps.resolve.outputs.max_sources_per_platform }}
+    steps:
+      - name: Resolve runtime settings
+        id: resolve
+        run: |
+          VALIDATE="false"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "30 12 * * 0" ]; then
+            VALIDATE="true"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.validate_links }}" = "true" ]; then
+            VALIDATE="true"
+          fi
+          MAX_SOURCES_VALUE="${MAX_SOURCES}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.max_sources }}" ]; then
+            MAX_SOURCES_VALUE="${{ inputs.max_sources }}"
+          fi
+          MAX_PER_PLATFORM_VALUE="${MAX_SOURCES_PER_PLATFORM}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.max_sources_per_platform }}" ]; then
+            MAX_PER_PLATFORM_VALUE="${{ inputs.max_sources_per_platform }}"
+          fi
+          echo "validate_links=${VALIDATE}" >> "$GITHUB_OUTPUT"
+          echo "max_sources=${MAX_SOURCES_VALUE}" >> "$GITHUB_OUTPUT"
+          echo "max_sources_per_platform=${MAX_PER_PLATFORM_VALUE}" >> "$GITHUB_OUTPUT"
+          echo "[info] Link validation enabled in aggregate job: ${VALIDATE}"
+          echo "[info] Max sources per chunk: ${MAX_SOURCES_VALUE:-<uncapped>}"
+          echo "[info] Max sources per platform: ${MAX_PER_PLATFORM_VALUE:-<uncapped>}"
+
   scrape-greenhouse:
     runs-on: ubuntu-latest
+    needs: resolve-run-config
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -74,8 +107,9 @@ jobs:
         env:
           PLATFORM_FILTER: greenhouse
           SOURCE_OFFSET: ${{ matrix.source_offset }}
-          VALIDATE_JOB_LINKS: "false"
-        run: python src/main.py
+          MAX_SOURCES: ${{ needs.resolve-run-config.outputs.max_sources }}
+          MAX_SOURCES_PER_PLATFORM: ${{ needs.resolve-run-config.outputs.max_sources_per_platform }}
+        run: python src/fetch_chunk.py
 
       - name: Save chunk outputs
         run: |
@@ -91,6 +125,7 @@ jobs:
 
   scrape-lever:
     runs-on: ubuntu-latest
+    needs: resolve-run-config
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -125,8 +160,9 @@ jobs:
         env:
           PLATFORM_FILTER: lever
           SOURCE_OFFSET: ${{ matrix.source_offset }}
-          VALIDATE_JOB_LINKS: "false"
-        run: python src/main.py
+          MAX_SOURCES: ${{ needs.resolve-run-config.outputs.max_sources }}
+          MAX_SOURCES_PER_PLATFORM: ${{ needs.resolve-run-config.outputs.max_sources_per_platform }}
+        run: python src/fetch_chunk.py
 
       - name: Save chunk outputs
         run: |
@@ -142,6 +178,7 @@ jobs:
 
   scrape-ashby:
     runs-on: ubuntu-latest
+    needs: resolve-run-config
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -176,10 +213,9 @@ jobs:
         env:
           PLATFORM_FILTER: ashby
           SOURCE_OFFSET: ${{ matrix.source_offset }}
-          VALIDATE_JOB_LINKS: ${{ steps.link_mode.outputs.validate_links }}
-          MAX_SOURCES: ${{ github.event_name == 'workflow_dispatch' && inputs.max_sources || env.MAX_SOURCES }}
-          MAX_SOURCES_PER_PLATFORM: ${{ github.event_name == 'workflow_dispatch' && inputs.max_sources_per_platform || env.MAX_SOURCES_PER_PLATFORM }}
-        run: python src/main.py
+          MAX_SOURCES: ${{ needs.resolve-run-config.outputs.max_sources }}
+          MAX_SOURCES_PER_PLATFORM: ${{ needs.resolve-run-config.outputs.max_sources_per_platform }}
+        run: python src/fetch_chunk.py
 
       - name: Save chunk outputs
         run: |
@@ -196,6 +232,7 @@ jobs:
   aggregate-and-publish:
     runs-on: ubuntu-latest
     needs:
+      - resolve-run-config
       - scrape-greenhouse
       - scrape-lever
       - scrape-ashby
@@ -208,19 +245,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Decide link validation mode
-        id: link_mode
-        run: |
-          VALIDATE="false"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "30 12 * * 0" ]; then
-            VALIDATE="true"
-          fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.validate_links }}" = "true" ]; then
-            VALIDATE="true"
-          fi
-          echo "validate_links=${VALIDATE}" >> "$GITHUB_OUTPUT"
-          echo "[info] Link validation enabled: ${VALIDATE}"
-
       - name: Download chunk artifacts
         uses: actions/download-artifact@v4
         with:
@@ -229,7 +253,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge chunk outputs and rebuild artifacts (link validation enabled)
-        if: steps.link_mode.outputs.validate_links == 'true'
+        if: needs.resolve-run-config.outputs.validate_links == 'true'
         run: |
           python src/aggregate_chunks.py \
             --chunks-dir chunk-artifacts \
@@ -238,7 +262,7 @@ jobs:
             --max-job-age-days "${MAX_JOB_AGE_DAYS}"
 
       - name: Merge chunk outputs and rebuild artifacts (link validation disabled)
-        if: steps.link_mode.outputs.validate_links != 'true'
+        if: needs.resolve-run-config.outputs.validate_links != 'true'
         run: |
           python src/aggregate_chunks.py \
             --chunks-dir chunk-artifacts \
@@ -257,6 +281,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add jobs.json jobs.csv jobs_chief_of_staff.json jobs_chief_of_staff.csv docs/index.html
+          git add jobs.json jobs.csv jobs_chief_of_staff.json jobs_chief_of_staff.csv jobs_strategy_ops.json jobs_strategy_ops.csv docs/index.html data/run_meta.json data/aggregate_summary.json
           git diff --cached --quiet || git commit -m "chore: update daily jobs digest"
           git push

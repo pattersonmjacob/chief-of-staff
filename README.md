@@ -36,6 +36,8 @@ _Chief-of-Staff matches: 14 · Snapshot timestamp: 2026-03-13 12:01 UTC_
   - `jobs_strategy_ops.json` (adjacent strategy/operations subset)
   - `jobs_strategy_ops.csv` (adjacent strategy/operations subset)
   - `docs/index.html` (GitHub Pages UI with subset toggles for Chief of Staff and adjacent roles)
+  - `data/run_meta.json` (latest published run totals and timestamp)
+  - `data/aggregate_summary.json` (chunk aggregation diagnostics from GitHub Actions)
   - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
 - Automatically tracks repeated HTTP 404 sources in `data/do_not_check.json` and skips them on future runs (after 3+ 404s and a healthy non-404 streak guard).
   - Optional GitHub Pages link banner in output (set `github_pages_url` or let Actions auto-detect).
@@ -112,6 +114,9 @@ There are two workflows:
 
 1. **Daily jobs digest** (`.github/workflows/daily.yml`)
    - Runs daily via cron (`15 12 * * *`) and on manual trigger.
+   - Resolves runtime settings once, then fans them out to split Greenhouse / Lever / Ashby chunk jobs.
+   - Chunk jobs use `src/fetch_chunk.py` to publish raw platform-specific `jobs_*.json` artifacts only; the final aggregate job rebuilds all public outputs from those raw chunks.
+   - Weekly Sunday run (`30 12 * * 0`) enables link validation in the aggregate job; the normal daily run skips link validation for speed.
    - Uses `SOURCES_CSV=data/company_slugs.csv` so daily scraping reads the repo-pinned source list.
 
 2. **Refresh company source list** (`.github/workflows/refresh-sources-weekly.yml`)
@@ -193,6 +198,9 @@ If secrets are missing, the script logs a warning and skips sending.
 
 - If workflow fails to push updated artifacts:
   - Recheck Actions write permissions and branch protection settings.
+- If the aggregate step fails after scraper chunks succeed:
+  - Check `data/aggregate_summary.json` in the workflow workspace/logs for invalid chunk files and per-platform artifact counts.
+  - Verify `src/main.py` and `src/aggregate_chunks.py` still share the same post-processing/output contract.
 
 
 ## Filtering behavior
