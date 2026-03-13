@@ -9,9 +9,11 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     chief_count = sum(1 for job in jobs if job.get("is_chief_of_staff"))
 
     pages_link = ""
+    base_path = ""
     if github_pages_url:
         safe_link = escape(github_pages_url)
         pages_link = f'<a class="pages-link" href="{safe_link}" target="_blank" rel="noopener noreferrer">Open GitHub Pages ↗</a>'
+        base_path = github_pages_url.rstrip("/") + "/"
 
     html = """<!doctype html>
 <html lang=\"en\">
@@ -52,14 +54,14 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
   </style>
 </head>
 <body>
-  <main class=\"container\">
+  <main class=\"container\" data-base-path="__BASE_PATH__">
     <header class=\"header\">
       <div>
         <h1>ATS Jobs Tracker</h1>
         <p class=\"meta\">__TOTAL__ total jobs · __CHIEF_TOTAL__ Chief of Staff matches · Generated __GENERATED__</p>
       </div>
       <div class=\"header-actions\">
-        <a class=\"secondary-link\" href=\"../jobs.csv\" download>Download CSV</a>
+        <a id=\"download-csv\" class=\"secondary-link\" href=\"./jobs.csv\" download>Download CSV</a>
         __PAGES_LINK__
       </div>
     </header>
@@ -88,6 +90,13 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
 
   <script>
     const q = (id) => document.getElementById(id);
+    const basePath = (document.querySelector('[data-base-path]')?.dataset.basePath || '').trim();
+    const assetUrl = (filename) => {
+      if (basePath) {
+        return `${basePath.replace(/\/$/, '')}/${filename}`;
+      }
+      return `./${filename}`;
+    };
     const CHUNK_SIZE = 100;
     const controls = ['search','platform','technical','function','freshness','chiefOnly'].map(q);
     let allJobs = [];
@@ -172,7 +181,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
 
     async function loadJobs() {
       try {
-        const response = await fetch('../jobs.json', { cache: 'no-store' });
+        const response = await fetch(assetUrl('jobs.json'), { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         allJobs = Array.isArray(data) ? data : [];
@@ -193,6 +202,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       observer.observe(sentinel);
     }
 
+    q('download-csv').href = assetUrl('jobs.csv');
     loadJobs();
   </script>
 </body>
@@ -203,5 +213,6 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         html.replace("__TOTAL__", str(len(jobs)))
         .replace("__CHIEF_TOTAL__", str(chief_count))
         .replace("__GENERATED__", generated_at)
+        .replace("__BASE_PATH__", escape(base_path))
         .replace("__PAGES_LINK__", pages_link)
     )

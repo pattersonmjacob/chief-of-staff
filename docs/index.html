@@ -37,15 +37,15 @@
   </style>
 </head>
 <body>
-  <main class="container">
+  <main class="container" data-base-path="">
     <header class="header">
       <div>
         <h1>ATS Jobs Tracker</h1>
-        <p class="meta">16127 total jobs · 14 Chief of Staff matches · Generated 2026-03-13 13:54 UTC</p>
+        <p class="meta">16127 total jobs · 14 Chief of Staff matches · Generated 2026-03-13 14:11 UTC</p>
       </div>
       <div class="header-actions">
-        <a class="secondary-link" href="../jobs.csv" download>Download CSV</a>
-        <a class="pages-link" href="https://pattersonmjacob.github.io/chief-of-staff/" target="_blank" rel="noopener noreferrer">Open GitHub Pages ↗</a>
+        <a id="download-csv" class="secondary-link" href="./jobs.csv" download>Download CSV</a>
+        
       </div>
     </header>
 
@@ -73,6 +73,13 @@
 
   <script>
     const q = (id) => document.getElementById(id);
+    const basePath = (document.querySelector('[data-base-path]')?.dataset.basePath || '').trim();
+    const assetUrl = (filename) => {
+      if (basePath) {
+        return `${basePath.replace(/\/$/, '')}/${filename}`;
+      }
+      return `./${filename}`;
+    };
     const CHUNK_SIZE = 100;
     const controls = ['search','platform','technical','function','freshness','chiefOnly'].map(q);
     let allJobs = [];
@@ -157,7 +164,7 @@
 
     async function loadJobs() {
       try {
-        const response = await fetch('../jobs.json', { cache: 'no-store' });
+        const response = await fetch(assetUrl('jobs.json'), { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         allJobs = Array.isArray(data) ? data : [];
@@ -178,6 +185,7 @@
       observer.observe(sentinel);
     }
 
+    q('download-csv').href = assetUrl('jobs.csv');
     loadJobs();
   </script>
 </body>
