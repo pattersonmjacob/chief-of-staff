@@ -28,6 +28,7 @@ def load_sources_from_csv(
     min_open_jobs: int = 1,
     max_sources: int | None = None,
     source_offset: int = 0,
+    platform_filter: str | None = None,
 ) -> list[dict[str, str]]:
     csv_path = Path(path)
     if not csv_path.exists():
@@ -37,6 +38,7 @@ def load_sources_from_csv(
     seen: set[tuple[str, str]] = set()
     source_offset = max(0, source_offset)
     skipped = 0
+    normalized_platform_filter = _normalize_vendor(platform_filter or "") if platform_filter else None
 
     with csv_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -48,6 +50,8 @@ def load_sources_from_csv(
             open_jobs = _to_int(row.get("open_jobs") or row.get("job_count"), default=0)
 
             if not vendor or not slug:
+                continue
+            if normalized_platform_filter and vendor != normalized_platform_filter:
                 continue
             if open_jobs < min_open_jobs:
                 continue
