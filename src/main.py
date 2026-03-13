@@ -506,13 +506,21 @@ def maybe_download_sources_csv(cfg: dict[str, Any]) -> None:
 
 
 def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
+    def parse_optional_cap(value: Any) -> int | None:
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not text:
+            return None
+        parsed = int(text)
+        return parsed if parsed > 0 else None
+
     source_rows = cfg.get("sources", [])
 
     sources_csv = cfg.get("sources_csv")
     if sources_csv:
         min_open_jobs = int(cfg.get("min_open_jobs", 1))
-        max_sources = cfg.get("max_sources")
-        max_sources_int = int(max_sources) if max_sources is not None else None
+        max_sources_int = parse_optional_cap(cfg.get("max_sources"))
         source_offset = int(cfg.get("source_offset", 0))
         platform_filter = str(cfg.get("platform_filter", "")).strip().lower()
         if platform_filter and platform_filter not in {"greenhouse", "lever", "ashby"}:
@@ -530,13 +538,8 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         except FileNotFoundError:
             print(f"[warn] sources_csv not found at {sources_csv}; falling back to config.sources")
 
-    platform_filter = str(cfg.get("platform_filter", "")).strip().lower()
-    if platform_filter in {"greenhouse", "lever", "ashby"}:
-        source_rows = [item for item in source_rows if str(item.get("platform", "")).strip().lower() == platform_filter]
-        print(f"[info] Applied platform filter: {platform_filter}={len(source_rows)}")
-
-    max_per_platform = int(cfg.get("max_sources_per_platform", 0) or 0)
-    if max_per_platform > 0:
+    max_per_platform = parse_optional_cap(cfg.get("max_sources_per_platform"))
+    if max_per_platform is not None:
         platform_counts: dict[str, int] = {}
         limited_rows: list[dict[str, Any]] = []
         for item in source_rows:
