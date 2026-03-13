@@ -83,7 +83,7 @@ def _dedupe_and_collate_jobs(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]
             merged[key] = dict(job)
             continue
 
-        for field in ["location", "department", "team", "employment_type"]:
+        for field in ["location", "work_mode", "department", "team", "employment_type", "comp_currency", "comp_interval", "comp_text"]:
             current[field] = _merge_pipe_values(current.get(field, ""), job.get(field, ""))
         current["url"] = _select_primary_url(current.get("url", ""), job.get("url", ""))
 
@@ -91,6 +91,28 @@ def _dedupe_and_collate_jobs(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]
         incoming_description = str(job.get("description") or "")
         if len(incoming_description) > len(current_description):
             current["description"] = incoming_description
+
+        current_min = current.get("comp_min")
+        incoming_min = job.get("comp_min")
+        if incoming_min not in {"", None}:
+            if current_min in {"", None}:
+                current["comp_min"] = incoming_min
+            else:
+                try:
+                    current["comp_min"] = min(float(current_min), float(incoming_min))
+                except (TypeError, ValueError):
+                    current["comp_min"] = incoming_min
+
+        current_max = current.get("comp_max")
+        incoming_max = job.get("comp_max")
+        if incoming_max not in {"", None}:
+            if current_max in {"", None}:
+                current["comp_max"] = incoming_max
+            else:
+                try:
+                    current["comp_max"] = max(float(current_max), float(incoming_max))
+                except (TypeError, ValueError):
+                    current["comp_max"] = incoming_max
 
         posted_values = [str(v) for v in [current.get("posted_at", ""), job.get("posted_at", "")] if str(v or "").strip()]
         if posted_values:
@@ -654,6 +676,15 @@ def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
         "company",
         "platform",
         "location",
+        "work_mode",
+        "comp_min",
+        "comp_max",
+        "comp_currency",
+        "comp_interval",
+        "comp_text",
+        "department",
+        "team",
+        "employment_type",
         "summary",
         "job_function",
         "is_technical",
@@ -697,6 +728,15 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             "company",
             "platform",
             "location",
+            "work_mode",
+            "comp_min",
+            "comp_max",
+            "comp_currency",
+            "comp_interval",
+            "comp_text",
+            "department",
+            "team",
+            "employment_type",
             "summary",
             "job_function",
             "is_technical",
