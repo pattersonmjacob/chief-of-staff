@@ -167,6 +167,169 @@ def _strip_html(value: Any) -> str:
     return re.sub(r"<[^>]+>", " ", text).strip()
 
 
+_CURRENCY_SYMBOL_TO_CODE = {
+    "$": "USD",
+    "£": "GBP",
+    "€": "EUR",
+    "¥": "JPY",
+    "₹": "INR",
+    "C$": "CAD",
+    "A$": "AUD",
+}
+
+
+def _to_number(value: Any) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    raw = str(value).strip()
+    if not raw:
+        return None
+    normalized = re.sub(r"[^0-9.,]", "", raw).replace(",", "")
+    if not normalized:
+        return None
+    try:
+        return float(normalized)
+    except ValueError:
+        return None
+
+
+def _normalize_interval(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    if not text:
+        return ""
+    mapping = {
+        "year": "year",
+        "annual": "year",
+        "annually": "year",
+        "yr": "year",
+        "month": "month",
+        "monthly": "month",
+        "mo": "month",
+        "hour": "hour",
+        "hourly": "hour",
+        "hr": "hour",
+        "week": "week",
+        "weekly": "week",
+        "day": "day",
+        "daily": "day",
+    }
+    for key, normalized in mapping.items():
+        if key in text:
+            return normalized
+    return text
+
+
+def _detect_currency(*values: Any) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if not text:
+            continue
+        upper = text.upper()
+        code_match = re.search(r"\b(USD|EUR|GBP|CAD|AUD|JPY|INR)\b", upper)
+        if code_match:
+            return code_match.group(1)
+        for symbol, code in _CURRENCY_SYMBOL_TO_CODE.items():
+            if symbol in text:
+                return code
+    return ""
+
+
+def _extract_comp_from_text(text: Any) -> dict[str, Any]:
+    description = str(text or "")
+    if not description:
+        return {}
+
+    patterns = [
+        r"(?P<currency>USD|EUR|GBP|CAD|AUD|JPY|INR|\$|£|€)\s?(?P<min>\d{2,3}(?:[\d,]{0,6})(?:\.\d+)?)\s?(?:-|to|–)\s?(?P<max>\d{2,3}(?:[\d,]{0,6})(?:\.\d+)?)\s?(?:USD|EUR|GBP|CAD|AUD|JPY|INR|\$|£|€)?(?:\s*(?:per|/)\s*(?P<intv>year|yr|annual|month|mo|hour|hr|week|day))?",
+        r"(?P<currency>USD|EUR|GBP|CAD|AUD|JPY|INR|\$|£|€)\s?(?P<single>\d{2,3}(?:[\d,]{0,6})(?:\.\d+)?)\s?(?:per|/)\s*(?P<intv>year|yr|annual|month|mo|hour|hr|week|day)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, description, re.IGNORECASE)
+        if not match:
+            continue
+        groups = match.groupdict()
+        comp_min = _to_number(groups.get("min") or groups.get("single"))
+        comp_max = _to_number(groups.get("max") or groups.get("single"))
+        currency = _detect_currency(groups.get("currency"), match.group(0))
+        interval = _normalize_interval(groups.get("intv"))
+        return {
+            "comp_min": comp_min if comp_min is not None else "",
+            "comp_max": comp_max if comp_max is not None else "",
+            "comp_currency": currency,
+            "comp_interval": interval,
+            "comp_text": match.group(0).strip(),
+        }
+    return {}
+
+
+def infer_work_mode(location: Any, description: Any) -> str:
+    text = " ".join([str(location or ""), str(description or "")]).lower()
+    if "hybrid" in text:
+        return "hybrid"
+    if "remote" in text or "work from home" in text or "wfh" in text:
+        return "remote"
+    if "on-site" in text or "onsite" in text or "on site" in text:
+        return "onsite"
+    if str(location or "").strip() and "remote" not in text:
+        return "hybrid_or_onsite"
+    return ""
+
+
+def _parse_compensation(raw_job: dict[str, Any], fields: dict[str, Any], description: str = "") -> dict[str, Any]:
+    comp_sources = [
+        fields.get("compensation"),
+        raw_job.get("compensation"),
+        raw_job.get("salary"),
+        raw_job.get("pay"),
+        raw_job.get("salaryRange"),
+        raw_job.get("compensationRange"),
+        raw_job.get("payRange"),
+    ]
+
+    for source in comp_sources:
+        if isinstance(source, dict):
+            comp_min = _to_number(source.get("min") or source.get("minimum") or source.get("minAmount"))
+            comp_max = _to_number(source.get("max") or source.get("maximum") or source.get("maxAmount"))
+            currency = _detect_currency(source.get("currency"), source.get("currencyCode"), source.get("symbol"))
+            interval = _normalize_interval(source.get("interval") or source.get("period") or source.get("unit"))
+            comp_text = str(source.get("text") or source.get("description") or "").strip()
+            if any([comp_min is not None, comp_max is not None, currency, interval, comp_text]):
+                return {
+                    "comp_min": comp_min if comp_min is not None else "",
+                    "comp_max": comp_max if comp_max is not None else "",
+                    "comp_currency": currency,
+                    "comp_interval": interval,
+                    "comp_text": comp_text,
+                }
+        elif isinstance(source, list):
+            for item in source:
+                parsed = _parse_compensation({"compensation": item}, {}, description)
+                if any(parsed.values()):
+                    return parsed
+        elif source:
+            parsed = _extract_comp_from_text(source)
+            if parsed:
+                return parsed
+
+    for key in [
+        "salaryRange",
+        "compensation",
+        "compensationText",
+        "salary",
+        "payRange",
+        "payTransparency",
+    ]:
+        value = fields.get(key)
+        if value:
+            parsed = _extract_comp_from_text(value)
+            if parsed:
+                return parsed
+
+    return _extract_comp_from_text(description)
+
+
 def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields: dict[str, Any]) -> dict[str, Any]:
     location = raw_job.get("location") or raw_job.get("offices") or fields.get("location") or ""
     if isinstance(location, dict):
@@ -174,11 +337,22 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
     elif isinstance(location, list):
         location = ", ".join(str(item.get("name", "")) if isinstance(item, dict) else str(item) for item in location)
 
+    description = _strip_html(
+        fields.get("description")
+        or raw_job.get("content")
+        or raw_job.get("descriptionPlain")
+        or raw_job.get("description")
+        or ""
+    )
+    compensation = _parse_compensation(raw_job, fields, description)
+    work_mode = infer_work_mode(location, description)
+
     return {
         "platform": platform,
         "company": company,
         "title": raw_job.get("title") or fields.get("title") or "",
         "location": str(location),
+        "work_mode": work_mode,
         "url": raw_job.get("absolute_url")
         or raw_job.get("hostedUrl")
         or raw_job.get("apply_url")
@@ -187,13 +361,12 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
         "department": fields.get("department") or raw_job.get("department") or "",
         "team": fields.get("team") or "",
         "employment_type": fields.get("employment_type") or raw_job.get("commitment") or "",
-        "description": _strip_html(
-            fields.get("description")
-            or raw_job.get("content")
-            or raw_job.get("descriptionPlain")
-            or raw_job.get("description")
-            or ""
-        ),
+        "description": description,
+        "comp_min": compensation.get("comp_min", ""),
+        "comp_max": compensation.get("comp_max", ""),
+        "comp_currency": compensation.get("comp_currency", ""),
+        "comp_interval": compensation.get("comp_interval", ""),
+        "comp_text": compensation.get("comp_text", ""),
         "posted_at": fields.get("posted_at") or raw_job.get("updated_at") or raw_job.get("createdAt") or raw_job.get("created_at") or "",
         "updated_at": fields.get("updated_at") or raw_job.get("updatedAt") or raw_job.get("updated_at") or "",
     }
@@ -208,6 +381,9 @@ def fetch_greenhouse(company_slug: str) -> list[dict[str, Any]]:
             "department": (raw_job.get("departments") or [{}])[0].get("name", "") if raw_job.get("departments") else "",
             "team": (raw_job.get("offices") or [{}])[0].get("name", "") if raw_job.get("offices") else "",
             "posted_at": raw_job.get("updated_at") or "",
+            "compensation": raw_job.get("salary_range")
+            or raw_job.get("pay_input_ranges")
+            or (raw_job.get("metadata", {}).get("compensation") if isinstance(raw_job.get("metadata"), dict) else ""),
         }
         jobs.append(_normalize_job("greenhouse", company_slug, raw_job, fields))
     return jobs
@@ -232,6 +408,7 @@ def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
                     "description": raw_job.get("descriptionPlain") or raw_job.get("description") or "",
                     "posted_at": raw_job.get("createdAt") or "",
                     "updated_at": raw_job.get("updatedAt") or "",
+                    "compensation": raw_job.get("salaryRange") or raw_job.get("salaryDescription") or raw_job.get("compensation") or raw_job.get("categories", {}).get("compensation", ""),
                 }
                 jobs.append(_normalize_job("lever", company_slug, raw_job, fields))
             if idx > 0:
@@ -263,8 +440,17 @@ def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
         "      jobs {\n"
         "        id\n"
         "        title\n"
+        "        description\n"
         "        location { name }\n"
         "        employmentType\n"
+        "        compensationTierSummary\n"
+        "        compensation {\n"
+        "          summary\n"
+        "          minCompensation\n"
+        "          maxCompensation\n"
+        "          currencyCode\n"
+        "          interval\n"
+        "        }\n"
         "        applyUrl\n"
         "        publishedDate\n"
         "        updatedAt\n"
@@ -377,6 +563,8 @@ def _fetch_ashby_jobs_from_board_page(company_slug: str) -> list[dict[str, Any]]
                 fields = {
                     "team": team_names.get(team_id, ""),
                     "employment_type": node.get("employmentType", ""),
+                    "description": node.get("description", ""),
+                    "compensation": node.get("compensation") or node.get("compensationTierSummary") or node.get("salaryRange") or "",
                     "posted_at": node.get("publishedDate") or node.get("createdAt") or "",
                     "updated_at": node.get("updatedAt") or "",
                 }
@@ -420,6 +608,8 @@ def _ashby_jobs_from_data(company_slug: str, data: dict[str, Any]) -> list[dict[
             fields = {
                 "team": team_name,
                 "employment_type": raw_job.get("employmentType", ""),
+                "description": raw_job.get("description", ""),
+                "compensation": raw_job.get("compensation") or raw_job.get("compensationTierSummary") or "",
                 "posted_at": raw_job.get("publishedDate") or "",
                 "updated_at": raw_job.get("updatedAt") or "",
             }

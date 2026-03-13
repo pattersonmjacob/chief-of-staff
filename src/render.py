@@ -30,7 +30,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     .header-actions { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
     .pages-link, .secondary-link { text-decoration:none; color:#04111d; background:linear-gradient(135deg,var(--accent),#67e8f9); padding:.58rem .85rem; border-radius:12px; font-weight:700; box-shadow:0 8px 24px #22d3ee3d; }
     .secondary-link { background:#1f2937; color:#cbd5e1; box-shadow:none; border:1px solid #334155; }
-    .toolbar { display:grid; grid-template-columns: 1.6fr repeat(4, 1fr); gap:.55rem; margin:.9rem 0 1rem; background: var(--card); border:1px solid #334155aa; border-radius:16px; padding:.7rem; backdrop-filter: blur(6px); }
+    .toolbar { display:grid; grid-template-columns: 1.6fr repeat(6, 1fr); gap:.55rem; margin:.9rem 0 1rem; background: var(--card); border:1px solid #334155aa; border-radius:16px; padding:.7rem; backdrop-filter: blur(6px); }
     .toolbar input,.toolbar select { padding:.62rem; border:1px solid #334155; border-radius:12px; background:#020617a8; color:var(--text); }
     .toolbar .toggle { display:flex; align-items:center; gap:.4rem; padding:.62rem; border:1px solid #334155; border-radius:12px; background:#020617a8; }
     .summary { margin:.2rem 0 .75rem; color:var(--muted); }
@@ -69,6 +69,8 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       <select id=\"platform\"><option value=\"\">All platforms</option><option>greenhouse</option><option>lever</option><option>ashby</option></select>
       <select id=\"technical\"><option value=\"\">All technicality</option><option value=\"yes\">Technical</option><option value=\"no\">Non-technical</option></select>
       <select id=\"function\"><option value=\"\">All functions</option><option>business-operations</option><option>program-management</option><option>product</option><option>engineering</option><option>finance</option><option>people-hr</option><option>other</option></select>
+      <select id=\"workMode\"><option value=\"\">All work modes</option><option>remote</option><option>hybrid</option><option>onsite</option><option>hybrid_or_onsite</option></select>
+      <select id=\"compensation\"><option value=\"\">All compensation</option><option value=\"has_comp\">Has compensation</option><option value=\"missing_comp\">Missing compensation</option></select>
       <select id=\"freshness\"><option value=\"\">All time</option><option value=\"new\">New since last run</option><option value=\"12h\">First seen ≤12h</option><option value=\"24h\">First seen ≤24h</option></select>
       <label class=\"toggle\"><input id=\"chiefOnly\" type=\"checkbox\" checked /> Chief of Staff only</label>
     </div>
@@ -77,7 +79,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
     <section class=\"table-wrap\">
       <table>
         <thead>
-          <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th></tr>
+          <tr><th>Title</th><th>Company</th><th>Platform</th><th>Location</th><th>Work mode</th><th>Compensation</th><th>Posted</th><th>First seen</th><th>Flags</th><th>Link</th></tr>
         </thead>
         <tbody id=\"jobs-body\"></tbody>
       </table>
@@ -89,7 +91,7 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
   <script>
     const q = (id) => document.getElementById(id);
     const CHUNK_SIZE = 100;
-    const controls = ['search','platform','technical','function','freshness','chiefOnly'].map(q);
+    const controls = ['search','platform','technical','function','workMode','compensation','freshness','chiefOnly'].map(q);
     let allJobs = [];
     let filteredJobs = [];
     let renderedCount = 0;
@@ -111,6 +113,19 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         .replaceAll("'", '&#39;');
     }
 
+
+    function compensationText(job) {
+      if (job.comp_text) return job.comp_text;
+      const min = job.comp_min;
+      const max = job.comp_max;
+      const currency = job.comp_currency || '';
+      const interval = job.comp_interval ? `/${job.comp_interval}` : '';
+      if (min || max) {
+        if (min && max) return `${currency} ${min} - ${max}${interval}`.trim();
+        return `${currency} ${min || max}${interval}`.trim();
+      }
+      return '—';
+    }
     function renderRow(job) {
       const flags = [
         badge(job.is_technical ? 'Technical' : 'Non-technical', job.is_technical ? 'tech' : 'non-tech'),
@@ -124,6 +139,8 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         <td>${escapeHtml(job.company || '')}</td>
         <td>${escapeHtml(job.platform || '')}</td>
         <td>${escapeHtml(job.location || '')}</td>
+        <td>${escapeHtml(job.work_mode || '—')}</td>
+        <td>${escapeHtml(compensationText(job))}</td>
         <td>${escapeHtml(job.posted_at || '—')}</td>
         <td>${escapeHtml(job.first_seen_at || '—')}</td>
         <td>${flags.join('')}</td>
@@ -136,6 +153,8 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
       const platform = q('platform').value.toLowerCase();
       const technical = q('technical').value;
       const func = q('function').value.toLowerCase();
+      const workMode = q('workMode').value.toLowerCase();
+      const compensation = q('compensation').value;
       const freshness = q('freshness').value;
       const chiefOnly = q('chiefOnly').checked;
 
@@ -145,6 +164,10 @@ def render_html(jobs: list[dict], github_pages_url: str = "") -> str:
         if (platform && (job.platform || '').toLowerCase() !== platform) return false;
         if (technical && (job.is_technical ? 'yes' : 'no') !== technical) return false;
         if (func && (job.job_function || '').toLowerCase() !== func) return false;
+        if (workMode && (job.work_mode || '').toLowerCase() !== workMode) return false;
+        const hasComp = !!(job.comp_text || job.comp_min || job.comp_max);
+        if (compensation === 'has_comp' && !hasComp) return false;
+        if (compensation === 'missing_comp' && hasComp) return false;
         if (freshness === 'new' && !job.is_new) return false;
         if (freshness === '12h' && !inHours(job.first_seen_at, 12)) return false;
         if (freshness === '24h' && !inHours(job.first_seen_at, 24)) return false;
