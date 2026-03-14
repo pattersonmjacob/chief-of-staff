@@ -32,6 +32,7 @@ JOBS_CHIEF_JSON = ROOT / "jobs_chief_of_staff.json"
 JOBS_CHIEF_CSV = ROOT / "jobs_chief_of_staff.csv"
 JOBS_STRATEGY_OPS_JSON = ROOT / "jobs_strategy_ops.json"
 JOBS_STRATEGY_OPS_CSV = ROOT / "jobs_strategy_ops.csv"
+DOCS_DATA_DIR = ROOT / "docs" / "data"
 
 
 @dataclass
@@ -281,6 +282,24 @@ def classify_is_learning_and_development(job: dict[str, Any]) -> bool:
     return any(term in text for term in learning_terms)
 
 
+def build_summary(job: dict[str, Any]) -> str:
+    token_candidates = [
+        ("team", job.get("team")),
+        ("dept", job.get("department")),
+        ("mode", job.get("work_mode") or job.get("employment_type")),
+        ("comp", job.get("comp_text")),
+    ]
+    tokens: list[str] = []
+    for label, value in token_candidates:
+        text = " ".join(str(value or "").split())
+        if not text:
+            continue
+        if len(text) > 40:
+            text = text[:39].rstrip() + "..."
+        tokens.append(f"{label}:{text}")
+    return " | ".join(tokens)
+
+
 def enrich_jobs_with_history_and_flags(jobs: list[dict[str, Any]], previous_jobs: list[dict[str, Any]], run_at: str) -> tuple[list[dict[str, Any]], dict[str, int]]:
     prev_by_key = {_job_key(job): job for job in previous_jobs}
     enriched: list[dict[str, Any]] = []
@@ -324,6 +343,8 @@ def write_run_meta(run_at: str, total_jobs: int, chief_of_staff_jobs: int, new_j
         "new_jobs": new_jobs,
     }
     RUN_META_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    DOCS_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    (DOCS_DATA_DIR / "run_meta.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
 
@@ -475,7 +496,7 @@ def fetch_all_jobs(
 
     print(f"[info] Source fetch summary: total={len(sources)} failed={failed_sources} rate_limited={rate_limited_sources} jobs={len(all_jobs)}")
     if jobs_by_platform:
-        print("[info] Jobs by platform: " + ", ".join(f"{p}={jobs_by_platform.get(p, 0)}" for p in ["greenhouse", "lever", "ashby"]))
+        print("[info] Jobs by platform: " + ", ".join(f"{p}={jobs_by_platform.get(p, 0)}" for p in ["greenhouse", "lever"]))
     if failures_by_platform:
         print("[info] Failures by platform: " + ", ".join(f"{p}={failures_by_platform.get(p, 0)}" for p in sorted(failures_by_platform)))
     return all_jobs, do_not_check_state
@@ -523,7 +544,7 @@ def apply_runtime_overrides(cfg: dict[str, Any]) -> dict[str, Any]:
         updated["max_sources_per_platform"] = int(env_max_sources_per_platform)
         print(f"[info] Using MAX_SOURCES_PER_PLATFORM override: {env_max_sources_per_platform}")
 
-    if env_platform_filter in {"greenhouse", "lever", "ashby"}:
+    if env_platform_filter in {"greenhouse", "lever"}:
         updated["platform_filter"] = env_platform_filter
         print(f"[info] Using PLATFORM_FILTER override: {env_platform_filter}")
 
@@ -583,7 +604,7 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         max_sources_int = parse_optional_cap(cfg.get("max_sources"))
         source_offset = int(cfg.get("source_offset", 0))
         platform_filter = str(cfg.get("platform_filter", "")).strip().lower()
-        if platform_filter and platform_filter not in {"greenhouse", "lever", "ashby"}:
+        if platform_filter and platform_filter not in {"greenhouse", "lever"}:
             platform_filter = ""
 
         try:
@@ -604,7 +625,7 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         limited_rows: list[dict[str, Any]] = []
         for item in source_rows:
             platform = str(item.get("platform", "")).lower().strip()
-            if platform not in {"greenhouse", "lever", "ashby"}:
+            if platform not in {"greenhouse", "lever"}:
                 continue
             count = platform_counts.get(platform, 0)
             if count >= max_per_platform:
@@ -614,7 +635,7 @@ def get_sources(cfg: dict[str, Any]) -> list[CompanySource]:
         source_rows = limited_rows
         print(
             "[info] Applied per-platform cap: "
-            + ", ".join(f"{p}={platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby"])
+            + ", ".join(f"{p}={platform_counts.get(p, 0)}" for p in ["greenhouse", "lever"])
         )
 
     return [CompanySource(**item) for item in source_rows]
@@ -774,6 +795,7 @@ def process_jobs_pipeline(
         job["is_chief_of_staff"] = is_chief_match
         job["is_strategy_ops"] = include_adjacent_roles and is_strategy_ops_match
         job["is_learning_and_development"] = classify_is_learning_and_development(job)
+        job["summary"] = build_summary(job)
 
     print(
         f"[info] Filter stats: input={filter_stats['input']}, "
@@ -884,6 +906,11 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             writer.writerow({name: job.get(name, "") for name in fieldnames})
 
 
+def _write_docs_json(filename: str, payload: Any) -> None:
+    DOCS_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    (DOCS_DATA_DIR / filename).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
 def write_outputs(
     focused_jobs: list[dict[str, Any]],
     chief_jobs: list[dict[str, Any]],
@@ -896,6 +923,9 @@ def write_outputs(
     JOBS_JSON.write_text(json.dumps(compact_focused_jobs, indent=2))
     JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, indent=2))
     JOBS_STRATEGY_OPS_JSON.write_text(json.dumps(compact_strategy_ops_jobs, indent=2))
+    _write_docs_json("jobs.json", compact_focused_jobs)
+    _write_docs_json("jobs_chief_of_staff.json", compact_chief_jobs)
+    _write_docs_json("jobs_strategy_ops.json", compact_strategy_ops_jobs)
 
     _write_csv(JOBS_CSV, compact_focused_jobs)
     _write_csv(JOBS_CHIEF_CSV, compact_chief_jobs)

@@ -10,7 +10,6 @@ from urllib.request import urlopen
 
 DEFAULT_GREENHOUSE_URL = "https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv"
 DEFAULT_LEVER_URL = "https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/lever/lever_companies.csv"
-DEFAULT_ASHBY_URL = "https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv"
 
 
 def _download_csv_rows(url: str) -> list[dict[str, str]]:
@@ -42,10 +41,6 @@ def _normalize_slug(vendor: str, raw_slug: str) -> str:
         elif vendor == "Lever":
             if "lever.co" in host and path_parts:
                 return path_parts[-1].lower()
-        elif vendor == "Ashby":
-            if "ashbyhq.com" in host and path_parts:
-                return path_parts[-1].lower()
-
         if path_parts:
             return path_parts[-1].lower()
         return ""
@@ -58,15 +53,12 @@ def _build_board_url(vendor: str, slug: str) -> str:
         return f"https://job-boards.greenhouse.io/{slug}"
     if vendor == "Lever":
         return f"https://jobs.lever.co/{slug}"
-    if vendor == "Ashby":
-        return f"https://jobs.ashbyhq.com/{slug}"
     return ""
 
 
 def merge_source_rows(
     greenhouse_rows: list[dict[str, str]],
     lever_rows: list[dict[str, str]],
-    ashby_rows: list[dict[str, str]],
 ) -> list[dict[str, str]]:
     merged: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
@@ -99,7 +91,6 @@ def merge_source_rows(
 
     add_rows(greenhouse_rows, "Greenhouse")
     add_rows(lever_rows, "Lever")
-    add_rows(ashby_rows, "Ashby")
     return merged
 
 
@@ -116,14 +107,12 @@ def main() -> None:
     parser.add_argument("--output", default="data/company_slugs.csv")
     parser.add_argument("--greenhouse-url", default=DEFAULT_GREENHOUSE_URL)
     parser.add_argument("--lever-url", default=DEFAULT_LEVER_URL)
-    parser.add_argument("--ashby-url", default=DEFAULT_ASHBY_URL)
     args = parser.parse_args()
 
     greenhouse_rows = _download_csv_rows(args.greenhouse_url)
     lever_rows = _download_csv_rows(args.lever_url)
-    ashby_rows = _download_csv_rows(args.ashby_url)
 
-    merged = merge_source_rows(greenhouse_rows, lever_rows, ashby_rows)
+    merged = merge_source_rows(greenhouse_rows, lever_rows)
     write_sources_csv(merged, Path(args.output))
     print(f"[info] Wrote {len(merged)} merged sources to {args.output}")
 

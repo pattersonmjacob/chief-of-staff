@@ -24,8 +24,7 @@ jobs:
         run: |
           python src/build_sources.py --output data/company_slugs.csv \
             --lever-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/lever/lever_companies.csv \
-            --greenhouse-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv \
-            --ashby-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv
+            --greenhouse-url https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv
 
       - name: Validate and preview source CSV
         run: |
@@ -43,7 +42,7 @@ jobs:
               raise SystemExit(f"Missing required columns: {missing}")
 
           counts = Counter((r.get("vendor") or "").strip() for r in rows)
-          print(f"[info] Source rows: total={len(rows)} greenhouse={counts.get('Greenhouse',0)} lever={counts.get('Lever',0)} ashby={counts.get('Ashby',0)}")
+          print(f"[info] Source rows: total={len(rows)} greenhouse={counts.get('Greenhouse',0)} lever={counts.get('Lever',0)}")
 
           missing_source_url = sum(1 for r in rows if not (r.get("url") or "").strip())
           missing_board_url = sum(1 for r in rows if not (r.get("board_url") or "").strip())

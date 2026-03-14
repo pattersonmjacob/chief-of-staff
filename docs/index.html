@@ -3,16 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>chief-of-staff artifacts</title>
+    <title>Chief of Staff jobs</title>
     <style>
       :root {
-        color-scheme: light;
-        --bg: #f6f3ea;
-        --card: #fffdf8;
-        --text: #1f1d1a;
-        --muted: #6a655d;
-        --line: #d8cfbf;
-        --accent: #9a3412;
+        --bg: #f3efe6;
+        --bg-strong: #e7ddcc;
+        --panel: rgba(255, 251, 245, 0.88);
+        --panel-strong: #fffaf2;
+        --text: #1f1b16;
+        --muted: #6f6559;
+        --line: rgba(81, 61, 34, 0.14);
+        --accent: #a4491d;
+        --accent-2: #1e6d62;
+        --shadow: 0 24px 60px rgba(60, 42, 18, 0.12);
+        --radius: 24px;
       }
 
       * {
@@ -21,72 +25,615 @@
 
       body {
         margin: 0;
-        font-family: Georgia, "Times New Roman", serif;
         color: var(--text);
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
         background:
-          radial-gradient(circle at top left, #efe3cf 0, transparent 28rem),
-          linear-gradient(180deg, #f9f6ef 0%, var(--bg) 100%);
-      }
-
-      main {
-        max-width: 48rem;
-        margin: 0 auto;
-        padding: 4rem 1.25rem 5rem;
-      }
-
-      .card {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: 0 1.25rem 3rem rgba(46, 37, 20, 0.08);
-      }
-
-      h1 {
-        margin: 0 0 0.75rem;
-        font-size: clamp(2rem, 4vw, 3rem);
-        line-height: 1.05;
-      }
-
-      p {
-        margin: 0 0 1rem;
-        line-height: 1.6;
-      }
-
-      .muted {
-        color: var(--muted);
-      }
-
-      ul {
-        padding-left: 1.25rem;
-        line-height: 1.7;
+          radial-gradient(circle at top left, rgba(209, 167, 117, 0.32), transparent 26rem),
+          radial-gradient(circle at top right, rgba(110, 161, 149, 0.2), transparent 24rem),
+          linear-gradient(180deg, #fbf8f2 0%, var(--bg) 100%);
       }
 
       a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 18px 56px;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(255, 247, 236, 0.94), rgba(247, 240, 228, 0.92));
+        border: 1px solid var(--line);
+        border-radius: 32px;
+        padding: 28px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -4rem -5rem auto;
+        width: 18rem;
+        height: 18rem;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(164, 73, 29, 0.18), transparent 70%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 7px 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(164, 73, 29, 0.18);
         color: var(--accent);
+        background: rgba(164, 73, 29, 0.06);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 16px 0 10px;
+        max-width: 12ch;
+        font-size: clamp(2.6rem, 6vw, 5rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .hero-copy {
+        max-width: 42rem;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .meta-grid,
+      .stats-grid,
+      .filters,
+      .job-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .meta-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin-top: 22px;
+      }
+
+      .meta-card,
+      .stat-card,
+      .filters,
+      .panel,
+      .job-card {
+        background: var(--panel);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .meta-card,
+      .stat-card {
+        padding: 18px;
+      }
+
+      .meta-label,
+      .stat-label,
+      .panel-label {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+      }
+
+      .meta-value,
+      .stat-value {
+        margin: 0;
+        font-size: 1.55rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .filters {
+        padding: 18px;
+        align-self: start;
+        position: sticky;
+        top: 16px;
+      }
+
+      .filters label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .filters input,
+      .filters select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: var(--panel-strong);
+        color: var(--text);
+        font: inherit;
+      }
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.62);
+        border: 1px solid var(--line);
+      }
+
+      .toggle-row input {
+        width: auto;
+        transform: scale(1.1);
+      }
+
+      .results {
+        display: grid;
+        gap: 18px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 8px;
+      }
+
+      .panel-head h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .helper {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .job-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .job-card {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .job-card h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        line-height: 1.2;
+      }
+
+      .job-link {
+        text-decoration: none;
+      }
+
+      .job-link:hover h3 {
+        color: var(--accent);
+      }
+
+      .company-line {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(81, 61, 34, 0.12);
+        background: rgba(255, 255, 255, 0.7);
+        font-size: 0.82rem;
+      }
+
+      .chip.flag {
+        background: rgba(30, 109, 98, 0.1);
+        border-color: rgba(30, 109, 98, 0.18);
+        color: var(--accent-2);
+      }
+
+      .summary {
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .fine {
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .empty,
+      .loading {
+        padding: 28px;
+        text-align: center;
+        color: var(--muted);
+        border: 1px dashed rgba(81, 61, 34, 0.22);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.45);
+      }
+
+      .footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 10px;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .filters {
+          position: static;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <section class="card">
-        <h1>Focused job artifacts</h1>
-        <p>
-          The old GitHub Pages dashboard has been retired. This repository now publishes
-          focused Chief of Staff and adjacent-role artifacts directly.
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">Daily digest</div>
+        <h1>Chief of Staff roles, plus adjacent operators.</h1>
+        <p class="hero-copy">
+          This dashboard is built from the repo's published artifacts. It highlights the strict
+          Chief of Staff set, the broader adjacent strategy and operations feed, and any roles
+          tagged as learning and development.
         </p>
-        <p class="muted">
-          Use the repository root for the latest generated files and the README for the current
-          Chief of Staff snapshot.
-        </p>
-        <ul>
-          <li><a href="../README.md">README.md</a></li>
-          <li><a href="../jobs.json">jobs.json</a></li>
-          <li><a href="../jobs.csv">jobs.csv</a></li>
-          <li><a href="../jobs_chief_of_staff.json">jobs_chief_of_staff.json</a></li>
-          <li><a href="../jobs_strategy_ops.json">jobs_strategy_ops.json</a></li>
-        </ul>
+        <div class="meta-grid">
+          <article class="meta-card">
+            <p class="meta-label">Last run</p>
+            <p class="meta-value" id="last-run">Loading...</p>
+          </article>
+          <article class="meta-card">
+            <p class="meta-label">Published feed</p>
+            <p class="meta-value" id="published-total">0</p>
+          </article>
+          <article class="meta-card">
+            <p class="meta-label">Strict Chief of Staff</p>
+            <p class="meta-value" id="chief-total">0</p>
+          </article>
+          <article class="meta-card">
+            <p class="meta-label">New since last run</p>
+            <p class="meta-value" id="new-total">0</p>
+          </article>
+        </div>
       </section>
+
+      <section class="layout">
+        <aside class="filters">
+          <div>
+            <p class="panel-label">Search</p>
+            <label for="search">Title, company, department, team, location</label>
+            <input id="search" type="search" placeholder="Search roles" />
+          </div>
+          <div>
+            <p class="panel-label">Feed</p>
+            <label for="feed">Which view to browse</label>
+            <select id="feed">
+              <option value="focused">Focused feed</option>
+              <option value="chief">Chief of Staff only</option>
+              <option value="adjacent">Adjacent strategy and operations</option>
+            </select>
+          </div>
+          <div>
+            <p class="panel-label">Platform</p>
+            <label for="platform">Source platform</label>
+            <select id="platform">
+              <option value="">All platforms</option>
+            </select>
+          </div>
+          <div class="toggle-row">
+            <label for="new-only">New roles only</label>
+            <input id="new-only" type="checkbox" />
+          </div>
+          <div class="toggle-row">
+            <label for="ld-only">Learning and development only</label>
+            <input id="ld-only" type="checkbox" />
+          </div>
+        </aside>
+
+        <section class="results">
+          <div class="stats-grid">
+            <article class="stat-card">
+              <p class="stat-label">Visible roles</p>
+              <p class="stat-value" id="visible-count">0</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Chief of Staff</p>
+              <p class="stat-value" id="visible-chief">0</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">Adjacent</p>
+              <p class="stat-value" id="visible-adjacent">0</p>
+            </article>
+            <article class="stat-card">
+              <p class="stat-label">L&amp;D flagged</p>
+              <p class="stat-value" id="visible-ld">0</p>
+            </article>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2 id="results-title">Focused feed</h2>
+              <span class="fine" id="results-subtitle">Loading published jobs...</span>
+            </div>
+            <p class="helper">
+              Strict Chief of Staff matches stay title-constrained. The focused feed includes the
+              broader adjacent set used for the daily digest.
+            </p>
+          </section>
+
+          <section id="loading" class="loading">Loading jobs from published repo data...</section>
+          <section id="empty" class="empty" hidden>No roles match the current filters.</section>
+          <section id="jobs" class="job-grid" hidden></section>
+        </section>
+      </section>
+
+      <footer class="footer">
+        Data sources are mirrored into `docs/data/` during each publish step so GitHub Pages can
+        render from stable local JSON.
+        <div class="footer-links">
+          <a href="./data/jobs.json">Focused JSON</a>
+          <a href="./data/jobs_chief_of_staff.json">Chief JSON</a>
+          <a href="./data/jobs_strategy_ops.json">Adjacent JSON</a>
+          <a href="https://github.com/pattersonmjacob/chief-of-staff/blob/main/README.md">README snapshot</a>
+        </div>
+      </footer>
     </main>
+
+    <script>
+      const state = {
+        focused: [],
+        chief: [],
+        adjacent: [],
+        meta: null,
+      };
+
+      const els = {
+        lastRun: document.getElementById("last-run"),
+        publishedTotal: document.getElementById("published-total"),
+        chiefTotal: document.getElementById("chief-total"),
+        newTotal: document.getElementById("new-total"),
+        visibleCount: document.getElementById("visible-count"),
+        visibleChief: document.getElementById("visible-chief"),
+        visibleAdjacent: document.getElementById("visible-adjacent"),
+        visibleLd: document.getElementById("visible-ld"),
+        resultsTitle: document.getElementById("results-title"),
+        resultsSubtitle: document.getElementById("results-subtitle"),
+        jobs: document.getElementById("jobs"),
+        loading: document.getElementById("loading"),
+        empty: document.getElementById("empty"),
+        search: document.getElementById("search"),
+        feed: document.getElementById("feed"),
+        platform: document.getElementById("platform"),
+        newOnly: document.getElementById("new-only"),
+        ldOnly: document.getElementById("ld-only"),
+      };
+
+      const feedNames = {
+        focused: "Focused feed",
+        chief: "Chief of Staff only",
+        adjacent: "Adjacent strategy and operations",
+      };
+
+      function formatTime(value) {
+        if (!value) return "Unknown";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        return date.toLocaleString(undefined, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+      }
+
+      function normalizeText(value) {
+        return String(value || "").toLowerCase();
+      }
+
+      function excerpt(job) {
+        const summary = String(job.summary || "").trim();
+        if (summary) return summary;
+        const parts = [job.department, job.team, job.work_mode || job.employment_type].filter(Boolean);
+        return parts.join(" | ");
+      }
+
+      function renderPlatforms() {
+        const platforms = new Set(
+          [...state.focused, ...state.chief, ...state.adjacent].map((job) => job.platform).filter(Boolean)
+        );
+        const existing = els.platform.value;
+        els.platform.innerHTML = '<option value="">All platforms</option>';
+        Array.from(platforms)
+          .sort()
+          .forEach((platform) => {
+            const option = document.createElement("option");
+            option.value = platform;
+            option.textContent = platform;
+            els.platform.appendChild(option);
+          });
+        els.platform.value = existing;
+      }
+
+      function activeFeed() {
+        return state[els.feed.value] || [];
+      }
+
+      function filteredJobs() {
+        const query = normalizeText(els.search.value);
+        const platform = els.platform.value;
+        const newOnly = els.newOnly.checked;
+        const ldOnly = els.ldOnly.checked;
+
+        return activeFeed().filter((job) => {
+          if (platform && job.platform !== platform) return false;
+          if (newOnly && !job.is_new) return false;
+          if (ldOnly && !job.is_learning_and_development) return false;
+          if (!query) return true;
+
+          const haystack = normalizeText([
+            job.title,
+            job.company,
+            job.department,
+            job.team,
+            job.location,
+            job.summary,
+          ].join(" "));
+          return haystack.includes(query);
+        });
+      }
+
+      function renderStats(jobs) {
+        els.visibleCount.textContent = String(jobs.length);
+        els.visibleChief.textContent = String(jobs.filter((job) => job.is_chief_of_staff).length);
+        els.visibleAdjacent.textContent = String(jobs.filter((job) => job.is_strategy_ops).length);
+        els.visibleLd.textContent = String(jobs.filter((job) => job.is_learning_and_development).length);
+      }
+
+      function renderJobs() {
+        const feed = els.feed.value;
+        const jobs = filteredJobs()
+          .slice()
+          .sort((a, b) => String(b.is_new).localeCompare(String(a.is_new)) || String(b.posted_at || "").localeCompare(String(a.posted_at || "")));
+
+        els.resultsTitle.textContent = feedNames[feed];
+        els.resultsSubtitle.textContent = jobs.length
+          ? `${jobs.length} visible roles`
+          : "No roles currently match these filters";
+
+        renderStats(jobs);
+        els.jobs.innerHTML = "";
+        els.loading.hidden = true;
+
+        if (!jobs.length) {
+          els.jobs.hidden = true;
+          els.empty.hidden = false;
+          return;
+        }
+
+        els.empty.hidden = true;
+        els.jobs.hidden = false;
+
+        jobs.forEach((job) => {
+          const article = document.createElement("article");
+          article.className = "job-card";
+
+          const title = document.createElement("a");
+          title.className = "job-link";
+          title.href = job.url || "#";
+          title.target = "_blank";
+          title.rel = "noreferrer";
+          title.innerHTML = `<h3>${job.title || "Untitled role"}</h3>`;
+
+          const company = document.createElement("p");
+          company.className = "company-line";
+          company.textContent = [job.company, job.platform, job.location].filter(Boolean).join(" · ");
+
+          const chips = document.createElement("div");
+          chips.className = "chip-row";
+          [
+            job.work_mode || job.employment_type,
+            job.department,
+            job.team,
+            job.is_new ? "New" : "",
+            job.is_chief_of_staff ? "Chief of Staff" : "",
+            job.is_strategy_ops ? "Adjacent" : "",
+            job.is_learning_and_development ? "L&D" : "",
+          ]
+            .filter(Boolean)
+            .forEach((value) => {
+              const chip = document.createElement("span");
+              chip.className = `chip${
+                value === "New" || value === "Chief of Staff" || value === "Adjacent" || value === "L&D" ? " flag" : ""
+              }`;
+              chip.textContent = value;
+              chips.appendChild(chip);
+            });
+
+          const summary = document.createElement("p");
+          summary.className = "summary";
+          summary.textContent = excerpt(job) || "No extra role metadata available yet.";
+
+          const fine = document.createElement("p");
+          fine.className = "fine";
+          fine.textContent = `Posted ${formatTime(job.posted_at)}${job.updated_at ? ` · Updated ${formatTime(job.updated_at)}` : ""}`;
+
+          article.append(title, company, chips, summary, fine);
+          els.jobs.appendChild(article);
+        });
+      }
+
+      async function loadData() {
+        const [focused, chief, adjacent, meta] = await Promise.all([
+          fetch("./data/jobs.json").then((response) => response.json()),
+          fetch("./data/jobs_chief_of_staff.json").then((response) => response.json()),
+          fetch("./data/jobs_strategy_ops.json").then((response) => response.json()),
+          fetch("./data/run_meta.json").then((response) => response.json()).catch(() => null),
+        ]);
+
+        state.focused = Array.isArray(focused) ? focused : [];
+        state.chief = Array.isArray(chief) ? chief : [];
+        state.adjacent = Array.isArray(adjacent) ? adjacent : [];
+        state.meta = meta && typeof meta === "object" ? meta : null;
+
+        els.publishedTotal.textContent = String(state.meta?.published_jobs || state.meta?.total_jobs || state.focused.length);
+        els.chiefTotal.textContent = String(state.meta?.chief_of_staff_jobs || state.chief.length);
+        els.newTotal.textContent = String(state.meta?.new_jobs || state.focused.filter((job) => job.is_new).length);
+        els.lastRun.textContent = formatTime(state.meta?.last_run_at);
+
+        renderPlatforms();
+        renderJobs();
+      }
+
+      [els.search, els.feed, els.platform, els.newOnly, els.ldOnly].forEach((input) => {
+        input.addEventListener("input", renderJobs);
+        input.addEventListener("change", renderJobs);
+      });
+
+      loadData().catch((error) => {
+        els.loading.textContent = `Unable to load dashboard data: ${error.message}`;
+      });
+    </script>
   </body>
 </html>

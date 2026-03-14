@@ -32,7 +32,6 @@ env:
   SCRAPE_CONCURRENCY: 3
   MIN_REQUEST_INTERVAL_SECONDS: 0.8
   REQUEST_TIMEOUT_SECONDS: 25
-  ASHBY_TIMEOUT_SECONDS: 35
   VALIDATE_JOB_LINKS: "false"
   LINK_CHECK_DELAY_SECONDS: 0.8
   MAX_JOB_AGE_DAYS: 7
@@ -176,66 +175,12 @@ jobs:
           path: chunk/jobs_lever_${{ matrix.chunk_index }}.json
           if-no-files-found: error
 
-  scrape-ashby:
-    runs-on: ubuntu-latest
-    needs: resolve-run-config
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        include:
-          - chunk_index: 0
-            source_offset: 0
-          - chunk_index: 1
-            source_offset: 1000
-          - chunk_index: 2
-            source_offset: 2000
-          - chunk_index: 3
-            source_offset: 3000
-          - chunk_index: 4
-            source_offset: 4000
-          - chunk_index: 5
-            source_offset: 5000
-          - chunk_index: 6
-            source_offset: 6000
-          - chunk_index: 7
-            source_offset: 7000
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Run scraper digest (Ashby)
-        env:
-          PLATFORM_FILTER: ashby
-          SOURCE_OFFSET: ${{ matrix.source_offset }}
-          MAX_SOURCES: ${{ needs.resolve-run-config.outputs.max_sources }}
-          MAX_SOURCES_PER_PLATFORM: ${{ needs.resolve-run-config.outputs.max_sources_per_platform }}
-        run: python src/fetch_chunk.py
-
-      - name: Save chunk outputs
-        run: |
-          mkdir -p chunk
-          cp jobs.json chunk/jobs_ashby_${{ matrix.chunk_index }}.json
-
-      - name: Upload chunk artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jobs-chunk-ashby-${{ matrix.chunk_index }}
-          path: chunk/jobs_ashby_${{ matrix.chunk_index }}.json
-          if-no-files-found: error
-
   aggregate-and-publish:
     runs-on: ubuntu-latest
     needs:
       - resolve-run-config
       - scrape-greenhouse
       - scrape-lever
-      - scrape-ashby
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -281,6 +226,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add jobs.json jobs.csv jobs_chief_of_staff.json jobs_chief_of_staff.csv jobs_strategy_ops.json jobs_strategy_ops.csv data/run_meta.json data/aggregate_summary.json README.md
+          git add jobs.json jobs.csv jobs_chief_of_staff.json jobs_chief_of_staff.csv jobs_strategy_ops.json jobs_strategy_ops.csv data/run_meta.json data/aggregate_summary.json docs/index.html docs/data README.md
           git diff --cached --quiet || git commit -m "chore: update daily jobs digest"
           git push

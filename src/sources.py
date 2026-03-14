@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any
 
 VENDOR_MAP = {
-    "ashby": "ashby",
     "greenhouse": "greenhouse",
     "lever": "lever",
 }

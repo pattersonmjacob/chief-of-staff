@@ -98,10 +98,6 @@ def _normalize_company_slug(platform: str, company: str) -> str:
     elif platform == "lever":
         if "lever.co" in host and path_parts[0] == "postings" and len(path_parts) > 1:
             return path_parts[1]
-    elif platform == "ashby":
-        if "ashbyhq.com" in host and path_parts[-1] == "jobs" and len(path_parts) > 1:
-            return path_parts[-2]
-
     return path_parts[-1]
 
 
@@ -110,8 +106,6 @@ def _board_url(platform: str, company_slug: str) -> str:
         return f"https://job-boards.greenhouse.io/{quote(company_slug)}"
     if platform == "lever":
         return f"https://jobs.lever.co/{quote(company_slug)}"
-    if platform == "ashby":
-        return f"https://jobs.ashbyhq.com/{quote(company_slug)}"
     return ""
 
 
@@ -120,8 +114,6 @@ def _api_url(platform: str, company_slug: str) -> str:
         return f"https://boards-api.greenhouse.io/v1/boards/{quote(company_slug)}/jobs?content=true"
     if platform == "lever":
         return f"https://api.lever.co/v0/postings/{quote(company_slug)}?mode=json"
-    if platform == "ashby":
-        return f"https://jobs.ashbyhq.com/api/non-user-graphql?company={quote(company_slug)}"
     return ""
 
 
@@ -375,13 +367,32 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
         or ""
     )
     compensation = _parse_compensation(raw_job, fields, description)
+    title = str(
+        raw_job.get("title")
+        or raw_job.get("text")
+        or fields.get("title")
+        or raw_job.get("name")
+        or raw_job.get("position")
+        or ""
+    ).strip()
+
+    if not title:
+        title_match = re.search(
+            r"(?:we(?:'re| are) looking for|hiring|role:?|position:?|job title:?)[^A-Za-z0-9]*(?P<title>[A-Z][A-Za-z0-9/&+,\-() ]{2,80}?)(?=\s+to\b|[.!:\n]|$)",
+            description,
+            re.IGNORECASE,
+        )
+        if title_match:
+            title = title_match.group("title").strip(" :-\u00a0")
+            title = re.sub(r"^(?:a|an|the)\s+", "", title, flags=re.IGNORECASE)
+
     work_mode = infer_work_mode(location, description, explicit_work_mode=fields.get("work_mode") or raw_job.get("workplaceType"))
 
     return {
         "id": raw_job.get("id") or fields.get("id") or "",
         "platform": platform,
         "company": company,
-        "title": raw_job.get("title") or raw_job.get("text") or fields.get("title") or "",
+        "title": title,
         "location": str(location),
         "work_mode": work_mode,
         "url": raw_job.get("absolute_url")
@@ -472,197 +483,6 @@ def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
     return []
 
 
-def fetch_ashby(company_slug: str) -> list[dict[str, Any]]:
-    url = _api_url("ashby", company_slug)
-    fallback_url = "https://jobs.ashbyhq.com/api/non-user-graphql"
-    payload = {
-        "operationName": "ApiJobBoard",
-        "variables": {"organizationHostedJobsPageName": company_slug},
-        "query": "query ApiJobBoard($organizationHostedJobsPageName: String!) {\n"
-        "  jobBoardWithTeams(organizationHostedJobsPageName: $organizationHostedJobsPageName) {\n"
-        "    teams {\n"
-        "      id\n"
-        "      name\n"
-        "      jobs {\n"
-        "        id\n"
-        "        title\n"
-        "        description\n"
-        "        location { name }\n"
-        "        employmentType\n"
-        "        compensationTierSummary\n"
-        "        compensation {\n"
-        "          summary\n"
-        "          minCompensation\n"
-        "          maxCompensation\n"
-        "          currencyCode\n"
-        "          interval\n"
-        "        }\n"
-        "        applyUrl\n"
-        "        publishedDate\n"
-        "        updatedAt\n"
-        "      }\n"
-        "    }\n"
-        "  }\n"
-        "}\n",
-    }
-    cache_key = f"POST::{url}::{company_slug}"
-    with _REQUEST_CACHE_LOCK:
-        if cache_key in _REQUEST_CACHE:
-            data = _REQUEST_CACHE[cache_key]
-            return _ashby_jobs_from_data(company_slug, data)
-
-    context = ssl.create_default_context()
-    timeout_seconds = _request_timeout_seconds("ashby")
-    data = None
-    graphql_urls = [url]
-    if fallback_url not in graphql_urls:
-        graphql_urls.append(fallback_url)
-
-    for graphql_url in graphql_urls:
-        request = Request(
-            graphql_url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "User-Agent": USER_AGENT,
-                "Origin": f"https://jobs.ashbyhq.com/{quote(company_slug)}",
-                "Referer": f"https://jobs.ashbyhq.com/{quote(company_slug)}",
-            },
-            method="POST",
-        )
-        for attempt in range(MAX_RETRIES + 1):
-            try:
-                _respect_request_interval("jobs.ashbyhq.com")
-                with urlopen(request, timeout=timeout_seconds, context=context) as response:  # nosec B310
-                    data = json.loads(response.read().decode("utf-8"))
-                break
-            except HTTPError as exc:
-                if exc.code not in {404, 429, 500, 502, 503, 504} or attempt >= MAX_RETRIES:
-                    if exc.code == 404:
-                        print(f"[warn] Ashby GraphQL endpoint not found ({graphql_url}); trying fallback")
-                        break
-                    raise
-                retry_after = exc.headers.get("Retry-After") if exc.headers else None
-                if retry_after and retry_after.isdigit():
-                    delay = float(retry_after)
-                else:
-                    delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
-                if exc.code == 429:
-                    print(f"[warn] Rate limited on jobs.ashbyhq.com; backing off {delay:.2f}s (attempt {attempt + 1}/{MAX_RETRIES + 1})")
-                time.sleep(delay)
-            except (URLError, TimeoutError, socket.timeout) as exc:
-                if attempt >= MAX_RETRIES:
-                    raise
-                delay = BACKOFF_SECONDS * (2**attempt) + random.uniform(0.0, 0.5)
-                print(f"[warn] Network error on jobs.ashbyhq.com: {exc}; retrying in {delay:.2f}s")
-                time.sleep(delay)
-        if data is not None:
-            break
-
-    if data is None:
-        print(f"[warn] Ashby GraphQL failed for {company_slug}; trying board HTML fallback")
-        return _fetch_ashby_jobs_from_board_page(company_slug)
-
-    with _REQUEST_CACHE_LOCK:
-        _REQUEST_CACHE[cache_key] = data
-
-    jobs = _ashby_jobs_from_data(company_slug, data)
-    if jobs:
-        return jobs
-
-    print(f"[warn] Ashby GraphQL returned zero jobs for {company_slug}; trying board HTML fallback")
-    return _fetch_ashby_jobs_from_board_page(company_slug)
-
-
-def _fetch_ashby_jobs_from_board_page(company_slug: str) -> list[dict[str, Any]]:
-    board_url = _board_url("ashby", company_slug)
-    request = Request(board_url, headers={"User-Agent": USER_AGENT, "Accept": "text/html"})
-    context = ssl.create_default_context()
-    timeout_seconds = _request_timeout_seconds("ashby")
-
-    _respect_request_interval("jobs.ashbyhq.com")
-    with urlopen(request, timeout=timeout_seconds, context=context) as response:  # nosec B310
-        html = response.read().decode("utf-8", errors="ignore")
-
-    next_data_match = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html, re.DOTALL)
-    if not next_data_match:
-        return []
-
-    try:
-        next_data = json.loads(next_data_match.group(1))
-    except ValueError:
-        return []
-
-    team_names: dict[str, str] = {}
-    jobs: list[dict[str, Any]] = []
-
-    def walk(node: Any) -> None:
-        if isinstance(node, dict):
-            if {"id", "title"}.issubset(node.keys()) and any(k in node for k in ["applyUrl", "jobUrl"]):
-                job = {
-                    "title": node.get("title", ""),
-                    "location": (node.get("location", {}) or {}).get("name", "") if isinstance(node.get("location"), dict) else str(node.get("location", "")),
-                    "hostedUrl": node.get("applyUrl") or node.get("jobUrl") or "",
-                }
-                team_id = str(node.get("teamId") or "")
-                fields = {
-                    "team": team_names.get(team_id, ""),
-                    "employment_type": node.get("employmentType", ""),
-                    "description": node.get("description", ""),
-                    "compensation": node.get("compensation") or node.get("compensationTierSummary") or node.get("salaryRange") or "",
-                    "posted_at": node.get("publishedDate") or node.get("createdAt") or "",
-                    "updated_at": node.get("updatedAt") or "",
-                }
-                jobs.append(_normalize_job("ashby", company_slug, job, fields))
-
-            if {"id", "name"}.issubset(node.keys()) and "jobs" in node and isinstance(node.get("jobs"), list):
-                team_names[str(node.get("id", ""))] = str(node.get("name", ""))
-
-            for value in node.values():
-                walk(value)
-            return
-
-        if isinstance(node, list):
-            for item in node:
-                walk(item)
-
-    walk(next_data)
-
-    deduped: list[dict[str, Any]] = []
-    seen: set[str] = set()
-    for job in jobs:
-        key = f"{job.get('title','')}::{job.get('url','')}"
-        if key in seen:
-            continue
-        seen.add(key)
-        deduped.append(job)
-    return deduped
-
-
-def _ashby_jobs_from_data(company_slug: str, data: dict[str, Any]) -> list[dict[str, Any]]:
-    teams = data.get("data", {}).get("jobBoardWithTeams", {}).get("teams", [])
-    jobs: list[dict[str, Any]] = []
-    for team in teams:
-        team_name = team.get("name", "")
-        for raw_job in team.get("jobs", []):
-            job = {
-                "title": raw_job.get("title", ""),
-                "location": raw_job.get("location", {}).get("name", ""),
-                "hostedUrl": raw_job.get("applyUrl", ""),
-            }
-            fields = {
-                "team": team_name,
-                "employment_type": raw_job.get("employmentType", ""),
-                "description": raw_job.get("description", ""),
-                "compensation": raw_job.get("compensation") or raw_job.get("compensationTierSummary") or "",
-                "posted_at": raw_job.get("publishedDate") or "",
-                "updated_at": raw_job.get("updatedAt") or "",
-            }
-            jobs.append(_normalize_job("ashby", company_slug, job, fields))
-    return jobs
-
-
 def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
     normalized_company = _normalize_company_slug(source.platform, source.company)
     fallback_company = _normalize_company_slug(source.platform, source.url) if source.url else ""
@@ -685,8 +505,6 @@ def fetch_jobs_for_source_status(source: CompanySource) -> FetchResult:
                 jobs = fetch_greenhouse(company_candidate)
             elif source.platform == "lever":
                 jobs = fetch_lever(company_candidate)
-            elif source.platform == "ashby":
-                jobs = fetch_ashby(company_candidate)
             else:
                 raise ValueError(f"Unsupported platform: {source.platform}")
 

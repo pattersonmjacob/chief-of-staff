@@ -24,7 +24,7 @@ AGGREGATE_SUMMARY_JSON = ROOT / "data" / "aggregate_summary.json"
 
 def _detect_platform_from_name(path: Path) -> str:
     name = path.stem.lower()
-    for platform in ("greenhouse", "lever", "ashby"):
+    for platform in ("greenhouse", "lever"):
         if f"_{platform}_" in name or name.endswith(f"_{platform}"):
             return platform
     return "unknown"
@@ -33,8 +33,8 @@ def _detect_platform_from_name(path: Path) -> str:
 def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict[str, int], list[str]]:
     chunk_files = sorted(chunks_dir.glob("jobs_*.json"))
     all_jobs: list[dict] = []
-    platform_jobs: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
-    platform_files: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
+    platform_jobs: dict[str, int] = {"greenhouse": 0, "lever": 0, "unknown": 0}
+    platform_files: dict[str, int] = {"greenhouse": 0, "lever": 0, "unknown": 0}
     invalid_files: list[str] = []
 
     for path in chunk_files:
@@ -55,11 +55,11 @@ def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict
     print(f"[info] Loaded {len(all_jobs)} raw jobs from {len(chunk_files)} chunk files")
     print(
         "[info] Raw chunk files by platform: "
-        + ", ".join(f"{p}={platform_files.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
+        + ", ".join(f"{p}={platform_files.get(p, 0)}" for p in ["greenhouse", "lever", "unknown"])
     )
     print(
         "[info] Raw jobs by platform (from artifact names): "
-        + ", ".join(f"{p}={platform_jobs.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
+        + ", ".join(f"{p}={platform_jobs.get(p, 0)}" for p in ["greenhouse", "lever", "unknown"])
     )
     return all_jobs, platform_jobs, platform_files, invalid_files
 
@@ -101,6 +101,9 @@ def _write_aggregate_summary(
         "strategy_ops_jobs": strategy_ops_jobs,
     }
     AGGREGATE_SUMMARY_JSON.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    docs_data_dir = ROOT / "docs" / "data"
+    docs_data_dir.mkdir(parents=True, exist_ok=True)
+    (docs_data_dir / "aggregate_summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -114,7 +117,7 @@ def main() -> None:
 
     chunks_dir = ROOT / args.chunks_dir
     raw_jobs, raw_platform_jobs, raw_platform_files, invalid_files = _load_chunk_jobs(chunks_dir)
-    raw_platform_counts: dict[str, int] = {"greenhouse": 0, "lever": 0, "ashby": 0, "unknown": 0}
+    raw_platform_counts: dict[str, int] = {"greenhouse": 0, "lever": 0, "unknown": 0}
     for job in raw_jobs:
         platform = str(job.get("platform", "")).strip().lower()
         if platform not in raw_platform_counts:
@@ -122,7 +125,7 @@ def main() -> None:
         raw_platform_counts[platform] += 1
     print(
         "[info] Raw merged jobs by platform: "
-        + ", ".join(f"{p}={raw_platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "ashby", "unknown"])
+        + ", ".join(f"{p}={raw_platform_counts.get(p, 0)}" for p in ["greenhouse", "lever", "unknown"])
     )
     cfg = _build_runtime_cfg(args)
     previous_jobs = load_previous_jobs()

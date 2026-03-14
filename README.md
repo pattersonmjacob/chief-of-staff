@@ -23,7 +23,7 @@ _Chief-of-Staff matches: 13 · Snapshot timestamp: 2026-03-14 01:09 UTC_
 - [Chief of Staff to CEO of BridgeBio and GondolaBio](https://job-boards.greenhouse.io/bridgebio/jobs/5067375007) — bridgebio · greenhouse · Palo Alto - 3160 Porter — opened 2026-03-12 · summary team:Palo Alto - 3160 Porter | dept:Management | mode:hybrid
 <!-- END_COS_ROLES -->
 
-- Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
+- Pulls jobs from **Greenhouse** and **Lever** job boards.
 - Computes a strict Chief-of-Staff subset using title regex + include/exclude keyword matching.
 - Computes a broader adjacent strategy/operations subset using include/exclude keyword matching.
 - Flags learning-and-development roles inside the focused published feed.
@@ -36,6 +36,7 @@ _Chief-of-Staff matches: 13 · Snapshot timestamp: 2026-03-14 01:09 UTC_
   - `jobs_strategy_ops.csv` (adjacent strategy/operations subset)
   - `data/run_meta.json` (latest published run totals and timestamp)
   - `data/aggregate_summary.json` (chunk aggregation diagnostics from GitHub Actions)
+  - `docs/data/*.json` (mirrored dashboard data used by GitHub Pages)
   - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
 - Automatically tracks repeated HTTP 404 sources in `data/do_not_check.json` and skips them on future runs (after 3+ 404s and a healthy non-404 streak guard).
 - Can optionally send an email digest through SMTP (using GitHub Actions secrets).
@@ -97,7 +98,7 @@ _Chief-of-Staff matches: 13 · Snapshot timestamp: 2026-03-14 01:09 UTC_
 
 The CSV should include (at minimum):
 - `slug`
-- `vendor` (`Ashby`, `Greenhouse`, `Lever`)
+- `vendor` (`Greenhouse`, `Lever`)
 - `open_jobs` (or `job_count`)
 
 Optional but recommended:
@@ -111,7 +112,7 @@ There are two workflows:
 
 1. **Daily jobs digest** (`.github/workflows/daily.yml`)
    - Runs daily via cron (`15 12 * * *`) and on manual trigger.
-   - Resolves runtime settings once, then fans them out to split Greenhouse / Lever / Ashby chunk jobs.
+   - Resolves runtime settings once, then fans them out to split Greenhouse / Lever chunk jobs.
    - Chunk jobs use `src/fetch_chunk.py` to publish raw platform-specific `jobs_*.json` artifacts only; the final aggregate job rebuilds all public outputs from those raw chunks.
    - Weekly Sunday run (`30 12 * * 0`) enables link validation in the aggregate job; the normal daily run skips link validation for speed.
    - Uses `SOURCES_CSV=data/company_slugs.csv` so daily scraping reads the repo-pinned source list.
@@ -121,7 +122,6 @@ There are two workflows:
    - Pulls and merges these upstream lists into `data/company_slugs.csv` and commits the updated file:
      - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/lever/lever_companies.csv`
      - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv`
-     - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/ashby/companies.csv`
 
 This gives you a stable, versioned source list in-repo that is refreshed weekly and consumed daily.
 
@@ -173,7 +173,7 @@ If secrets are missing, the script logs a warning and skips sending.
 
 - If workflow runs but returns zero jobs:
   - Verify `sources_csv` exists and has valid `slug` + `vendor` values.
-  - Confirm vendor names map to supported platforms (`Ashby`, `Greenhouse`, `Lever`).
+  - Confirm vendor names map to supported platforms (`Greenhouse`, `Lever`).
   - Check keyword filters are not overly restrictive.
 
 - If the run fails with `JSONDecodeError`:
@@ -208,4 +208,4 @@ If secrets are missing, the script logs a warning and skips sending.
 
 - Do **not** commit `config.json` if it contains private values. Keep secrets in GitHub Actions secrets.
 - SMTP credentials are read from environment variables (`SMTP_*`) and are not written to artifacts.
-- Use HTTPS-only upstream endpoints (Greenhouse/Lever/Ashby APIs) and avoid adding arbitrary untrusted URLs.
+- Use HTTPS-only upstream endpoints (Greenhouse/Lever APIs) and avoid adding arbitrary untrusted URLs.

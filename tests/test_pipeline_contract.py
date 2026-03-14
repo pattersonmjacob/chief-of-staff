@@ -114,14 +114,14 @@ class PipelineContractTests(unittest.TestCase):
             chunks_dir = Path(temp_dir)
             (chunks_dir / "jobs_greenhouse_0.json").write_text(json.dumps(self.raw_jobs[:1]), encoding="utf-8")
             (chunks_dir / "jobs_lever_0.json").write_text("{not json", encoding="utf-8")
-            (chunks_dir / "jobs_ashby_0.json").write_text(json.dumps({"unexpected": "shape"}), encoding="utf-8")
+            (chunks_dir / "jobs_unknown_0.json").write_text(json.dumps({"unexpected": "shape"}), encoding="utf-8")
 
             jobs, platform_jobs, platform_files, invalid_files = aggregate_chunks._load_chunk_jobs(chunks_dir)
 
         self.assertEqual(len(jobs), 1)
         self.assertEqual(platform_jobs["greenhouse"], 1)
         self.assertEqual(platform_files["lever"], 1)
-        self.assertCountEqual(invalid_files, ["jobs_lever_0.json", "jobs_ashby_0.json"])
+        self.assertCountEqual(invalid_files, ["jobs_lever_0.json", "jobs_unknown_0.json"])
 
     def test_write_outputs_signature_matches_aggregate_usage(self) -> None:
         result = main.process_jobs_pipeline(self.raw_jobs, self.cfg, previous_jobs=[], run_at="2026-03-13T12:00:00Z")
@@ -133,6 +133,7 @@ class PipelineContractTests(unittest.TestCase):
             original_jobs_chief_csv = main.JOBS_CHIEF_CSV
             original_jobs_strategy_json = main.JOBS_STRATEGY_OPS_JSON
             original_jobs_strategy_csv = main.JOBS_STRATEGY_OPS_CSV
+            original_docs_data_dir = main.DOCS_DATA_DIR
             try:
                 temp_root = Path(temp_dir)
                 main.ROOT = temp_root
@@ -142,14 +143,17 @@ class PipelineContractTests(unittest.TestCase):
                 main.JOBS_CHIEF_CSV = temp_root / "jobs_chief_of_staff.csv"
                 main.JOBS_STRATEGY_OPS_JSON = temp_root / "jobs_strategy_ops.json"
                 main.JOBS_STRATEGY_OPS_CSV = temp_root / "jobs_strategy_ops.csv"
+                main.DOCS_DATA_DIR = temp_root / "docs" / "data"
 
                 main.write_outputs(result.focused_jobs, result.chief_jobs, result.strategy_ops_jobs)
 
                 self.assertTrue(main.JOBS_JSON.exists())
                 self.assertTrue(main.JOBS_CHIEF_JSON.exists())
                 self.assertTrue(main.JOBS_STRATEGY_OPS_JSON.exists())
+                self.assertTrue((main.DOCS_DATA_DIR / "jobs.json").exists())
                 focused_jobs = json.loads(main.JOBS_JSON.read_text(encoding="utf-8"))
                 self.assertEqual(len(focused_jobs), 2)
+                self.assertTrue(all(job["summary"] for job in focused_jobs))
             finally:
                 main.ROOT = original_root
                 main.JOBS_JSON = original_jobs_json
@@ -158,6 +162,7 @@ class PipelineContractTests(unittest.TestCase):
                 main.JOBS_CHIEF_CSV = original_jobs_chief_csv
                 main.JOBS_STRATEGY_OPS_JSON = original_jobs_strategy_json
                 main.JOBS_STRATEGY_OPS_CSV = original_jobs_strategy_csv
+                main.DOCS_DATA_DIR = original_docs_data_dir
 
     def test_fetch_lever_maps_live_style_fields(self) -> None:
         raw_job = {
@@ -191,6 +196,26 @@ class PipelineContractTests(unittest.TestCase):
         self.assertEqual(jobs[0]["url"], raw_job["hostedUrl"])
         self.assertEqual(jobs[0]["posted_at"], "2026-03-11T00:00:00Z")
         self.assertEqual(jobs[0]["updated_at"], "2026-03-11T00:00:00Z")
+
+    def test_fetch_lever_infers_title_when_text_is_missing(self) -> None:
+        raw_job = {
+            "id": "a32ca7c2-43e5-404f-aab8-a01e43db69cc",
+            "text": "",
+            "categories": {
+                "department": "Operations",
+                "location": "Argentina",
+                "commitment": "Remote Full Time",
+            },
+            "createdAt": 1773422033575,
+            "descriptionPlain": "We're looking for a Data Engineer to help take our expertise to the next level.",
+            "hostedUrl": "https://jobs.lever.co/muttdata/dd6fe048-650e-417f-8669-3afafa7a8c6b",
+            "workplaceType": "remote",
+        }
+
+        with mock.patch.object(scrapers, "_fetch_json", return_value=[raw_job]):
+            jobs = scrapers.fetch_lever("muttdata")
+
+        self.assertEqual(jobs[0]["title"], "Data Engineer")
 
 
 if __name__ == "__main__":
