@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>chief-of-staff artifacts</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f3ea;
+        --card: #fffdf8;
+        --text: #1f1d1a;
+        --muted: #6a655d;
+        --line: #d8cfbf;
+        --accent: #9a3412;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, #efe3cf 0, transparent 28rem),
+          linear-gradient(180deg, #f9f6ef 0%, var(--bg) 100%);
+      }
+
+      main {
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 4rem 1.25rem 5rem;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 1.25rem 3rem rgba(46, 37, 20, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.05;
+      }
+
+      p {
+        margin: 0 0 1rem;
+        line-height: 1.6;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      ul {
+        padding-left: 1.25rem;
+        line-height: 1.7;
+      }
+
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <h1>Focused job artifacts</h1>
+        <p>
+          The old GitHub Pages dashboard has been retired. This repository now publishes
+          focused Chief of Staff and adjacent-role artifacts directly.
+        </p>
+        <p class="muted">
+          Use the repository root for the latest generated files and the README for the current
+          Chief of Staff snapshot.
+        </p>
+        <ul>
+          <li><a href="../README.md">README.md</a></li>
+          <li><a href="../jobs.json">jobs.json</a></li>
+          <li><a href="../jobs.csv">jobs.csv</a></li>
+          <li><a href="../jobs_chief_of_staff.json">jobs_chief_of_staff.json</a></li>
+          <li><a href="../jobs_strategy_ops.json">jobs_strategy_ops.json</a></li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
