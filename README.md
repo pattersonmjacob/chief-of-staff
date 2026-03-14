@@ -7,21 +7,20 @@ Version 1 of a free, keyword-based jobs pipeline.
 ## Latest Chief of Staff roles
 
 <!-- START_COS_ROLES -->
-_Chief-of-Staff matches: 14 · Snapshot timestamp: 2026-03-13 12:01 UTC_
-- [Chief of Defence Staff or equivalent to the Affected Nation](https://spektrum-group.com/jobs?gh_jid=4371968101) — spektrum · greenhouse · Stavanger, Norway — opened in last 24h · summary team:Spektrum Management Gro… | dept:NATO
-- [Chief of Staff, Sales ](https://stripe.com/jobs/search?gh_jid=7600099) — stripe · greenhouse · SF — opened in last 24h · summary team:US | dept:1170 GEO Sales HQ (NA)
-- [Chief of Staff](https://job-boards.greenhouse.io/mochihealth/jobs/5119052008) — mochihealth · greenhouse · San Francisco, CA — opened in last 24h · summary team:Mochi HQ | dept:People
-- [Chief of Staff](https://job-boards.greenhouse.io/interfaceai/jobs/4608965006) — interfaceai · greenhouse · San Francisco / Palo Alto (In-Office) — opened in last 24h · summary team:interface USA | dept:Office of the CEO
-- [Chief of Staff to CFO/COO](https://job-boards.greenhouse.io/babylist/jobs/5690329004) — babylist · greenhouse · Emeryville, CA — opened in last 24h · summary team:Remote | dept:General & Administrative
-- [Chief of Staff, Tactical Recon & Strike](https://boards.greenhouse.io/andurilindustries/jobs/5068434007?gh_jid=5068434007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened in last 24h · summary team:Costa Mesa, CA (HQ) | dept:Tactical Recon & Strike
-- [Chief of Staff, Design](https://boards.greenhouse.io/andurilindustries/jobs/4740150007?gh_jid=4740150007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened in last 24h · summary team:Costa Mesa, CA (HQ) | dept:Sales and Marketing : D…
-- [Chief of Staff, Air Dominance & Strike ](https://boards.greenhouse.io/andurilindustries/jobs/4841348007?gh_jid=4841348007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened in last 24h · summary team:Costa Mesa, CA (HQ) | dept:Air Dominance & Strike…
-- [Executive Leadership Programme - Chief of Staff (Europe)](https://job-boards.greenhouse.io/banyansoftware/jobs/5012912007) — banyansoftware · greenhouse · Denmark; Netherlands; Sweden — opened in last 24h · summary team:Amsterdam, Netherlands | dept:Executive Team
-- [Executive Leadership Program - Chief of Staff](https://job-boards.greenhouse.io/banyansoftware/jobs/4980694007) — banyansoftware · greenhouse · United States — opened in last 24h · summary team:Remote - USA | dept:Operating Partners
-- [Technical Chief of Staff for ASIC Engineering](https://job-boards.greenhouse.io/asteralabs/jobs/4632063005) — asteralabs · greenhouse · San Jose, CA — opened in last 24h · summary team:San Jose, CA | dept:ASIC Engineering
-- [Chief of Staff - R&D](https://job-boards.greenhouse.io/addepar1/jobs/8120254002) — addepar1 · greenhouse · New York, NY — opened in last 24h · summary team:New York, NY | dept:Engineering Executive S…
-- [Chief of Staff to CEO of BridgeBio and GondolaBio](https://job-boards.greenhouse.io/bridgebio/jobs/5067375007) — bridgebio · greenhouse · Palo Alto - 3160 Porter — opened in last 24h · summary team:Palo Alto - 3160 Porter | dept:Management
-- [Chief of Staff](https://job-boards.greenhouse.io/blankstreet/jobs/7621264003) — blankstreet · greenhouse · New York City — opened in last 24h · summary team:New York | dept:Business Operations & S…
+_Chief-of-Staff matches: 13 · Snapshot timestamp: 2026-03-14 01:09 UTC_
+- [Chief of Staff](https://jobs.lever.co/arraylabs.io/035e4848-e32a-4b54-a3f6-e87bca54c180) — arraylabs.io · lever · Palo Alto, CA — new since last run · summary team:Management | mode:onsite
+- [Chief of Staff, Sales ](https://stripe.com/jobs/search?gh_jid=7600099) — stripe · greenhouse · SF — opened 2026-03-12 · summary team:US | dept:1170 GEO Sales HQ (NA) | mode:hybrid_or_onsite
+- [Chief of Staff](https://job-boards.greenhouse.io/interfaceai/jobs/4608965006) — interfaceai · greenhouse · Palo-Alto (In-office) — opened 2026-03-12 · summary team:interface USA | dept:Office of the CEO | mode:hybrid_or_onsite
+- [Chief of Staff](https://job-boards.greenhouse.io/mochihealth/jobs/5119052008) — mochihealth · greenhouse · San Francisco, CA — opened 2026-03-12 · summary team:Mochi HQ | dept:People | mode:onsite
+- [Chief of Staff to CFO/COO](https://job-boards.greenhouse.io/babylist/jobs/5690329004) — babylist · greenhouse · Emeryville, CA — opened 2026-03-12 · summary team:Remote | dept:General & Administrative | mode:remote
+- [Chief of Staff, Tactical Recon & Strike](https://boards.greenhouse.io/andurilindustries/jobs/5068434007?gh_jid=5068434007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened 2026-03-12 · summary team:Costa Mesa, CA (HQ) | dept:Tactical Recon & Strike | mode:hybrid_or_onsite
+- [Chief of Staff, Design](https://boards.greenhouse.io/andurilindustries/jobs/4740150007?gh_jid=4740150007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened 2026-03-12 · summary team:Costa Mesa, CA (HQ) | dept:Sales and Marketing : D… | mode:onsite
+- [Chief of Staff, Air Dominance & Strike ](https://boards.greenhouse.io/andurilindustries/jobs/4841348007?gh_jid=4841348007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened 2026-03-12 · summary team:Costa Mesa, CA (HQ) | dept:Air Dominance & Strike… | mode:hybrid_or_onsite
+- [Executive Leadership Programme - Chief of Staff (Europe)](https://job-boards.greenhouse.io/banyansoftware/jobs/5012912007) — banyansoftware · greenhouse · Denmark; Netherlands; Sweden — opened 2026-03-12 · summary team:Amsterdam, Netherlands | dept:Executive Team | mode:hybrid_or_onsite
+- [Executive Leadership Program - Chief of Staff](https://job-boards.greenhouse.io/banyansoftware/jobs/4980694007) — banyansoftware · greenhouse · United States — opened 2026-03-12 · summary team:Remote - USA | dept:Operating Partners | mode:hybrid_or_onsite
+- [Technical Chief of Staff for ASIC Engineering](https://job-boards.greenhouse.io/asteralabs/jobs/4632063005) — asteralabs · greenhouse · San Jose, CA — opened 2026-03-12 · summary team:San Jose, CA | dept:ASIC Engineering | mode:hybrid_or_onsite
+- [Chief of Staff - R&D](https://job-boards.greenhouse.io/addepar1/jobs/8120254002) — addepar1 · greenhouse · New York, NY — opened 2026-03-12 · summary team:New York, NY | dept:Engineering Executive S… | mode:remote
+- [Chief of Staff to CEO of BridgeBio and GondolaBio](https://job-boards.greenhouse.io/bridgebio/jobs/5067375007) — bridgebio · greenhouse · Palo Alto - 3160 Porter — opened 2026-03-12 · summary team:Palo Alto - 3160 Porter | dept:Management | mode:hybrid
 <!-- END_COS_ROLES -->
 
 - Pulls jobs from **Greenhouse**, **Lever**, and **Ashby** job boards.
