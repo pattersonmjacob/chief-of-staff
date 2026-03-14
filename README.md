@@ -61,7 +61,7 @@ _Chief-of-Staff matches: 13 · Snapshot timestamp: 2026-03-14 01:09 UTC_
        - `scrape_concurrency` (default `1`; set to `1` for no in-process concurrency)
        - `validate_job_links` (default `true`; verifies job URLs before publishing and removes unavailable postings)
        - `link_check_delay_seconds` (default `0.8`; delay between URL checks to avoid rate limits)
-       - `max_job_age_days` (default `7`; keeps only roles posted/updated within the last N days)
+       - `max_job_age_days` (default `13`; keeps only roles posted/updated within the last N days)
        - `keep_missing_dates` (default `true`; preserves jobs with missing/invalid dates during age filtering)
       - `strict_chief_title_required` (default `true`; requires `chief ... staff` in title for `jobs_chief_of_staff.*`)
       - `include_adjacent_roles` (default `true`; enables the broader `jobs_strategy_ops.*` subset)
@@ -72,7 +72,7 @@ _Chief-of-Staff matches: 13 · Snapshot timestamp: 2026-03-14 01:09 UTC_
      - Add known company slugs under `sources`.
 
 3. Configure keyword filters:
-   - `keywords_include`: terms to keep.
+   - `keywords_include`: terms to keep. The default fallback config already includes Chief of Staff, strategy/business ops, program-management, and learning-design/L&D phrases.
    - `keywords_exclude`: terms to drop after include matching.
 
 4. Run locally:
@@ -124,6 +124,33 @@ There are two workflows:
      - `https://raw.githubusercontent.com/stapply-ai/ats-scrapers/main/greenhouse/greenhouse_companies.csv`
 
 This gives you a stable, versioned source list in-repo that is refreshed weekly and consumed daily.
+
+## Multi-agent setup
+
+This repo now includes a lightweight multi-agent operating model for Codex:
+- [AGENTS.md](/Users/jacobpatterson/VSCode/chief-of-staff/AGENTS.md) defines the shared workflow and agent boundaries.
+- [.codex/config.toml](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/config.toml) registers role names, prompt files, and recommended worktree paths.
+- [.codex/agents/orchestrator.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/orchestrator.md), [.codex/agents/workflow-optimizer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-optimizer.md), [.codex/agents/workflow-ops.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-ops.md), [.codex/agents/scraper-accuracy.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/scraper-accuracy.md), [.codex/agents/board-scout.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/board-scout.md), [.codex/agents/pages-designer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-designer.md), [.codex/agents/pages-ui.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-ui.md), and [.codex/agents/qa-review.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/qa-review.md) hold the role briefs.
+- [scripts/setup_multi_agent_worktrees.sh](/Users/jacobpatterson/VSCode/chief-of-staff/scripts/setup_multi_agent_worktrees.sh) creates isolated sibling worktrees for parallel agents.
+- [.codex/backlog.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/backlog.md) is the shared cleanup list.
+
+Recommended flow:
+1. Run `bash scripts/setup_multi_agent_worktrees.sh`
+2. Start one Codex session per worktree
+3. Assign one role brief per session
+4. Merge scraper/workflow changes before Pages polish when possible
+
+Shortcut launchers:
+- `bash scripts/launch_codex_agents.sh single`
+  - starts one orchestrator Codex session in the current repo with `multi_agent` enabled and a stronger Pages/workflow/discovery mission
+- `bash scripts/launch_codex_agents.sh multi`
+  - creates worktrees and opens one Terminal-backed Codex session per role
+- `bash scripts/launch_codex_agents.sh pages`
+  - launches orchestrator + pages-designer + pages-ui + qa-review
+- `bash scripts/launch_codex_agents.sh ops`
+  - launches orchestrator + workflow-ops + qa-review
+- `bash scripts/launch_codex_agents.sh discovery`
+  - launches orchestrator + board-scout + scraper-accuracy
 
 ### Required repo settings
 
@@ -196,7 +223,7 @@ If secrets are missing, the script logs a warning and skips sending.
 
 ## Filtering behavior
 
-- Published feed (`jobs.json` / `jobs.csv`) keeps only the focused roles that match the Chief-of-Staff/adjacent keyword logic after dedupe + age filter (`max_job_age_days`, default 7) + optional link validation.
+- Published feed (`jobs.json` / `jobs.csv`) keeps only the focused roles that match the Chief-of-Staff/adjacent keyword logic after dedupe + age filter (`max_job_age_days`, default 13) + optional link validation.
 - Published artifacts intentionally omit the raw `description` body to keep file sizes below GitHub push limits (the description is only used during filtering in-memory).
 - Chief-of-Staff subset (`jobs_chief_of_staff.*`) defaults to requiring title match `chief ... staff` (case-insensitive) plus include/exclude checks against title, department, team, location, and description text (controlled by `strict_chief_title_required`).
 - Adjacent-role subset (`jobs_strategy_ops.*`) uses include/exclude checks without requiring the chief-title regex (enabled by `include_adjacent_roles`).

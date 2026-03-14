@@ -17,11 +17,18 @@ import scrapers  # noqa: E402
 class PipelineContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.cfg = {
-            "keywords_include": ["chief of staff", "strategy and operations", "business operations", "learning and development"],
+            "keywords_include": [
+                "chief of staff",
+                "strategy and operations",
+                "business operations",
+                "program manager",
+                "learning and development",
+                "instructional design",
+            ],
             "keywords_exclude": ["clinical operations"],
             "validate_job_links": False,
             "link_check_delay_seconds": 0.0,
-            "max_job_age_days": 30,
+            "max_job_age_days": 13,
             "keep_missing_dates": True,
             "strict_chief_title_required": True,
             "include_adjacent_roles": True,
@@ -108,6 +115,43 @@ class PipelineContractTests(unittest.TestCase):
 
         self.assertTrue(result.jobs[0]["is_learning_and_development"])
         self.assertEqual(len(result.focused_jobs), 1)
+
+    def test_program_manager_and_instructional_design_roles_are_included(self) -> None:
+        raw_jobs = [
+            {
+                "platform": "greenhouse",
+                "company": "delta",
+                "title": "Program Manager, Strategic Initiatives",
+                "location": "Remote",
+                "department": "Operations",
+                "team": "Strategy",
+                "employment_type": "Full-time",
+                "description": "Own special projects and business operations cadences.",
+                "posted_at": "2026-03-11T00:00:00Z",
+                "updated_at": "2026-03-11T00:00:00Z",
+                "url": "https://example.com/program",
+            },
+            {
+                "platform": "lever",
+                "company": "epsilon",
+                "title": "Instructional Designer",
+                "location": "Remote",
+                "department": "Learning and Development",
+                "team": "Enablement",
+                "employment_type": "Full-time",
+                "description": "Build learning programs and curriculum for leadership development.",
+                "posted_at": "2026-03-10T00:00:00Z",
+                "updated_at": "2026-03-10T00:00:00Z",
+                "url": "https://example.com/instructional",
+            },
+        ]
+
+        result = main.process_jobs_pipeline(raw_jobs, self.cfg, previous_jobs=[], run_at="2026-03-13T12:00:00Z")
+
+        self.assertEqual(len(result.focused_jobs), 2)
+        self.assertTrue(any(job["title"] == "Program Manager, Strategic Initiatives" for job in result.focused_jobs))
+        instructional = next(job for job in result.focused_jobs if job["title"] == "Instructional Designer")
+        self.assertTrue(instructional["is_learning_and_development"])
 
     def test_aggregate_chunk_loader_skips_invalid_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

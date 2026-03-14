@@ -34,7 +34,7 @@ env:
   REQUEST_TIMEOUT_SECONDS: 25
   VALIDATE_JOB_LINKS: "false"
   LINK_CHECK_DELAY_SECONDS: 0.8
-  MAX_JOB_AGE_DAYS: 7
+  MAX_JOB_AGE_DAYS: 13
 
 jobs:
   resolve-run-config:

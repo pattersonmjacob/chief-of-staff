@@ -1,0 +1,60 @@
+# Project-local multi-agent registry for Codex sessions.
+# Keep this file human-readable and use it as the source of truth
+# for role names, prompt files, and recommended worktree paths.
+
+[project]
+name = "chief-of-staff"
+default_branch = "main"
+primary_goal = "Build the easiest publicly available Chief of Staff job board to browse and share."
+
+[features]
+multi_agent = true
+child_agents_md = true
+
+[[agents]]
+name = "orchestrator"
+description = "Plan work, split tasks across agents, merge cleanly, and keep the roadmap coherent."
+prompt_file = ".codex/agents/orchestrator.md"
+worktree = "../chief-orchestrator"
+
+[[agents]]
+name = "workflow-optimizer"
+description = "Reduce CI time, artifact size, and publish risk while keeping scheduled runs reliable."
+prompt_file = ".codex/agents/workflow-optimizer.md"
+worktree = "../chief-workflow"
+
+[[agents]]
+name = "workflow-ops"
+description = "Inspect GitHub Actions runs, diagnose failures and bottlenecks, and rerun safe workflows when helpful."
+prompt_file = ".codex/agents/workflow-ops.md"
+worktree = "../chief-workflow-ops"
+
+[[agents]]
+name = "scraper-accuracy"
+description = "Improve ATS normalization, metadata extraction, filtering precision, and source diagnostics."
+prompt_file = ".codex/agents/scraper-accuracy.md"
+worktree = "../chief-scraper"
+
+[[agents]]
+name = "board-scout"
+description = "Discover new public job boards, inspect payloads, and recommend integration paths."
+prompt_file = ".codex/agents/board-scout.md"
+worktree = "../chief-board-scout"
+
+[[agents]]
+name = "pages-designer"
+description = "Improve visual hierarchy, layout, polish, copy, and mobile presentation for the public dashboard."
+prompt_file = ".codex/agents/pages-designer.md"
+worktree = "../chief-pages-design"
+
+[[agents]]
+name = "pages-ui"
+description = "Implement resilient, fast, accessible dashboard behavior with clean HTML, CSS, and JavaScript."
+prompt_file = ".codex/agents/pages-ui.md"
+worktree = "../chief-pages-ui"
+
+[[agents]]
+name = "qa-review"
+description = "Review regressions, verify tests, and harden the publish contract."
+prompt_file = ".codex/agents/qa-review.md"
+worktree = "../chief-qa"

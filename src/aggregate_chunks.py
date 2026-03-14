@@ -111,7 +111,7 @@ def main() -> None:
     parser.add_argument("--chunks-dir", default="chunk-artifacts")
     parser.add_argument("--repository", default="")
     parser.add_argument("--link-check-delay-seconds", type=float, default=0.8)
-    parser.add_argument("--max-job-age-days", type=int, default=7)
+    parser.add_argument("--max-job-age-days", type=int, default=13)
     parser.add_argument("--disable-link-validation", action="store_true")
     args = parser.parse_args()
 

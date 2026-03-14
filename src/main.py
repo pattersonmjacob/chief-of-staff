@@ -34,6 +34,47 @@ JOBS_STRATEGY_OPS_JSON = ROOT / "jobs_strategy_ops.json"
 JOBS_STRATEGY_OPS_CSV = ROOT / "jobs_strategy_ops.csv"
 DOCS_DATA_DIR = ROOT / "docs" / "data"
 
+DEFAULT_ADJACENT_KEYWORDS = [
+    "chief of staff",
+    "office of the ceo",
+    "founder's office",
+    "founders office",
+    "strategic operations",
+    "strategy and operations",
+    "strategy & operations",
+    "business operations",
+    "bizops",
+    "program manager",
+    "program management",
+    "technical program manager",
+    "program management office",
+    "program lead",
+    "program director",
+    "chief of staff program",
+    "strategic initiatives",
+    "special projects",
+]
+
+DEFAULT_LEARNING_KEYWORDS = [
+    "learning and development",
+    "l&d",
+    "leadership development",
+    "talent development",
+    "organizational development",
+    "instructional design",
+    "instructional designer",
+    "learning design",
+    "learning designer",
+    "learning program manager",
+    "learning program management",
+    "learning manager",
+    "learning partner",
+    "curriculum design",
+    "curriculum developer",
+    "enablement",
+    "facilitator",
+]
+
 
 @dataclass
 class ProcessedJobsResult:
@@ -253,6 +294,7 @@ def classify_job_function(job: dict[str, Any]) -> str:
     mapping = [
         ("program-management", ["program manager", "program management", "pm" ]),
         ("business-operations", ["business operations", "bizops", "strategy", "strategic operations", "operations"]),
+        ("learning-development", ["learning and development", "instructional design", "learning design", "enablement"]),
         ("product", ["product", "gtm"]),
         ("engineering", ["engineering", "software", "technical", "data", "platform", "infrastructure"]),
         ("finance", ["finance", "cfo", "fp&a"]),
@@ -272,14 +314,20 @@ def classify_is_technical(job: dict[str, Any]) -> bool:
 
 def classify_is_learning_and_development(job: dict[str, Any]) -> bool:
     text = " ".join([str(job.get("title", "")), str(job.get("department", "")), str(job.get("team", ""))]).lower()
-    learning_terms = [
-        "learning and development",
-        "l&d",
-        "leadership development",
-        "talent development",
-        "organizational development",
-    ]
-    return any(term in text for term in learning_terms)
+    return any(term in text for term in DEFAULT_LEARNING_KEYWORDS)
+
+
+def _merged_include_keywords(cfg: dict[str, Any]) -> list[str]:
+    configured = cfg.get("keywords_include", cfg.get("keywords", []))
+    merged: list[str] = []
+    seen: set[str] = set()
+    for keyword in [*DEFAULT_ADJACENT_KEYWORDS, *DEFAULT_LEARNING_KEYWORDS, *configured]:
+        normalized = str(keyword or "").strip().lower()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        merged.append(normalized)
+    return merged
 
 
 def build_summary(job: dict[str, Any]) -> str:
@@ -732,7 +780,7 @@ def process_jobs_pipeline(
     run_at: str | None = None,
 ) -> ProcessedJobsResult:
     jobs = _dedupe_and_collate_jobs(raw_jobs)
-    max_job_age_days = int(cfg.get("max_job_age_days", 7) or 7)
+    max_job_age_days = int(cfg.get("max_job_age_days", 13) or 13)
     keep_missing_dates = bool(cfg.get("keep_missing_dates", True))
     jobs, age_filter_stats = filter_jobs_by_max_age_days(
         jobs,
@@ -752,7 +800,7 @@ def process_jobs_pipeline(
     effective_run_at = run_at or utc_now_iso()
     jobs, run_stats = enrich_jobs_with_history_and_flags(jobs, previous_jobs or [], effective_run_at)
 
-    include_keywords = cfg.get("keywords_include", cfg.get("keywords", []))
+    include_keywords = _merged_include_keywords(cfg)
     exclude_keywords = cfg.get("keywords_exclude", [])
     strict_chief_title_required = bool(cfg.get("strict_chief_title_required", True))
     include_adjacent_roles = bool(cfg.get("include_adjacent_roles", True))
