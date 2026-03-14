@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import json
 import os
 import random
@@ -221,6 +222,28 @@ def _normalize_interval(value: Any) -> str:
     return text
 
 
+def _normalize_timestamp(value: Any) -> str:
+    if value is None or value == "":
+        return ""
+    if isinstance(value, (int, float)):
+        timestamp = float(value)
+    else:
+        raw = str(value).strip()
+        if not raw:
+            return ""
+        if raw.isdigit():
+            timestamp = float(raw)
+        else:
+            return raw
+
+    if timestamp > 1_000_000_000_000:
+        timestamp /= 1000.0
+    try:
+        return datetime.fromtimestamp(timestamp, tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    except (OverflowError, OSError, ValueError):
+        return str(value)
+
+
 def _detect_currency(*values: Any) -> str:
     for value in values:
         text = str(value or "").strip()
@@ -264,7 +287,11 @@ def _extract_comp_from_text(text: Any) -> dict[str, Any]:
     return {}
 
 
-def infer_work_mode(location: Any, description: Any) -> str:
+def infer_work_mode(location: Any, description: Any, explicit_work_mode: Any = "") -> str:
+    explicit = str(explicit_work_mode or "").strip().lower()
+    if explicit in {"remote", "hybrid", "onsite", "on-site"}:
+        return "onsite" if explicit == "on-site" else explicit
+
     text = " ".join([str(location or ""), str(description or "")]).lower()
     if "hybrid" in text:
         return "hybrid"
@@ -340,21 +367,26 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
     description = _strip_html(
         fields.get("description")
         or raw_job.get("content")
+        or raw_job.get("openingPlain")
+        or raw_job.get("descriptionBodyPlain")
+        or raw_job.get("additionalPlain")
         or raw_job.get("descriptionPlain")
         or raw_job.get("description")
         or ""
     )
     compensation = _parse_compensation(raw_job, fields, description)
-    work_mode = infer_work_mode(location, description)
+    work_mode = infer_work_mode(location, description, explicit_work_mode=fields.get("work_mode") or raw_job.get("workplaceType"))
 
     return {
+        "id": raw_job.get("id") or fields.get("id") or "",
         "platform": platform,
         "company": company,
-        "title": raw_job.get("title") or fields.get("title") or "",
+        "title": raw_job.get("title") or raw_job.get("text") or fields.get("title") or "",
         "location": str(location),
         "work_mode": work_mode,
         "url": raw_job.get("absolute_url")
         or raw_job.get("hostedUrl")
+        or raw_job.get("applyUrl")
         or raw_job.get("apply_url")
         or raw_job.get("url")
         or "",
@@ -367,8 +399,8 @@ def _normalize_job(platform: str, company: str, raw_job: dict[str, Any], fields:
         "comp_currency": compensation.get("comp_currency", ""),
         "comp_interval": compensation.get("comp_interval", ""),
         "comp_text": compensation.get("comp_text", ""),
-        "posted_at": fields.get("posted_at") or raw_job.get("updated_at") or raw_job.get("createdAt") or raw_job.get("created_at") or "",
-        "updated_at": fields.get("updated_at") or raw_job.get("updatedAt") or raw_job.get("updated_at") or "",
+        "posted_at": _normalize_timestamp(fields.get("posted_at") or raw_job.get("createdAt") or raw_job.get("created_at") or raw_job.get("updated_at")),
+        "updated_at": _normalize_timestamp(fields.get("updated_at") or raw_job.get("updatedAt") or raw_job.get("updated_at") or raw_job.get("createdAt") or raw_job.get("created_at")),
     }
 
 
@@ -400,15 +432,29 @@ def fetch_lever(company_slug: str) -> list[dict[str, Any]]:
             data = _fetch_json(url)
             jobs = []
             for raw_job in data:
+                categories = raw_job.get("categories", {}) if isinstance(raw_job.get("categories"), dict) else {}
+                all_locations = categories.get("allLocations") if isinstance(categories.get("allLocations"), list) else []
+                location = categories.get("location") or ", ".join(str(item) for item in all_locations if item)
+                description_parts = [
+                    raw_job.get("openingPlain"),
+                    raw_job.get("descriptionBodyPlain"),
+                    raw_job.get("additionalPlain"),
+                    raw_job.get("descriptionPlain"),
+                    raw_job.get("description"),
+                ]
+                description = "\n\n".join(str(part).strip() for part in description_parts if str(part or "").strip())
                 fields = {
-                    "department": raw_job.get("categories", {}).get("team", ""),
-                    "team": raw_job.get("categories", {}).get("department", ""),
-                    "employment_type": raw_job.get("categories", {}).get("commitment", ""),
-                    "location": raw_job.get("categories", {}).get("location", ""),
-                    "description": raw_job.get("descriptionPlain") or raw_job.get("description") or "",
+                    "id": raw_job.get("id") or "",
+                    "title": raw_job.get("text") or "",
+                    "department": categories.get("department", ""),
+                    "team": categories.get("team", ""),
+                    "employment_type": categories.get("commitment", "") or raw_job.get("commitment") or "",
+                    "location": location,
+                    "work_mode": raw_job.get("workplaceType") or "",
+                    "description": description,
                     "posted_at": raw_job.get("createdAt") or "",
                     "updated_at": raw_job.get("updatedAt") or "",
-                    "compensation": raw_job.get("salaryRange") or raw_job.get("salaryDescription") or raw_job.get("compensation") or raw_job.get("categories", {}).get("compensation", ""),
+                    "compensation": raw_job.get("salaryRange") or raw_job.get("salaryDescription") or raw_job.get("compensation") or categories.get("compensation", ""),
                 }
                 jobs.append(_normalize_job("lever", company_slug, raw_job, fields))
             if idx > 0:

@@ -4,7 +4,6 @@ import argparse
 import json
 from pathlib import Path
 import sys
-from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT / "src"))
@@ -18,6 +17,7 @@ from main import (  # noqa: E402
     write_outputs,
     write_run_meta,
 )
+from update_readme_roles import update_readme  # noqa: E402
 
 AGGREGATE_SUMMARY_JSON = ROOT / "data" / "aggregate_summary.json"
 
@@ -66,14 +66,6 @@ def _load_chunk_jobs(chunks_dir: Path) -> tuple[list[dict], dict[str, int], dict
 
 def _build_runtime_cfg(args: argparse.Namespace) -> dict[str, object]:
     cfg = apply_runtime_overrides(load_config())
-
-    repository = args.repository.strip()
-    pages_url = str(cfg.get("github_pages_url", "")).strip()
-    if not pages_url and repository and "/" in repository:
-        owner, repo = repository.split("/", 1)
-        pages_url = f"https://{owner}.github.io/{quote(repo)}/"
-
-    cfg["github_pages_url"] = pages_url
     cfg["validate_job_links"] = not args.disable_link_validation
     cfg["link_check_delay_seconds"] = max(0.0, args.link_check_delay_seconds)
     cfg["max_job_age_days"] = max(0, args.max_job_age_days)
@@ -136,19 +128,19 @@ def main() -> None:
     previous_jobs = load_previous_jobs()
     result = process_jobs_pipeline(raw_jobs, cfg, previous_jobs=previous_jobs)
     write_outputs(
-        result.jobs,
+        result.focused_jobs,
         result.chief_jobs,
         result.strategy_ops_jobs,
-        github_pages_url=str(cfg.get("github_pages_url", "")),
     )
+    update_readme()
     write_run_meta(
         result.run_at,
-        total_jobs=len(result.jobs),
+        total_jobs=len(result.focused_jobs),
         chief_of_staff_jobs=len(result.chief_jobs),
         new_jobs=result.run_stats["new_count"],
     )
     _write_aggregate_summary(
-        result_jobs=len(result.jobs),
+        result_jobs=len(result.focused_jobs),
         chief_jobs=len(result.chief_jobs),
         strategy_ops_jobs=len(result.strategy_ops_jobs),
         raw_platform_jobs=raw_platform_jobs,
@@ -158,7 +150,7 @@ def main() -> None:
         repository=args.repository,
     )
     print(
-        f"[info] Aggregated {len(result.jobs)} unique jobs "
+        f"[info] Aggregated {len(result.focused_jobs)} focused jobs "
         f"(chief_of_staff={len(result.chief_jobs)}, strategy_ops={len(result.strategy_ops_jobs)})"
     )
 

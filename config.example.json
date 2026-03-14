@@ -10,7 +10,12 @@
     "business operations",
     "bizops",
     "strategic initiatives",
-    "special projects"
+    "special projects",
+    "learning and development",
+    "l&d",
+    "leadership development",
+    "talent development",
+    "organizational development"
   ],
   "keywords_exclude": [
     "clinical operations",
@@ -39,7 +44,6 @@
   "email": {
     "enabled": false
   },
-  "github_pages_url": "",
   "scrape_concurrency": 4,
   "verbose_sources": false,
   "validate_job_links": true,

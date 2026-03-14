@@ -15,19 +15,17 @@ import ssl
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-from render import render_html
 from scrapers import CompanySource, FetchResult, fetch_jobs_for_source_status
 from sources import load_sources_from_csv
+from update_readme_roles import update_readme
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT / "config.json"
 CONFIG_EXAMPLE_PATH = ROOT / "config.example.json"
 JOBS_JSON = ROOT / "jobs.json"
 JOBS_CSV = ROOT / "jobs.csv"
-DOCS_HTML = ROOT / "docs" / "index.html"
 RUN_META_JSON = ROOT / "data" / "run_meta.json"
 DO_NOT_CHECK_JSON = ROOT / "data" / "do_not_check.json"
 JOBS_CHIEF_JSON = ROOT / "jobs_chief_of_staff.json"
@@ -39,6 +37,7 @@ JOBS_STRATEGY_OPS_CSV = ROOT / "jobs_strategy_ops.csv"
 @dataclass
 class ProcessedJobsResult:
     jobs: list[dict[str, Any]]
+    focused_jobs: list[dict[str, Any]]
     chief_jobs: list[dict[str, Any]]
     strategy_ops_jobs: list[dict[str, Any]]
     run_at: str
@@ -192,9 +191,20 @@ def validate_and_filter_jobs_by_link(
 
 
 def _parse_iso_datetime(value: Any) -> datetime | None:
+    if isinstance(value, (int, float)):
+        timestamp = float(value)
+        if timestamp > 1_000_000_000_000:
+            timestamp /= 1000.0
+        try:
+            return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            return None
+
     raw = str(value or "").strip()
     if not raw:
         return None
+    if raw.isdigit():
+        return _parse_iso_datetime(int(raw))
     normalized = raw.replace("Z", "+00:00")
     try:
         dt = datetime.fromisoformat(normalized)
@@ -259,6 +269,18 @@ def classify_is_technical(job: dict[str, Any]) -> bool:
     return any(term in text for term in technical_terms)
 
 
+def classify_is_learning_and_development(job: dict[str, Any]) -> bool:
+    text = " ".join([str(job.get("title", "")), str(job.get("department", "")), str(job.get("team", ""))]).lower()
+    learning_terms = [
+        "learning and development",
+        "l&d",
+        "leadership development",
+        "talent development",
+        "organizational development",
+    ]
+    return any(term in text for term in learning_terms)
+
+
 def enrich_jobs_with_history_and_flags(jobs: list[dict[str, Any]], previous_jobs: list[dict[str, Any]], run_at: str) -> tuple[list[dict[str, Any]], dict[str, int]]:
     prev_by_key = {_job_key(job): job for job in previous_jobs}
     enriched: list[dict[str, Any]] = []
@@ -297,7 +319,7 @@ def write_run_meta(run_at: str, total_jobs: int, chief_of_staff_jobs: int, new_j
     RUN_META_JSON.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "last_run_at": run_at,
-        "total_jobs": total_jobs,
+        "published_jobs": total_jobs,
         "chief_of_staff_jobs": chief_of_staff_jobs,
         "new_jobs": new_jobs,
     }
@@ -751,6 +773,7 @@ def process_jobs_pipeline(
         )
         job["is_chief_of_staff"] = is_chief_match
         job["is_strategy_ops"] = include_adjacent_roles and is_strategy_ops_match
+        job["is_learning_and_development"] = classify_is_learning_and_development(job)
 
     print(
         f"[info] Filter stats: input={filter_stats['input']}, "
@@ -767,8 +790,11 @@ def process_jobs_pipeline(
     else:
         print("[info] Adjacent-role subset disabled via include_adjacent_roles=false")
 
+    focused_jobs = strategy_ops_jobs if include_adjacent_roles else chief_jobs
+
     return ProcessedJobsResult(
         jobs=jobs,
+        focused_jobs=focused_jobs,
         chief_jobs=chief_jobs,
         strategy_ops_jobs=strategy_ops_jobs,
         run_at=effective_run_at,
@@ -806,6 +832,7 @@ def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
         "is_technical",
         "is_chief_of_staff",
         "is_strategy_ops",
+        "is_learning_and_development",
         "posted_at",
         "updated_at",
         "first_seen_at",
@@ -819,22 +846,6 @@ def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
         compact[field] = job.get(field, "")
     return compact
 
-
-def resolve_github_pages_url(cfg: dict[str, Any]) -> str:
-    configured_url = str(cfg.get("github_pages_url", "")).strip()
-    if configured_url:
-        return configured_url
-
-    env_url = os.getenv("GITHUB_PAGES_URL", "").strip()
-    if env_url:
-        return env_url
-
-    repository = os.getenv("GITHUB_REPOSITORY", "").strip()
-    if repository and "/" in repository:
-        owner, repo = repository.split("/", 1)
-        return f"https://{owner}.github.io/{quote(repo)}/"
-
-    return ""
 
 def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -858,6 +869,7 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
             "is_technical",
             "is_chief_of_staff",
             "is_strategy_ops",
+            "is_learning_and_development",
             "posted_at",
             "updated_at",
             "first_seen_at",
@@ -873,25 +885,22 @@ def _write_csv(path: Path, jobs: list[dict[str, Any]]) -> None:
 
 
 def write_outputs(
-    all_jobs: list[dict[str, Any]],
+    focused_jobs: list[dict[str, Any]],
     chief_jobs: list[dict[str, Any]],
     strategy_ops_jobs: list[dict[str, Any]],
-    github_pages_url: str = "",
 ) -> None:
-    compact_all_jobs = [_compact_job_for_output(job) for job in all_jobs]
+    compact_focused_jobs = [_compact_job_for_output(job) for job in focused_jobs]
     compact_chief_jobs = [_compact_job_for_output(job) for job in chief_jobs]
     compact_strategy_ops_jobs = [_compact_job_for_output(job) for job in strategy_ops_jobs]
 
-    JOBS_JSON.write_text(json.dumps(compact_all_jobs, indent=2))
+    JOBS_JSON.write_text(json.dumps(compact_focused_jobs, indent=2))
     JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, indent=2))
     JOBS_STRATEGY_OPS_JSON.write_text(json.dumps(compact_strategy_ops_jobs, indent=2))
 
-    _write_csv(JOBS_CSV, compact_all_jobs)
+    _write_csv(JOBS_CSV, compact_focused_jobs)
     _write_csv(JOBS_CHIEF_CSV, compact_chief_jobs)
     _write_csv(JOBS_STRATEGY_OPS_CSV, compact_strategy_ops_jobs)
 
-    DOCS_HTML.parent.mkdir(parents=True, exist_ok=True)
-    DOCS_HTML.write_text(render_html(compact_all_jobs, github_pages_url=github_pages_url), encoding="utf-8")
     detail_chunks_dir = ROOT / "data" / "jobs"
     written_chunk_count = len(list(detail_chunks_dir.glob("*.json"))) if detail_chunks_dir.exists() else 0
     print(f"[info] Detail chunk files available under data/jobs/: {written_chunk_count}")
@@ -963,23 +972,21 @@ def main() -> None:
     previous_jobs = load_previous_jobs()
     result = process_jobs_pipeline(all_jobs, cfg, previous_jobs=previous_jobs)
 
-    github_pages_url = resolve_github_pages_url(cfg)
-    write_outputs(result.jobs, result.chief_jobs, result.strategy_ops_jobs, github_pages_url=github_pages_url)
+    write_outputs(result.focused_jobs, result.chief_jobs, result.strategy_ops_jobs)
+    update_readme()
     write_run_meta(
         result.run_at,
-        total_jobs=len(result.jobs),
+        total_jobs=len(result.focused_jobs),
         chief_of_staff_jobs=len(result.chief_jobs),
         new_jobs=result.run_stats["new_count"],
     )
     write_do_not_check_state(do_not_check_state)
     maybe_send_email(result.chief_jobs, cfg.get("email", {}))
     print(
-        f"[info] Wrote {len(result.jobs)} total jobs, {len(result.chief_jobs)} chief-of-staff jobs, "
-        f"and {len(result.strategy_ops_jobs)} strategy/ops-adjacent jobs to JSON/CSV plus docs/index.html"
+        f"[info] Wrote {len(result.focused_jobs)} focused jobs, {len(result.chief_jobs)} chief-of-staff jobs, "
+        f"and {len(result.strategy_ops_jobs)} strategy/ops-adjacent jobs to JSON/CSV"
     )
     print(f"[info] New since last run: {result.run_stats['new_count']}")
-    if github_pages_url:
-        print(f"[info] GitHub Pages URL: {github_pages_url}")
 
 
 if __name__ == "__main__":

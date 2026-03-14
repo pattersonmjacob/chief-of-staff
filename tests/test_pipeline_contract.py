@@ -2,6 +2,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -10,12 +11,13 @@ sys.path.append(str(ROOT / "src"))
 
 import aggregate_chunks  # noqa: E402
 import main  # noqa: E402
+import scrapers  # noqa: E402
 
 
 class PipelineContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.cfg = {
-            "keywords_include": ["chief of staff", "strategy and operations", "business operations"],
+            "keywords_include": ["chief of staff", "strategy and operations", "business operations", "learning and development"],
             "keywords_exclude": ["clinical operations"],
             "validate_job_links": False,
             "link_check_delay_seconds": 0.0,
@@ -70,6 +72,7 @@ class PipelineContractTests(unittest.TestCase):
         result = main.process_jobs_pipeline(self.raw_jobs, self.cfg, previous_jobs=[], run_at="2026-03-13T12:00:00Z")
 
         self.assertEqual(len(result.jobs), 2)
+        self.assertEqual(len(result.focused_jobs), 2)
         self.assertEqual(len(result.chief_jobs), 1)
         self.assertEqual(len(result.strategy_ops_jobs), 2)
         self.assertEqual(result.run_stats["new_count"], 2)
@@ -83,6 +86,28 @@ class PipelineContractTests(unittest.TestCase):
         self.assertFalse(strategy_job["is_chief_of_staff"])
         self.assertIn("New York, NY", chief_job["location"])
         self.assertIn("San Francisco, CA", chief_job["location"])
+
+    def test_learning_and_development_flag_is_set(self) -> None:
+        raw_jobs = [
+            {
+                "platform": "lever",
+                "company": "gamma",
+                "title": "Learning and Development Manager",
+                "location": "Remote",
+                "department": "People",
+                "team": "Learning and Development",
+                "employment_type": "Full-time",
+                "description": "Own the learning and development strategy.",
+                "posted_at": "2026-03-11T00:00:00Z",
+                "updated_at": "2026-03-11T00:00:00Z",
+                "url": "https://example.com/ld",
+            }
+        ]
+
+        result = main.process_jobs_pipeline(raw_jobs, self.cfg, previous_jobs=[], run_at="2026-03-13T12:00:00Z")
+
+        self.assertTrue(result.jobs[0]["is_learning_and_development"])
+        self.assertEqual(len(result.focused_jobs), 1)
 
     def test_aggregate_chunk_loader_skips_invalid_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -104,7 +129,6 @@ class PipelineContractTests(unittest.TestCase):
             original_root = main.ROOT
             original_jobs_json = main.JOBS_JSON
             original_jobs_csv = main.JOBS_CSV
-            original_docs_html = main.DOCS_HTML
             original_jobs_chief_json = main.JOBS_CHIEF_JSON
             original_jobs_chief_csv = main.JOBS_CHIEF_CSV
             original_jobs_strategy_json = main.JOBS_STRATEGY_OPS_JSON
@@ -114,27 +138,59 @@ class PipelineContractTests(unittest.TestCase):
                 main.ROOT = temp_root
                 main.JOBS_JSON = temp_root / "jobs.json"
                 main.JOBS_CSV = temp_root / "jobs.csv"
-                main.DOCS_HTML = temp_root / "docs" / "index.html"
                 main.JOBS_CHIEF_JSON = temp_root / "jobs_chief_of_staff.json"
                 main.JOBS_CHIEF_CSV = temp_root / "jobs_chief_of_staff.csv"
                 main.JOBS_STRATEGY_OPS_JSON = temp_root / "jobs_strategy_ops.json"
                 main.JOBS_STRATEGY_OPS_CSV = temp_root / "jobs_strategy_ops.csv"
 
-                main.write_outputs(result.jobs, result.chief_jobs, result.strategy_ops_jobs, github_pages_url="")
+                main.write_outputs(result.focused_jobs, result.chief_jobs, result.strategy_ops_jobs)
 
                 self.assertTrue(main.JOBS_JSON.exists())
                 self.assertTrue(main.JOBS_CHIEF_JSON.exists())
                 self.assertTrue(main.JOBS_STRATEGY_OPS_JSON.exists())
-                self.assertTrue(main.DOCS_HTML.exists())
+                focused_jobs = json.loads(main.JOBS_JSON.read_text(encoding="utf-8"))
+                self.assertEqual(len(focused_jobs), 2)
             finally:
                 main.ROOT = original_root
                 main.JOBS_JSON = original_jobs_json
                 main.JOBS_CSV = original_jobs_csv
-                main.DOCS_HTML = original_docs_html
                 main.JOBS_CHIEF_JSON = original_jobs_chief_json
                 main.JOBS_CHIEF_CSV = original_jobs_chief_csv
                 main.JOBS_STRATEGY_OPS_JSON = original_jobs_strategy_json
                 main.JOBS_STRATEGY_OPS_CSV = original_jobs_strategy_csv
+
+    def test_fetch_lever_maps_live_style_fields(self) -> None:
+        raw_job = {
+            "id": "dbc3d287-2085-4329-abca-d1d85a4f0860",
+            "text": "Senior Legal Counsel - Financial Services",
+            "categories": {
+                "department": "Legal",
+                "team": "Legal",
+                "commitment": "Permanent",
+                "location": "Melbourne, Australia",
+                "allLocations": ["Melbourne, Australia"],
+            },
+            "createdAt": 1773187200000,
+            "descriptionPlain": "About the role",
+            "openingPlain": "We are hiring.",
+            "descriptionBodyPlain": "Senior legal counsel responsibilities.",
+            "additionalPlain": "Benefits.",
+            "hostedUrl": "https://jobs.lever.co/myob-2/dbc3d287-2085-4329-abca-d1d85a4f0860",
+            "applyUrl": "https://jobs.lever.co/myob-2/dbc3d287-2085-4329-abca-d1d85a4f0860/apply",
+            "workplaceType": "hybrid",
+        }
+
+        with mock.patch.object(scrapers, "_fetch_json", return_value=[raw_job]):
+            jobs = scrapers.fetch_lever("myob-2")
+
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0]["title"], "Senior Legal Counsel - Financial Services")
+        self.assertEqual(jobs[0]["department"], "Legal")
+        self.assertEqual(jobs[0]["team"], "Legal")
+        self.assertEqual(jobs[0]["work_mode"], "hybrid")
+        self.assertEqual(jobs[0]["url"], raw_job["hostedUrl"])
+        self.assertEqual(jobs[0]["posted_at"], "2026-03-11T00:00:00Z")
+        self.assertEqual(jobs[0]["updated_at"], "2026-03-11T00:00:00Z")
 
 
 if __name__ == "__main__":

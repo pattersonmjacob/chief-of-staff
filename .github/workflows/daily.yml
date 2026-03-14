@@ -281,6 +281,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add jobs.json jobs.csv jobs_chief_of_staff.json jobs_chief_of_staff.csv jobs_strategy_ops.json jobs_strategy_ops.csv docs/index.html data/run_meta.json data/aggregate_summary.json
+          git add jobs.json jobs.csv jobs_chief_of_staff.json jobs_chief_of_staff.csv jobs_strategy_ops.json jobs_strategy_ops.csv data/run_meta.json data/aggregate_summary.json README.md
           git diff --cached --quiet || git commit -m "chore: update daily jobs digest"
           git push
