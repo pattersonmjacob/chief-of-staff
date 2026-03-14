@@ -1,21 +1,19 @@
 {
   "repository": "pattersonmjacob/chief-of-staff",
-  "generated_at": "2026-03-14T01:09:34Z",
+  "generated_at": "2026-03-14T01:54:04Z",
   "validate_job_links": false,
   "raw_platform_jobs": {
-    "greenhouse": 61558,
+    "greenhouse": 61550,
     "lever": 27062,
-    "ashby": 0,
     "unknown": 0
   },
   "raw_platform_files": {
     "greenhouse": 8,
     "lever": 8,
-    "ashby": 8,
     "unknown": 0
   },
   "invalid_chunk_files": [],
-  "total_jobs": 1581,
+  "total_jobs": 1579,
   "chief_of_staff_jobs": 13,
-  "strategy_ops_jobs": 1581
+  "strategy_ops_jobs": 1579
 }
