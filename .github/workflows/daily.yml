@@ -50,6 +50,9 @@ jobs:
       greenhouse_matrix: ${{ steps.resolve.outputs.greenhouse_matrix }}
       lever_matrix: ${{ steps.resolve.outputs.lever_matrix }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Resolve runtime settings
         id: resolve
         env:
