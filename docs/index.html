@@ -95,6 +95,7 @@
       .meta-grid,
       .stats-grid,
       .filters,
+      .filter-actions,
       .job-grid {
         display: grid;
         gap: 16px;
@@ -170,6 +171,38 @@
         font: inherit;
       }
 
+      .filter-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .button,
+      .button-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+        color: var(--text);
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .button.primary,
+      .button-link.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff7f0;
+      }
+
+      .button:hover,
+      .button-link:hover {
+        border-color: rgba(81, 61, 34, 0.3);
+      }
+
       .toggle-row {
         display: flex;
         align-items: center;
@@ -202,7 +235,8 @@
       .panel-head {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+        flex-wrap: wrap;
         gap: 16px;
         margin-bottom: 8px;
       }
@@ -216,6 +250,64 @@
         margin: 0;
         color: var(--muted);
         line-height: 1.6;
+      }
+
+      .toolbar {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .toolbar-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .filter-pill {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(164, 73, 29, 0.08);
+        border: 1px solid rgba(164, 73, 29, 0.14);
+        color: var(--accent);
+        font-size: 0.84rem;
+      }
+
+      .toolbar-note {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .ghost-button {
+        border: 1px solid rgba(81, 61, 34, 0.16);
+        border-radius: 999px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .ghost-button:hover {
+        border-color: rgba(164, 73, 29, 0.28);
+        color: var(--accent);
+      }
+
+      .ghost-button:focus-visible,
+      .job-link:focus-visible,
+      .filters input:focus-visible,
+      .filters select:focus-visible {
+        outline: 2px solid rgba(164, 73, 29, 0.34);
+        outline-offset: 2px;
       }
 
       .job-grid {
@@ -278,13 +370,28 @@
       }
 
       .empty,
-      .loading {
+      .loading,
+      .error-state {
         padding: 28px;
         text-align: center;
         color: var(--muted);
         border: 1px dashed rgba(81, 61, 34, 0.22);
         border-radius: var(--radius);
         background: rgba(255, 255, 255, 0.45);
+      }
+
+      .error-state {
+        color: #8a2f16;
+        border-color: rgba(138, 47, 22, 0.28);
+        background: rgba(255, 244, 240, 0.92);
+      }
+
+      .state-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
       }
 
       .footer {
@@ -309,6 +416,36 @@
           position: static;
         }
       }
+
+      @media (max-width: 640px) {
+        .shell {
+          padding: 18px 14px 40px;
+        }
+
+        .hero,
+        .filters,
+        .panel,
+        .job-card,
+        .meta-card,
+        .stat-card {
+          border-radius: 22px;
+        }
+
+        .hero {
+          padding: 22px 18px;
+        }
+
+        h1 {
+          max-width: 10ch;
+        }
+
+        .meta-grid,
+        .stats-grid,
+        .job-grid,
+        .filter-actions {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -321,6 +458,11 @@
           Chief of Staff set, the broader adjacent strategy and operations feed, and any roles
           tagged as learning and development.
         </p>
+        <div class="footer-links">
+          <a class="button-link primary" href="./data/jobs_chief_of_staff.json">Share strict feed</a>
+          <a class="button-link" href="./data/jobs.json">Browse raw JSON</a>
+          <a class="button-link" href="https://github.com/pattersonmjacob/chief-of-staff">View repo</a>
+        </div>
         <div class="meta-grid">
           <article class="meta-card">
             <p class="meta-label">Last run</p>
@@ -335,7 +477,7 @@
             <p class="meta-value" id="chief-total">0</p>
           </article>
           <article class="meta-card">
-            <p class="meta-label">New since last run</p>
+            <p class="meta-label">New in published feed</p>
             <p class="meta-value" id="new-total">0</p>
           </article>
         </div>
@@ -352,8 +494,8 @@
             <p class="panel-label">Feed</p>
             <label for="feed">Which view to browse</label>
             <select id="feed">
-              <option value="focused">Focused feed</option>
               <option value="chief">Chief of Staff only</option>
+              <option value="focused">Focused feed</option>
               <option value="adjacent">Adjacent strategy and operations</option>
             </select>
           </div>
@@ -371,6 +513,10 @@
           <div class="toggle-row">
             <label for="ld-only">Learning and development only</label>
             <input id="ld-only" type="checkbox" />
+          </div>
+          <div class="filter-actions">
+            <button class="button primary" id="clear-filters" type="button">Clear filters</button>
+            <a class="button-link" href="./data/jobs.json">Open JSON</a>
           </div>
         </aside>
 
@@ -396,24 +542,56 @@
 
           <section class="panel">
             <div class="panel-head">
-              <h2 id="results-title">Focused feed</h2>
-              <span class="fine" id="results-subtitle">Loading published jobs...</span>
+              <div>
+                <h2 id="results-title">Focused feed</h2>
+                <p class="toolbar-note" id="results-subtitle" aria-live="polite">Loading published jobs...</p>
+              </div>
+              <span class="chip flag" id="snapshot-chip">Waiting for data</span>
             </div>
             <p class="helper">
-              Strict Chief of Staff matches stay title-constrained. The focused feed includes the
-              broader adjacent set used for the daily digest.
+              The board opens on the strict Chief of Staff slice by default. The broader focused
+              and adjacent feeds are still available when you want the wider operator market.
             </p>
+            <div class="toolbar">
+              <div class="toolbar-row">
+                <p class="panel-label" style="margin: 0">Active filters</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                  <button class="ghost-button" id="share-link" type="button">Copy share link</button>
+                  <button class="ghost-button" id="reset-filters" type="button">Reset filters</button>
+                </div>
+              </div>
+              <div class="active-filters" id="active-filters" aria-live="polite"></div>
+            </div>
           </section>
 
-          <section id="loading" class="loading">Loading jobs from published repo data...</section>
-          <section id="empty" class="empty" hidden>No roles match the current filters.</section>
-          <section id="jobs" class="job-grid" hidden></section>
+          <section id="loading" class="loading" role="status" aria-live="polite">
+            <strong>Loading published jobs</strong>
+            Reading the latest repo snapshot from <code>docs/data/*.json</code>.
+          </section>
+          <section id="error" class="error-state" role="alert" hidden>
+            <strong>Dashboard data did not load cleanly</strong>
+            <span id="error-message">Try reloading the page or opening the published JSON directly.</span>
+            <div class="state-actions">
+              <button class="button primary" id="retry-load" type="button">Retry load</button>
+              <a class="button-link" href="./data/jobs.json">Open focused JSON</a>
+            </div>
+          </section>
+          <section id="empty" class="empty" hidden>
+            <strong>No roles match the current filters</strong>
+            <span id="empty-message">Try widening the feed, clearing the search, or turning off one of the toggles.</span>
+            <div class="state-actions">
+              <button class="button primary" id="clear-empty-state" type="button">Clear filters</button>
+              <a class="button-link" href="./data/jobs.json">Open focused JSON</a>
+            </div>
+          </section>
+          <section id="jobs" class="job-grid" hidden aria-live="polite"></section>
         </section>
       </section>
 
       <footer class="footer">
-        Data sources are mirrored into `docs/data/` during each publish step so GitHub Pages can
-        render from stable local JSON.
+        Data sources are mirrored into `docs/data/` during each publish step using a dashboard-sized
+        field set so GitHub Pages can render from stable local JSON without downloading the full
+        root artifacts.
         <div class="footer-links">
           <a href="./data/jobs.json">Focused JSON</a>
           <a href="./data/jobs_chief_of_staff.json">Chief JSON</a>
@@ -442,14 +620,24 @@
         visibleLd: document.getElementById("visible-ld"),
         resultsTitle: document.getElementById("results-title"),
         resultsSubtitle: document.getElementById("results-subtitle"),
+        snapshotChip: document.getElementById("snapshot-chip"),
         jobs: document.getElementById("jobs"),
         loading: document.getElementById("loading"),
+        error: document.getElementById("error"),
+        errorMessage: document.getElementById("error-message"),
         empty: document.getElementById("empty"),
+        emptyMessage: document.getElementById("empty-message"),
+        activeFilters: document.getElementById("active-filters"),
         search: document.getElementById("search"),
         feed: document.getElementById("feed"),
         platform: document.getElementById("platform"),
         newOnly: document.getElementById("new-only"),
         ldOnly: document.getElementById("ld-only"),
+        clearFilters: document.getElementById("clear-filters"),
+        clearEmptyState: document.getElementById("clear-empty-state"),
+        shareLink: document.getElementById("share-link"),
+        resetFilters: document.getElementById("reset-filters"),
+        retryLoad: document.getElementById("retry-load"),
       };
 
       const feedNames = {
@@ -457,6 +645,45 @@
         chief: "Chief of Staff only",
         adjacent: "Adjacent strategy and operations",
       };
+
+      function selectedFeed() {
+        const value = els.feed.value;
+        return Object.prototype.hasOwnProperty.call(feedNames, value) ? value : "chief";
+      }
+
+      function shareUrl() {
+        const url = new URL(window.location.href);
+        const params = url.searchParams;
+        const query = String(els.search.value || "").trim();
+        const feed = selectedFeed();
+
+        if (feed !== "chief") params.set("feed", feed);
+        else params.delete("feed");
+        if (query) params.set("q", query);
+        else params.delete("q");
+        if (els.platform.value) params.set("platform", els.platform.value);
+        else params.delete("platform");
+        if (els.newOnly.checked) params.set("new", "1");
+        else params.delete("new");
+        if (els.ldOnly.checked) params.set("ld", "1");
+        else params.delete("ld");
+
+        return url;
+      }
+
+      function syncUrlState() {
+        window.history.replaceState({}, "", shareUrl());
+      }
+
+      function hydrateFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const feed = params.get("feed");
+        els.feed.value = Object.prototype.hasOwnProperty.call(feedNames, feed) ? feed : "chief";
+        els.search.value = params.get("q") || "";
+        els.platform.value = params.get("platform") || "";
+        els.newOnly.checked = params.get("new") === "1";
+        els.ldOnly.checked = params.get("ld") === "1";
+      }
 
       function formatTime(value) {
         if (!value) return "Unknown";
@@ -472,11 +699,76 @@
         return String(value || "").toLowerCase();
       }
 
+      function asTimestamp(value) {
+        const parsed = Date.parse(value || "");
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+
       function excerpt(job) {
         const summary = String(job.summary || "").trim();
         if (summary) return summary;
         const parts = [job.department, job.team, job.work_mode || job.employment_type].filter(Boolean);
         return parts.join(" | ");
+      }
+
+      function updateStatus(message) {
+        els.resultsSubtitle.textContent = message;
+      }
+
+      function renderActiveFilters(jobs) {
+        const filters = [];
+        const query = String(els.search.value || "").trim();
+        if (query) filters.push(`Search: ${query}`);
+        if (selectedFeed() !== "chief") filters.push(feedNames[selectedFeed()]);
+        if (els.platform.value) filters.push(`Platform: ${els.platform.value}`);
+        if (els.newOnly.checked) filters.push("New only");
+        if (els.ldOnly.checked) filters.push("L&D only");
+        if (!filters.length) filters.push(`Curated Chief of Staff feed · ${jobs.length} visible`);
+
+        els.activeFilters.replaceChildren();
+        filters.forEach((value) => {
+          const chip = document.createElement("span");
+          chip.className = "filter-pill";
+          chip.textContent = value;
+          els.activeFilters.appendChild(chip);
+        });
+      }
+
+      function resetFilters() {
+        els.search.value = "";
+        els.feed.value = "chief";
+        els.platform.value = "";
+        els.newOnly.checked = false;
+        els.ldOnly.checked = false;
+        renderJobs();
+      }
+
+      function showLoading(message) {
+        els.loading.hidden = false;
+        els.error.hidden = true;
+        els.jobs.hidden = true;
+        els.empty.hidden = true;
+        updateStatus(message);
+        renderActiveFilters([]);
+      }
+
+      function showError(message) {
+        els.loading.hidden = true;
+        els.error.hidden = false;
+        els.errorMessage.textContent = message;
+        els.jobs.hidden = true;
+        els.empty.hidden = true;
+        renderStats([]);
+        updateStatus("Dashboard data unavailable");
+        renderActiveFilters([]);
+      }
+
+      function showEmpty(message) {
+        els.loading.hidden = true;
+        els.error.hidden = true;
+        els.jobs.hidden = true;
+        els.empty.hidden = false;
+        els.emptyMessage.textContent = message;
       }
 
       function renderPlatforms() {
@@ -493,11 +785,11 @@
             option.textContent = platform;
             els.platform.appendChild(option);
           });
-        els.platform.value = existing;
+        els.platform.value = platforms.has(existing) ? existing : "";
       }
 
       function activeFeed() {
-        return state[els.feed.value] || [];
+        return state[selectedFeed()] || [];
       }
 
       function filteredJobs() {
@@ -532,23 +824,40 @@
       }
 
       function renderJobs() {
-        const feed = els.feed.value;
+        const feed = selectedFeed();
         const jobs = filteredJobs()
           .slice()
-          .sort((a, b) => String(b.is_new).localeCompare(String(a.is_new)) || String(b.posted_at || "").localeCompare(String(a.posted_at || "")));
+          .sort((a, b) => {
+            return (
+              Number(Boolean(b.is_new)) - Number(Boolean(a.is_new)) ||
+              asTimestamp(b.posted_at) - asTimestamp(a.posted_at) ||
+              asTimestamp(b.updated_at) - asTimestamp(a.updated_at) ||
+              normalizeText(a.title).localeCompare(normalizeText(b.title))
+            );
+          });
 
         els.resultsTitle.textContent = feedNames[feed];
-        els.resultsSubtitle.textContent = jobs.length
+        els.snapshotChip.textContent = state.meta?.last_run_at ? `Snapshot ${formatTime(state.meta.last_run_at)}` : "Published snapshot";
+        updateStatus(jobs.length
           ? `${jobs.length} visible roles`
-          : "No roles currently match these filters";
+          : "No roles currently match these filters");
 
         renderStats(jobs);
-        els.jobs.innerHTML = "";
+        renderActiveFilters(jobs);
+        els.jobs.replaceChildren();
         els.loading.hidden = true;
+        els.error.hidden = true;
+        syncUrlState();
 
         if (!jobs.length) {
-          els.jobs.hidden = true;
-          els.empty.hidden = false;
+          const hasActiveFilters = Boolean(
+            normalizeText(els.search.value) || els.platform.value || els.newOnly.checked || els.ldOnly.checked
+          );
+          showEmpty(
+            hasActiveFilters
+              ? "No roles match the current filters. Try another feed, clear a filter, or broaden your search."
+              : `No roles are available in the ${feedNames[feed].toLowerCase()} right now.`
+          );
           return;
         }
 
@@ -564,7 +873,11 @@
           title.href = job.url || "#";
           title.target = "_blank";
           title.rel = "noreferrer";
-          title.innerHTML = `<h3>${job.title || "Untitled role"}</h3>`;
+          title.setAttribute("aria-label", `${job.title || "Untitled role"} at ${job.company || "Unknown company"}`);
+
+          const titleHeading = document.createElement("h3");
+          titleHeading.textContent = job.title || "Untitled role";
+          title.appendChild(titleHeading);
 
           const company = document.createElement("p");
           company.className = "company-line";
@@ -573,6 +886,7 @@
           const chips = document.createElement("div");
           chips.className = "chip-row";
           [
+            job.comp_text,
             job.work_mode || job.employment_type,
             job.department,
             job.team,
@@ -604,12 +918,27 @@
         });
       }
 
+      async function fetchJson(url, label, { optional = false } = {}) {
+        try {
+          const response = await fetch(url, { cache: "no-store" });
+          if (!response.ok) {
+            if (optional && response.status === 404) return null;
+            throw new Error(`${label} returned ${response.status}`);
+          }
+          return await response.json();
+        } catch (error) {
+          if (optional) return null;
+          throw new Error(`Could not load ${label.toLowerCase()}: ${error.message}`);
+        }
+      }
+
       async function loadData() {
+        showLoading("Loading jobs from published repo data...");
         const [focused, chief, adjacent, meta] = await Promise.all([
-          fetch("./data/jobs.json").then((response) => response.json()),
-          fetch("./data/jobs_chief_of_staff.json").then((response) => response.json()),
-          fetch("./data/jobs_strategy_ops.json").then((response) => response.json()),
-          fetch("./data/run_meta.json").then((response) => response.json()).catch(() => null),
+          fetchJson("./data/jobs.json", "focused feed"),
+          fetchJson("./data/jobs_chief_of_staff.json", "chief of staff feed"),
+          fetchJson("./data/jobs_strategy_ops.json", "adjacent feed"),
+          fetchJson("./data/run_meta.json", "run metadata", { optional: true }),
         ]);
 
         state.focused = Array.isArray(focused) ? focused : [];
@@ -630,9 +959,34 @@
         input.addEventListener("input", renderJobs);
         input.addEventListener("change", renderJobs);
       });
+      [els.clearFilters, els.clearEmptyState, els.resetFilters].forEach((button) => {
+        button.addEventListener("click", resetFilters);
+      });
+      els.shareLink.addEventListener("click", async () => {
+        const value = shareUrl().toString();
+        try {
+          await navigator.clipboard.writeText(value);
+          els.shareLink.textContent = "Link copied";
+          window.setTimeout(() => {
+            els.shareLink.textContent = "Copy share link";
+          }, 1800);
+        } catch (error) {
+          els.shareLink.textContent = "Copy failed";
+          window.setTimeout(() => {
+            els.shareLink.textContent = "Copy share link";
+          }, 1800);
+          console.error(error);
+        }
+      });
+      els.retryLoad.addEventListener("click", () => {
+        loadData().catch((error) => {
+          showError(`Unable to load dashboard data. ${error.message}`);
+        });
+      });
 
+      hydrateFromUrl();
       loadData().catch((error) => {
-        els.loading.textContent = `Unable to load dashboard data: ${error.message}`;
+        showError(`Unable to load dashboard data. ${error.message}`);
       });
     </script>
   </body>

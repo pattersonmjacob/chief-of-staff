@@ -140,6 +140,73 @@ This repo now includes a lightweight multi-agent operating model for Codex:
 - [scripts/setup_multi_agent_worktrees.sh](/Users/jacobpatterson/VSCode/chief-of-staff/scripts/setup_multi_agent_worktrees.sh) creates isolated sibling worktrees for parallel agents.
 - [.codex/backlog.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/backlog.md) is the shared cleanup list.
 
+Agent graph:
+
+```mermaid
+flowchart TD
+    O[orchestrator]
+
+    WO[workflow-optimizer]
+    WOPS[workflow-ops]
+    SA[scraper-accuracy]
+    BS[board-scout]
+    PD[pages-designer]
+    PU[pages-ui]
+    QA[qa-review]
+    SEC[security-review]
+
+    O --> WO
+    O --> WOPS
+    O --> SA
+    O --> BS
+    O --> PD
+    O --> PU
+    O --> QA
+    O --> SEC
+
+    BS --> SA
+    WO --> QA
+    WOPS --> QA
+    SA --> QA
+    PD --> PU
+    PU --> QA
+    SEC --> QA
+
+    WO -. merge first .-> PD
+    SA -. merge first .-> PD
+```
+
+Current cycle snapshot:
+
+```mermaid
+flowchart TD
+    O[orchestrator<br/>active]
+
+    WO[workflow-optimizer<br/>completed]
+    WOPS[workflow-ops<br/>completed]
+    SA[scraper-accuracy<br/>completed]
+    BS[board-scout<br/>pending handoff]
+    PD[pages-designer<br/>completed]
+    PU[pages-ui<br/>completed]
+    QA[qa-review<br/>completed]
+
+    O --> WO
+    O --> WOPS
+    O --> SA
+    O --> BS
+    O --> PD
+    O --> PU
+    O --> QA
+
+    classDef active fill:#fff4cc,stroke:#9a6700,color:#3b2f00;
+    classDef done fill:#dff3e4,stroke:#1f6f43,color:#123524;
+    classDef pending fill:#fde2e4,stroke:#b42318,color:#5f2120;
+
+    class O active;
+    class WO,WOPS,SA,PD,PU,QA done;
+    class BS pending;
+```
+
 Recommended flow:
 1. Run `bash scripts/setup_multi_agent_worktrees.sh`
 2. Start one Codex session per worktree

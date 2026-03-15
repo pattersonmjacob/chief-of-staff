@@ -12,7 +12,7 @@ on:
         default: false
         type: boolean
       max_sources:
-        description: "Optional cap for sources processed per chunk (empty = uncapped)"
+        description: "Optional cap for sources processed per chunk (empty = default 1000)"
         required: false
         default: ""
         type: string
@@ -27,7 +27,7 @@ permissions:
 
 env:
   SOURCES_CSV: data/company_slugs.csv
-  MAX_SOURCES: ""
+  MAX_SOURCES: "1000"
   MAX_SOURCES_PER_PLATFORM: ""
   SCRAPE_CONCURRENCY: 3
   MIN_REQUEST_INTERVAL_SECONDS: 0.8
@@ -36,6 +36,10 @@ env:
   LINK_CHECK_DELAY_SECONDS: 0.8
   MAX_JOB_AGE_DAYS: 13
 
+concurrency:
+  group: daily-jobs-digest-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   resolve-run-config:
     runs-on: ubuntu-latest
@@ -43,31 +47,102 @@ jobs:
       validate_links: ${{ steps.resolve.outputs.validate_links }}
       max_sources: ${{ steps.resolve.outputs.max_sources }}
       max_sources_per_platform: ${{ steps.resolve.outputs.max_sources_per_platform }}
+      greenhouse_matrix: ${{ steps.resolve.outputs.greenhouse_matrix }}
+      lever_matrix: ${{ steps.resolve.outputs.lever_matrix }}
     steps:
       - name: Resolve runtime settings
         id: resolve
+        env:
+          SOURCES_CSV: ${{ env.SOURCES_CSV }}
+          MAX_SOURCES: ${{ env.MAX_SOURCES }}
+          MAX_SOURCES_PER_PLATFORM: ${{ env.MAX_SOURCES_PER_PLATFORM }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          INPUT_VALIDATE_LINKS: ${{ inputs.validate_links }}
+          INPUT_MAX_SOURCES: ${{ inputs.max_sources }}
+          INPUT_MAX_SOURCES_PER_PLATFORM: ${{ inputs.max_sources_per_platform }}
         run: |
-          VALIDATE="false"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "30 12 * * 0" ]; then
-            VALIDATE="true"
-          fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.validate_links }}" = "true" ]; then
-            VALIDATE="true"
-          fi
-          MAX_SOURCES_VALUE="${MAX_SOURCES}"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.max_sources }}" ]; then
-            MAX_SOURCES_VALUE="${{ inputs.max_sources }}"
-          fi
-          MAX_PER_PLATFORM_VALUE="${MAX_SOURCES_PER_PLATFORM}"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.max_sources_per_platform }}" ]; then
-            MAX_PER_PLATFORM_VALUE="${{ inputs.max_sources_per_platform }}"
-          fi
-          echo "validate_links=${VALIDATE}" >> "$GITHUB_OUTPUT"
-          echo "max_sources=${MAX_SOURCES_VALUE}" >> "$GITHUB_OUTPUT"
-          echo "max_sources_per_platform=${MAX_PER_PLATFORM_VALUE}" >> "$GITHUB_OUTPUT"
-          echo "[info] Link validation enabled in aggregate job: ${VALIDATE}"
-          echo "[info] Max sources per chunk: ${MAX_SOURCES_VALUE:-<uncapped>}"
-          echo "[info] Max sources per platform: ${MAX_PER_PLATFORM_VALUE:-<uncapped>}"
+          python - <<'PY'
+          import csv
+          import json
+          import math
+          import os
+          from pathlib import Path
+
+          def parse_optional_positive_int(value: str) -> int | None:
+              text = (value or "").strip()
+              if not text:
+                  return None
+              parsed = int(text)
+              return parsed if parsed > 0 else None
+
+          event_name = os.environ["EVENT_NAME"]
+          event_schedule = os.environ.get("EVENT_SCHEDULE", "")
+          validate_links = (
+              (event_name == "schedule" and event_schedule == "30 12 * * 0")
+              or (event_name == "workflow_dispatch" and os.environ.get("INPUT_VALIDATE_LINKS", "") == "true")
+          )
+
+          max_sources = parse_optional_positive_int(
+              os.environ.get("INPUT_MAX_SOURCES") if event_name == "workflow_dispatch" else os.environ.get("MAX_SOURCES", "")
+          ) or 1000
+          max_sources_per_platform = parse_optional_positive_int(
+              os.environ.get("INPUT_MAX_SOURCES_PER_PLATFORM")
+              if event_name == "workflow_dispatch"
+              else os.environ.get("MAX_SOURCES_PER_PLATFORM", "")
+          )
+
+          vendor_map = {"greenhouse": "greenhouse", "lever": "lever"}
+          counts = {"greenhouse": 0, "lever": 0}
+          seen = set()
+          with Path(os.environ["SOURCES_CSV"]).open(newline="", encoding="utf-8") as f:
+              for row in csv.DictReader(f):
+                  vendor = vendor_map.get((row.get("vendor", "") or "").strip().lower())
+                  slug = (row.get("slug", "") or "").strip().lower()
+                  if not vendor or not slug:
+                      continue
+                  try:
+                      open_jobs = int(str(row.get("open_jobs") or row.get("job_count") or 0).strip())
+                  except ValueError:
+                      open_jobs = 0
+                  if open_jobs < 1:
+                      continue
+                  key = (vendor, slug)
+                  if key in seen:
+                      continue
+                  seen.add(key)
+                  if max_sources_per_platform is not None and counts[vendor] >= max_sources_per_platform:
+                      continue
+                  counts[vendor] += 1
+
+          def build_matrix(total_sources: int) -> str:
+              chunk_count = max(1, math.ceil(total_sources / max_sources)) if total_sources else 1
+              matrix = {
+                  "include": [
+                      {"chunk_index": idx, "source_offset": idx * max_sources}
+                      for idx in range(chunk_count)
+                  ]
+              }
+              return json.dumps(matrix, separators=(",", ":"))
+
+          outputs = {
+              "validate_links": "true" if validate_links else "false",
+              "max_sources": str(max_sources),
+              "max_sources_per_platform": "" if max_sources_per_platform is None else str(max_sources_per_platform),
+              "greenhouse_matrix": build_matrix(counts["greenhouse"]),
+              "lever_matrix": build_matrix(counts["lever"]),
+          }
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              for key, value in outputs.items():
+                  f.write(f"{key}={value}\n")
+
+          print(f"[info] Link validation enabled in aggregate job: {outputs['validate_links']}")
+          print(f"[info] Max sources per chunk: {max_sources}")
+          print(f"[info] Max sources per platform: {outputs['max_sources_per_platform'] or '<uncapped>'}")
+          print(f"[info] Source counts after caps: greenhouse={counts['greenhouse']} lever={counts['lever']}")
+          print(f"[info] Greenhouse matrix: {outputs['greenhouse_matrix']}")
+          print(f"[info] Lever matrix: {outputs['lever_matrix']}")
+          PY
 
   scrape-greenhouse:
     runs-on: ubuntu-latest
@@ -75,24 +150,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 2
-      matrix:
-        include:
-          - chunk_index: 0
-            source_offset: 0
-          - chunk_index: 1
-            source_offset: 1000
-          - chunk_index: 2
-            source_offset: 2000
-          - chunk_index: 3
-            source_offset: 3000
-          - chunk_index: 4
-            source_offset: 4000
-          - chunk_index: 5
-            source_offset: 5000
-          - chunk_index: 6
-            source_offset: 6000
-          - chunk_index: 7
-            source_offset: 7000
+      matrix: ${{ fromJson(needs.resolve-run-config.outputs.greenhouse_matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -128,24 +186,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 2
-      matrix:
-        include:
-          - chunk_index: 0
-            source_offset: 0
-          - chunk_index: 1
-            source_offset: 1000
-          - chunk_index: 2
-            source_offset: 2000
-          - chunk_index: 3
-            source_offset: 3000
-          - chunk_index: 4
-            source_offset: 4000
-          - chunk_index: 5
-            source_offset: 5000
-          - chunk_index: 6
-            source_offset: 6000
-          - chunk_index: 7
-            source_offset: 7000
+      matrix: ${{ fromJson(needs.resolve-run-config.outputs.lever_matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

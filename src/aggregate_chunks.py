@@ -140,7 +140,8 @@ def main() -> None:
         result.run_at,
         total_jobs=len(result.focused_jobs),
         chief_of_staff_jobs=len(result.chief_jobs),
-        new_jobs=result.run_stats["new_count"],
+        new_jobs=result.run_stats["focused_new_count"],
+        processed_new_jobs=result.run_stats["new_count"],
     )
     _write_aggregate_summary(
         result_jobs=len(result.focused_jobs),

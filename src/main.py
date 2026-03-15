@@ -382,7 +382,13 @@ def load_previous_jobs() -> list[dict[str, Any]]:
         return []
 
 
-def write_run_meta(run_at: str, total_jobs: int, chief_of_staff_jobs: int, new_jobs: int) -> None:
+def write_run_meta(
+    run_at: str,
+    total_jobs: int,
+    chief_of_staff_jobs: int,
+    new_jobs: int,
+    processed_new_jobs: int | None = None,
+) -> None:
     RUN_META_JSON.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "last_run_at": run_at,
@@ -390,6 +396,8 @@ def write_run_meta(run_at: str, total_jobs: int, chief_of_staff_jobs: int, new_j
         "chief_of_staff_jobs": chief_of_staff_jobs,
         "new_jobs": new_jobs,
     }
+    if processed_new_jobs is not None:
+        payload["processed_new_jobs"] = processed_new_jobs
     RUN_META_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     DOCS_DATA_DIR.mkdir(parents=True, exist_ok=True)
     (DOCS_DATA_DIR / "run_meta.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -861,6 +869,12 @@ def process_jobs_pipeline(
         print("[info] Adjacent-role subset disabled via include_adjacent_roles=false")
 
     focused_jobs = strategy_ops_jobs if include_adjacent_roles else chief_jobs
+    focused_new_count = sum(1 for job in focused_jobs if job.get("is_new"))
+    chief_new_count = sum(1 for job in chief_jobs if job.get("is_new"))
+    strategy_ops_new_count = sum(1 for job in strategy_ops_jobs if job.get("is_new"))
+    run_stats["focused_new_count"] = focused_new_count
+    run_stats["chief_new_count"] = chief_new_count
+    run_stats["strategy_ops_new_count"] = strategy_ops_new_count
 
     return ProcessedJobsResult(
         jobs=jobs,
@@ -910,6 +924,34 @@ def _compact_job_for_output(job: dict[str, Any]) -> dict[str, Any]:
         "is_new",
         "url",
         "detail_chunk",
+    ]
+    compact: dict[str, Any] = {}
+    for field in allowed_fields:
+        compact[field] = job.get(field, "")
+    return compact
+
+
+def _compact_job_for_docs(job: dict[str, Any]) -> dict[str, Any]:
+    """Keep the Pages mirror aligned to the dashboard's actual data needs."""
+    allowed_fields = [
+        "id",
+        "title",
+        "company",
+        "platform",
+        "location",
+        "work_mode",
+        "comp_text",
+        "department",
+        "team",
+        "employment_type",
+        "summary",
+        "is_chief_of_staff",
+        "is_strategy_ops",
+        "is_learning_and_development",
+        "posted_at",
+        "updated_at",
+        "is_new",
+        "url",
     ]
     compact: dict[str, Any] = {}
     for field in allowed_fields:
@@ -967,13 +1009,16 @@ def write_outputs(
     compact_focused_jobs = [_compact_job_for_output(job) for job in focused_jobs]
     compact_chief_jobs = [_compact_job_for_output(job) for job in chief_jobs]
     compact_strategy_ops_jobs = [_compact_job_for_output(job) for job in strategy_ops_jobs]
+    docs_focused_jobs = [_compact_job_for_docs(job) for job in focused_jobs]
+    docs_chief_jobs = [_compact_job_for_docs(job) for job in chief_jobs]
+    docs_strategy_ops_jobs = [_compact_job_for_docs(job) for job in strategy_ops_jobs]
 
     JOBS_JSON.write_text(json.dumps(compact_focused_jobs, indent=2))
     JOBS_CHIEF_JSON.write_text(json.dumps(compact_chief_jobs, indent=2))
     JOBS_STRATEGY_OPS_JSON.write_text(json.dumps(compact_strategy_ops_jobs, indent=2))
-    _write_docs_json("jobs.json", compact_focused_jobs)
-    _write_docs_json("jobs_chief_of_staff.json", compact_chief_jobs)
-    _write_docs_json("jobs_strategy_ops.json", compact_strategy_ops_jobs)
+    _write_docs_json("jobs.json", docs_focused_jobs)
+    _write_docs_json("jobs_chief_of_staff.json", docs_chief_jobs)
+    _write_docs_json("jobs_strategy_ops.json", docs_strategy_ops_jobs)
 
     _write_csv(JOBS_CSV, compact_focused_jobs)
     _write_csv(JOBS_CHIEF_CSV, compact_chief_jobs)
@@ -1056,7 +1101,8 @@ def main() -> None:
         result.run_at,
         total_jobs=len(result.focused_jobs),
         chief_of_staff_jobs=len(result.chief_jobs),
-        new_jobs=result.run_stats["new_count"],
+        new_jobs=result.run_stats["focused_new_count"],
+        processed_new_jobs=result.run_stats["new_count"],
     )
     write_do_not_check_state(do_not_check_state)
     maybe_send_email(result.chief_jobs, cfg.get("email", {}))
@@ -1064,7 +1110,10 @@ def main() -> None:
         f"[info] Wrote {len(result.focused_jobs)} focused jobs, {len(result.chief_jobs)} chief-of-staff jobs, "
         f"and {len(result.strategy_ops_jobs)} strategy/ops-adjacent jobs to JSON/CSV"
     )
-    print(f"[info] New since last run: {result.run_stats['new_count']}")
+    print(
+        f"[info] New since last run: published={result.run_stats['focused_new_count']} "
+        f"processed={result.run_stats['new_count']}"
+    )
 
 
 if __name__ == "__main__":

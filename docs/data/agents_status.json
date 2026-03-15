@@ -1,0 +1,196 @@
+{
+  "generated_at": "2026-03-15T01:31:04Z",
+  "summary": {
+    "total_agents": 9,
+    "active_agents": 0,
+    "dirty_worktrees": 0,
+    "missing_worktrees": 9
+  },
+  "agents": [
+    {
+      "name": "board-scout",
+      "description": "Discover new public job boards, inspect payloads, and recommend integration paths.",
+      "config_file": "agents/board-scout.toml",
+      "modes": [
+        "discovery",
+        "multi"
+      ],
+      "worktree": "../chief-board-scout",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "orchestrator",
+      "description": "Plan work, split tasks across agents, merge cleanly, and keep the roadmap coherent.",
+      "config_file": "agents/orchestrator.toml",
+      "modes": [
+        "discovery",
+        "multi",
+        "ops",
+        "pages",
+        "security"
+      ],
+      "worktree": "../chief-orchestrator",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "pages-designer",
+      "description": "Improve visual hierarchy, layout, polish, copy, and mobile presentation for the public dashboard.",
+      "config_file": "agents/pages-designer.toml",
+      "modes": [
+        "multi",
+        "pages"
+      ],
+      "worktree": "../chief-pages-design",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "pages-ui",
+      "description": "Implement resilient, fast, accessible dashboard behavior with clean HTML, CSS, and JavaScript.",
+      "config_file": "agents/pages-ui.toml",
+      "modes": [
+        "multi",
+        "pages"
+      ],
+      "worktree": "../chief-pages-ui",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "qa-review",
+      "description": "Review regressions, verify tests, and harden the publish contract.",
+      "config_file": "agents/qa-review.toml",
+      "modes": [
+        "multi",
+        "ops",
+        "pages",
+        "security"
+      ],
+      "worktree": "../chief-qa",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "scraper-accuracy",
+      "description": "Improve ATS normalization, metadata extraction, filtering precision, and source diagnostics.",
+      "config_file": "agents/scraper-accuracy.toml",
+      "modes": [
+        "discovery",
+        "multi"
+      ],
+      "worktree": "../chief-scraper",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "security-review",
+      "description": "Review workflows, scripts, scraping, and public artifacts for security risks and unsafe defaults.",
+      "config_file": "agents/security-review.toml",
+      "modes": [
+        "multi",
+        "ops",
+        "security"
+      ],
+      "worktree": "../chief-security",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "workflow-ops",
+      "description": "Inspect GitHub Actions runs, diagnose failures and bottlenecks, and rerun safe workflows when helpful.",
+      "config_file": "agents/workflow-ops.toml",
+      "modes": [
+        "multi",
+        "ops"
+      ],
+      "worktree": "../chief-workflow-ops",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    },
+    {
+      "name": "workflow-optimizer",
+      "description": "Reduce CI time, artifact size, and publish risk while keeping scheduled runs reliable.",
+      "config_file": "agents/workflow-optimizer.toml",
+      "modes": [
+        "multi"
+      ],
+      "worktree": "../chief-workflow",
+      "worktree_exists": false,
+      "branch": "",
+      "dirty_count": 0,
+      "ahead": 0,
+      "behind": 0,
+      "active": false,
+      "last_started_at": "",
+      "last_stopped_at": "",
+      "last_mode": "",
+      "status": "missing"
+    }
+  ]
+}

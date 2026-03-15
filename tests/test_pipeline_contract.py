@@ -83,6 +83,9 @@ class PipelineContractTests(unittest.TestCase):
         self.assertEqual(len(result.chief_jobs), 1)
         self.assertEqual(len(result.strategy_ops_jobs), 2)
         self.assertEqual(result.run_stats["new_count"], 2)
+        self.assertEqual(result.run_stats["focused_new_count"], 2)
+        self.assertEqual(result.run_stats["chief_new_count"], 1)
+        self.assertEqual(result.run_stats["strategy_ops_new_count"], 2)
 
         chief_job = next(job for job in result.jobs if job["title"] == "Chief of Staff")
         strategy_job = next(job for job in result.jobs if job["title"] == "Strategy and Operations Lead")
@@ -173,6 +176,7 @@ class PipelineContractTests(unittest.TestCase):
             original_root = main.ROOT
             original_jobs_json = main.JOBS_JSON
             original_jobs_csv = main.JOBS_CSV
+            original_run_meta_json = main.RUN_META_JSON
             original_jobs_chief_json = main.JOBS_CHIEF_JSON
             original_jobs_chief_csv = main.JOBS_CHIEF_CSV
             original_jobs_strategy_json = main.JOBS_STRATEGY_OPS_JSON
@@ -183,6 +187,7 @@ class PipelineContractTests(unittest.TestCase):
                 main.ROOT = temp_root
                 main.JOBS_JSON = temp_root / "jobs.json"
                 main.JOBS_CSV = temp_root / "jobs.csv"
+                main.RUN_META_JSON = temp_root / "data" / "run_meta.json"
                 main.JOBS_CHIEF_JSON = temp_root / "jobs_chief_of_staff.json"
                 main.JOBS_CHIEF_CSV = temp_root / "jobs_chief_of_staff.csv"
                 main.JOBS_STRATEGY_OPS_JSON = temp_root / "jobs_strategy_ops.json"
@@ -190,18 +195,37 @@ class PipelineContractTests(unittest.TestCase):
                 main.DOCS_DATA_DIR = temp_root / "docs" / "data"
 
                 main.write_outputs(result.focused_jobs, result.chief_jobs, result.strategy_ops_jobs)
+                main.write_run_meta(
+                    result.run_at,
+                    total_jobs=len(result.focused_jobs),
+                    chief_of_staff_jobs=len(result.chief_jobs),
+                    new_jobs=result.run_stats["focused_new_count"],
+                    processed_new_jobs=result.run_stats["new_count"],
+                )
 
                 self.assertTrue(main.JOBS_JSON.exists())
                 self.assertTrue(main.JOBS_CHIEF_JSON.exists())
                 self.assertTrue(main.JOBS_STRATEGY_OPS_JSON.exists())
                 self.assertTrue((main.DOCS_DATA_DIR / "jobs.json").exists())
+                run_meta = json.loads((main.DOCS_DATA_DIR / "run_meta.json").read_text(encoding="utf-8"))
                 focused_jobs = json.loads(main.JOBS_JSON.read_text(encoding="utf-8"))
+                docs_focused_jobs = json.loads((main.DOCS_DATA_DIR / "jobs.json").read_text(encoding="utf-8"))
                 self.assertEqual(len(focused_jobs), 2)
+                self.assertEqual(len(docs_focused_jobs), 2)
                 self.assertTrue(all(job["summary"] for job in focused_jobs))
+                self.assertTrue(all(job["summary"] for job in docs_focused_jobs))
+                self.assertIn("detail_chunk", focused_jobs[0])
+                self.assertNotIn("detail_chunk", docs_focused_jobs[0])
+                self.assertIn("comp_text", docs_focused_jobs[0])
+                self.assertEqual(run_meta["published_jobs"], 2)
+                self.assertEqual(run_meta["chief_of_staff_jobs"], 1)
+                self.assertEqual(run_meta["new_jobs"], 2)
+                self.assertEqual(run_meta["processed_new_jobs"], 2)
             finally:
                 main.ROOT = original_root
                 main.JOBS_JSON = original_jobs_json
                 main.JOBS_CSV = original_jobs_csv
+                main.RUN_META_JSON = original_run_meta_json
                 main.JOBS_CHIEF_JSON = original_jobs_chief_json
                 main.JOBS_CHIEF_CSV = original_jobs_chief_csv
                 main.JOBS_STRATEGY_OPS_JSON = original_jobs_strategy_json

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agent Overseer</title>
+    <style>
+      :root {
+        --bg: #f2ede4;
+        --panel: rgba(255, 250, 242, 0.9);
+        --panel-strong: #fffaf3;
+        --text: #1f1914;
+        --muted: #6e6358;
+        --line: rgba(74, 58, 34, 0.14);
+        --accent: #9a3e16;
+        --accent-2: #0f6a63;
+        --warn: #8c5c12;
+        --danger: #8f2d1d;
+        --shadow: 0 20px 50px rgba(52, 38, 18, 0.1);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+        background:
+          radial-gradient(circle at top left, rgba(196, 159, 98, 0.25), transparent 25rem),
+          radial-gradient(circle at top right, rgba(73, 140, 130, 0.18), transparent 22rem),
+          linear-gradient(180deg, #faf6ef 0%, var(--bg) 100%);
+      }
+      a { color: inherit; }
+      .shell { max-width: 1280px; margin: 0 auto; padding: 30px 18px 48px; }
+      .hero, .panel, .agent-card, .metric {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+      .hero { padding: 28px; }
+      .eyebrow {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(154, 62, 22, 0.18);
+        color: var(--accent);
+        background: rgba(154, 62, 22, 0.06);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      h1 { margin: 16px 0 8px; font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 0.95; letter-spacing: -0.04em; }
+      .hero p { margin: 0; max-width: 44rem; color: var(--muted); line-height: 1.7; }
+      .grid { display: grid; gap: 16px; }
+      .metrics { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 18px; }
+      .metric { padding: 18px; }
+      .label { color: var(--muted); font-size: 0.82rem; letter-spacing: 0.09em; text-transform: uppercase; margin: 0 0 8px; }
+      .value { margin: 0; font-size: 1.7rem; }
+      .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+      .panel { padding: 18px; }
+      .panel h2 { margin: 0 0 10px; font-size: 1.2rem; }
+      .small { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+      .mode-list, .agent-grid { display: grid; gap: 14px; }
+      .mode-item { padding: 14px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,0.55); }
+      .mode-item strong { display: block; margin-bottom: 6px; }
+      .agent-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+      .agent-card { padding: 18px; display: grid; gap: 14px; }
+      .agent-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+      .agent-head h3 { margin: 0; font-size: 1.08rem; }
+      .badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 80px; padding: 6px 10px; border-radius: 999px;
+        font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;
+        border: 1px solid var(--line);
+      }
+      .badge.running { background: rgba(15,106,99,0.12); color: var(--accent-2); border-color: rgba(15,106,99,0.2); }
+      .badge.idle { background: rgba(255,255,255,0.65); }
+      .badge.dirty { background: rgba(140,92,18,0.1); color: var(--warn); border-color: rgba(140,92,18,0.18); }
+      .badge.missing { background: rgba(143,45,29,0.1); color: var(--danger); border-color: rgba(143,45,29,0.18); }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+      .chip { padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,0.68); font-size: 0.82rem; }
+      .kv { display: grid; gap: 8px; }
+      .row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 0.92rem; }
+      pre {
+        margin: 0; padding: 16px; overflow: auto; border-radius: 18px; border: 1px solid var(--line);
+        background: var(--panel-strong); color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.83rem;
+      }
+      .loading, .empty { padding: 24px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 24px; }
+      @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">Agent Overseer</div>
+        <h1>See every agent, mode, and worktree at a glance.</h1>
+        <p>
+          This view is generated from the same Codex config and launcher scripts that start the agents.
+          It is meant to help you understand what is running, what mode launched it, and where drift or
+          local changes are accumulating.
+        </p>
+        <div class="grid metrics">
+          <article class="metric"><p class="label">Generated</p><p class="value" id="generated-at">Loading...</p></article>
+          <article class="metric"><p class="label">Total Agents</p><p class="value" id="total-agents">0</p></article>
+          <article class="metric"><p class="label">Running</p><p class="value" id="running-agents">0</p></article>
+          <article class="metric"><p class="label">Dirty Worktrees</p><p class="value" id="dirty-worktrees">0</p></article>
+          <article class="metric"><p class="label">Missing Worktrees</p><p class="value" id="missing-worktrees">0</p></article>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="grid">
+          <section class="panel">
+            <h2>Launch Modes</h2>
+            <div class="mode-list" id="mode-list"></div>
+          </section>
+          <section class="panel">
+            <h2>Graph Source</h2>
+            <p class="small">A generated Mermaid graph of the current agent topology.</p>
+            <pre id="graph-source">Loading graph…</pre>
+          </section>
+        </aside>
+        <section class="grid">
+          <section id="loading" class="loading">Loading agent status…</section>
+          <section id="agent-grid" class="agent-grid" hidden></section>
+          <section id="empty" class="empty" hidden>No agents found.</section>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const modeDescriptions = {
+        multi: "All roles launched in parallel.",
+        pages: "Pages designer, UI, and QA with orchestrator.",
+        ops: "Workflow triage, QA, and security with orchestrator.",
+        discovery: "Board discovery and scraper work with orchestrator.",
+        security: "Security review and QA with orchestrator."
+      };
+
+      function fmt(value) {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+      }
+
+      function badgeClass(status) {
+        return `badge ${status || "idle"}`;
+      }
+
+      function row(label, value) {
+        return `<div class="row"><span>${label}</span><strong>${value || "-"}</strong></div>`;
+      }
+
+      async function load() {
+        const [statusResponse, graphResponse] = await Promise.all([
+          fetch("./data/agents_status.json"),
+          fetch("./data/agents_graph.mmd").catch(() => null)
+        ]);
+        const status = await statusResponse.json();
+        const graphText = graphResponse ? await graphResponse.text() : "No graph generated yet.";
+
+        document.getElementById("generated-at").textContent = fmt(status.generated_at);
+        document.getElementById("total-agents").textContent = String(status.summary.total_agents || 0);
+        document.getElementById("running-agents").textContent = String(status.summary.active_agents || 0);
+        document.getElementById("dirty-worktrees").textContent = String(status.summary.dirty_worktrees || 0);
+        document.getElementById("missing-worktrees").textContent = String(status.summary.missing_worktrees || 0);
+        document.getElementById("graph-source").textContent = graphText;
+
+        const modes = {};
+        for (const agent of status.agents || []) {
+          for (const mode of agent.modes || []) {
+            modes[mode] = modes[mode] || [];
+            modes[mode].push(agent.name);
+          }
+        }
+        const modeList = document.getElementById("mode-list");
+        modeList.innerHTML = "";
+        Object.keys(modes).sort().forEach((mode) => {
+          const item = document.createElement("article");
+          item.className = "mode-item";
+          item.innerHTML = `<strong>${mode}</strong><div class="small">${modeDescriptions[mode] || "Custom launch grouping."}</div><div class="small"><code>${modes[mode].join(", ")}</code></div>`;
+          modeList.appendChild(item);
+        });
+
+        const loading = document.getElementById("loading");
+        const grid = document.getElementById("agent-grid");
+        const empty = document.getElementById("empty");
+        loading.hidden = true;
+        grid.innerHTML = "";
+
+        if (!status.agents || !status.agents.length) {
+          empty.hidden = false;
+          return;
+        }
+
+        grid.hidden = false;
+        for (const agent of status.agents) {
+          const article = document.createElement("article");
+          article.className = "agent-card";
+          article.innerHTML = `
+            <div class="agent-head">
+              <div>
+                <h3>${agent.name}</h3>
+                <div class="small">${agent.description || ""}</div>
+              </div>
+              <span class="${badgeClass(agent.status)}">${agent.status}</span>
+            </div>
+            <div class="chips">${(agent.modes || []).map((mode) => `<span class="chip">${mode}</span>`).join("")}</div>
+            <div class="kv">
+              ${row("Worktree", agent.worktree || "-")}
+              ${row("Branch", agent.branch || "-")}
+              ${row("Dirty files", String(agent.dirty_count || 0))}
+              ${row("Ahead / Behind", `${agent.ahead || 0} / ${agent.behind || 0}`)}
+              ${row("Last launched", fmt(agent.last_started_at))}
+              ${row("Last stopped", fmt(agent.last_stopped_at))}
+            </div>
+          `;
+          grid.appendChild(article);
+        }
+      }
+
+      load().catch((error) => {
+        document.getElementById("loading").textContent = `Unable to load agent status: ${error.message}`;
+      });
+    </script>
+  </body>
+</html>

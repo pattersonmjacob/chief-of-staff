@@ -12,6 +12,17 @@ if [ -z "$CODEX_BIN" ]; then
   exit 1
 fi
 
+agent_command() {
+  local role="$1"
+  local role_file="$2"
+  local abs_worktree="$3"
+  local mode="$4"
+  local prompt="$5"
+  cat <<EOF
+cd "$abs_worktree" && python3 "$ROOT_DIR/scripts/agent_monitor.py" start --role "$role" --mode "$mode" --worktree "$abs_worktree" && set +e; "$CODEX_BIN" --enable multi_agent --full-auto -C "$abs_worktree" "$prompt"; status=\$?; set -e; python3 "$ROOT_DIR/scripts/agent_monitor.py" stop --role "$role" --mode "$mode" --worktree "$abs_worktree"; exit \$status
+EOF
+}
+
 setup_worktrees() {
   bash "$ROOT_DIR/scripts/setup_multi_agent_worktrees.sh" "$BASE_BRANCH"
 }
@@ -124,11 +135,17 @@ launch_single_orchestrator() {
   local prompt
   prompt="$(single_orchestrator_prompt)"
   cd "$ROOT_DIR"
-  exec "$CODEX_BIN" \
+  python3 "$ROOT_DIR/scripts/agent_monitor.py" start --role orchestrator --mode single --worktree "$ROOT_DIR"
+  set +e
+  "$CODEX_BIN" \
     --enable multi_agent \
     --full-auto \
     -C "$ROOT_DIR" \
     "$prompt"
+  local status=$?
+  set -e
+  python3 "$ROOT_DIR/scripts/agent_monitor.py" stop --role orchestrator --mode single --worktree "$ROOT_DIR"
+  return "$status"
 }
 
 launch_mode_in_terminal() {
@@ -151,13 +168,16 @@ launch_mode_in_terminal() {
       abs_worktree="$(cd "$ROOT_DIR" && cd "$worktree" && pwd)"
       local prompt
       prompt="$(prompt_for_role "$role_name" "$role_file")"
+      local command
+      command="$(agent_command "$role_name" "$role_file" "$abs_worktree" "$mode" "$prompt")"
+      command="${command//$'\n'/}"
+      command="${command//\"/\\\"}"
       prompt="${prompt//$'\n'/\\n}"
-      prompt="${prompt//\"/\\\"}"
       if [ "$first" -eq 1 ]; then
-        echo "do script \"cd \\\"$abs_worktree\\\" && \\\"$CODEX_BIN\\\" --enable multi_agent --full-auto -C \\\"$abs_worktree\\\" \\\"$prompt\\\"\""
+        echo "do script \"$command\""
         first=0
       else
-        echo "do script \"cd \\\"$abs_worktree\\\" && \\\"$CODEX_BIN\\\" --enable multi_agent --full-auto -C \\\"$abs_worktree\\\" \\\"$prompt\\\"\" in front window"
+        echo "do script \"$command\" in front window"
       fi
     done
     echo 'end tell'

@@ -1,0 +1,46 @@
+graph TD
+    orchestrator[orchestrator]
+    board_scout[board-scout\nmissing]
+    orchestrator --> board_scout
+    pages_designer[pages-designer\nmissing]
+    orchestrator --> pages_designer
+    pages_ui[pages-ui\nmissing]
+    orchestrator --> pages_ui
+    qa_review[qa-review\nmissing]
+    orchestrator --> qa_review
+    scraper_accuracy[scraper-accuracy\nmissing]
+    orchestrator --> scraper_accuracy
+    security_review[security-review\nmissing]
+    orchestrator --> security_review
+    workflow_ops[workflow-ops\nmissing]
+    orchestrator --> workflow_ops
+    workflow_optimizer[workflow-optimizer\nmissing]
+    orchestrator --> workflow_optimizer
+    mode_discovery((discovery))
+    mode_discovery --- board_scout
+    mode_discovery --- orchestrator
+    mode_discovery --- scraper_accuracy
+    mode_multi((multi))
+    mode_multi --- board_scout
+    mode_multi --- orchestrator
+    mode_multi --- pages_designer
+    mode_multi --- pages_ui
+    mode_multi --- qa_review
+    mode_multi --- scraper_accuracy
+    mode_multi --- security_review
+    mode_multi --- workflow_ops
+    mode_multi --- workflow_optimizer
+    mode_ops((ops))
+    mode_ops --- orchestrator
+    mode_ops --- qa_review
+    mode_ops --- security_review
+    mode_ops --- workflow_ops
+    mode_pages((pages))
+    mode_pages --- orchestrator
+    mode_pages --- pages_designer
+    mode_pages --- pages_ui
+    mode_pages --- qa_review
+    mode_security((security))
+    mode_security --- orchestrator
+    mode_security --- qa_review
+    mode_security --- security_review
