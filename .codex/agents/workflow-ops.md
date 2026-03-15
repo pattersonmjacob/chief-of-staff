@@ -28,3 +28,7 @@ Focus on:
 - artifact size drift
 - slow chunk fan-out
 - schedule/manual-run differences
+
+Operational notes:
+- prefer `scripts/gh` over plain `gh` so the repo-local GitHub CLI is used when present
+- if `scripts/gh auth status` reports an invalid token, re-authenticate before attempting live run inspection

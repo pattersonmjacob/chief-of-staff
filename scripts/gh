@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+LOCAL_GH="$ROOT_DIR/tools/gh/bin/gh"
+
+if [ -x "$LOCAL_GH" ]; then
+  exec "$LOCAL_GH" "$@"
+fi
+
+if command -v gh >/dev/null 2>&1; then
+  exec gh "$@"
+fi
+
+echo "gh is not installed. Install the repo-local binary under tools/gh/bin/gh or add gh to PATH." >&2
+exit 1

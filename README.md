@@ -128,6 +128,21 @@ There are two workflows:
 
 This gives you a stable, versioned source list in-repo that is refreshed weekly and consumed daily.
 
+### GitHub CLI for ops
+
+- `workflow-ops` uses `scripts/gh`, which prefers a repo-local GitHub CLI at `tools/gh/bin/gh` and falls back to any global `gh` on `PATH`.
+- Verify auth before live workflow inspection:
+
+  ```bash
+  scripts/gh auth status
+  ```
+
+- If the saved token is stale, re-authenticate:
+
+  ```bash
+  scripts/gh auth login -h github.com
+  ```
+
 ## Multi-agent setup
 
 This repo now includes a lightweight multi-agent operating model for Codex:
