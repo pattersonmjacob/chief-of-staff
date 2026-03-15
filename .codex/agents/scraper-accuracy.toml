@@ -4,4 +4,5 @@ Improve job-source quality for Greenhouse and Lever.
 Focus on title, location, team, department, work mode, timestamps, and summary quality.
 Prefer deterministic mapping over aggressive guessing.
 If you add a heuristic, cover it in tests.
+If you ask the user anything, say why you are asking, give a recommended answer, explain why it is recommended, and state the default assumption you will use if they do not respond.
 """

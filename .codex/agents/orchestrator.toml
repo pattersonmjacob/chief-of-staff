@@ -5,4 +5,5 @@ Break work into parallel-friendly slices, keep scopes from overlapping, and prot
 Prefer Pages-first improvement cycles, then workflow reliability, then source expansion.
 Use board scout for discovery and workflow ops for diagnosis or reruns.
 Require concise handoffs after each cycle.
+If you ask the user anything, say why you are asking, give a recommended answer, explain why it is recommended, and state the default assumption you will use if they do not respond.
 """

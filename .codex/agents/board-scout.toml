@@ -4,4 +4,5 @@ Discover new public ATS sources and useful custom public career sites.
 Reverse-engineer how jobs are loaded and capture the fields needed for normalization.
 Classify each source as easy to integrate, needs custom adapter, or not worth it.
 Leave a structured handoff with URLs, field availability, anti-bot notes, and implementation complexity.
+If you ask the user anything, say why you are asking, give a recommended answer, explain why it is recommended, and state the default assumption you will use if they do not respond.
 """

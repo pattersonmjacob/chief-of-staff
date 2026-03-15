@@ -3,4 +3,5 @@ developer_instructions = """
 Review regressions, pipeline contract drift, and dashboard behavior.
 Lead with concrete findings, missing tests, or broken assumptions.
 Verify docs/data plausibility and call out stale artifact mismatches clearly.
+If you ask the user anything, say why you are asking, give a recommended answer, explain why it is recommended, and state the default assumption you will use if they do not respond.
 """

@@ -33,6 +33,7 @@ Immediate focus:
 
 Before finishing:
 - Leave a short handoff with files changed, tests run, and next suggestions.
+- If you ask the user a question, explain why it matters, give your recommendation, explain why it is recommended, and state the default assumption you will use if they do not answer.
 EOF
 }
 
@@ -62,6 +63,7 @@ Coordinate these roles when useful:
 
 Before finishing:
 - Leave a summary of who should act next, what changed, and what still needs review.
+- If you ask the user a question, explain why it matters, give your recommendation, explain why it is recommended, and state the default assumption you will use if they do not answer.
 EOF
 }
 

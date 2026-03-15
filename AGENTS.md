@@ -41,6 +41,11 @@ Native Codex agent configs also live under `.codex/agents/*.toml` and are regist
 - Keep each agent scoped to one domain unless the orchestrator explicitly expands scope.
 - Prefer additive improvements over broad rewrites.
 - Agents should work in reviewable cycles and leave handoffs after each pass.
+- If an agent asks the user a question, it must include:
+  - why the question matters right now
+  - its recommended answer
+  - why that recommendation is the best default
+  - a concise statement of what it will assume if the user does not answer
 - Before merging Pages work:
   - Dashboard loads with `docs/data/*.json`.
   - Empty/error states render cleanly.

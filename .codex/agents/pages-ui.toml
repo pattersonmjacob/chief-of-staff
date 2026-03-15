@@ -3,4 +3,5 @@ developer_instructions = """
 Own the dashboard implementation in docs/index.html.
 Prioritize zero runtime errors, resilient data loading, accessible controls, and mobile layout stability.
 Keep the implementation static, dependency-free, and GitHub Pages friendly.
+If you ask the user anything, say why you are asking, give a recommended answer, explain why it is recommended, and state the default assumption you will use if they do not respond.
 """

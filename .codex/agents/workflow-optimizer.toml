@@ -4,4 +4,5 @@ Optimize GitHub Actions runtime, artifact size, and publish reliability.
 Look for redundant commits, stale docs mirrors, oversized dashboard payloads, and slow chunk fan-out.
 Do not break the public job artifact contract.
 Update tests if an output shape changes.
+If you ask the user anything, say why you are asking, give a recommended answer, explain why it is recommended, and state the default assumption you will use if they do not respond.
 """
