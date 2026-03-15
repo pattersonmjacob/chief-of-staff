@@ -60,6 +60,7 @@ Coordinate these roles when useful:
 - pages-designer
 - pages-ui
 - qa-review
+- security-review
 
 Before finishing:
 - Leave a summary of who should act next, what changed, and what still needs review.
@@ -80,6 +81,7 @@ chief-board-scout|../chief-board-scout|$ROOT_DIR/.codex/agents/board-scout.md|bo
 chief-pages-design|../chief-pages-design|$ROOT_DIR/.codex/agents/pages-designer.md|pages-designer
 chief-pages-ui|../chief-pages-ui|$ROOT_DIR/.codex/agents/pages-ui.md|pages-ui
 chief-qa|../chief-qa|$ROOT_DIR/.codex/agents/qa-review.md|qa-review
+chief-security|../chief-security|$ROOT_DIR/.codex/agents/security-review.md|security-review
 EOF
       ;;
     pages)
@@ -95,6 +97,7 @@ EOF
 chief-orchestrator|../chief-orchestrator|$ROOT_DIR/.codex/agents/orchestrator.md|orchestrator
 chief-workflow-ops|../chief-workflow-ops|$ROOT_DIR/.codex/agents/workflow-ops.md|workflow-ops
 chief-qa|../chief-qa|$ROOT_DIR/.codex/agents/qa-review.md|qa-review
+chief-security|../chief-security|$ROOT_DIR/.codex/agents/security-review.md|security-review
 EOF
       ;;
     discovery)
@@ -102,6 +105,13 @@ EOF
 chief-orchestrator|../chief-orchestrator|$ROOT_DIR/.codex/agents/orchestrator.md|orchestrator
 chief-board-scout|../chief-board-scout|$ROOT_DIR/.codex/agents/board-scout.md|board-scout
 chief-scraper|../chief-scraper|$ROOT_DIR/.codex/agents/scraper-accuracy.md|scraper-accuracy
+EOF
+      ;;
+    security)
+      cat <<EOF
+chief-orchestrator|../chief-orchestrator|$ROOT_DIR/.codex/agents/orchestrator.md|orchestrator
+chief-security|../chief-security|$ROOT_DIR/.codex/agents/security-review.md|security-review
+chief-qa|../chief-qa|$ROOT_DIR/.codex/agents/qa-review.md|qa-review
 EOF
       ;;
     *)
@@ -165,6 +175,7 @@ Usage:
   bash scripts/launch_codex_agents.sh pages
   bash scripts/launch_codex_agents.sh ops
   bash scripts/launch_codex_agents.sh discovery
+  bash scripts/launch_codex_agents.sh security
 
 Modes:
   single     Launch one orchestrator Codex session in the current repo with multi-agent flags enabled.
@@ -172,6 +183,7 @@ Modes:
   pages      Launch orchestrator + pages-designer + pages-ui + qa-review.
   ops        Launch orchestrator + workflow-ops + qa-review.
   discovery  Launch orchestrator + board-scout + scraper-accuracy.
+  security   Launch orchestrator + security-review + qa-review.
 EOF
 }
 
@@ -190,6 +202,9 @@ case "$MODE" in
     ;;
   discovery)
     launch_mode_in_terminal discovery
+    ;;
+  security)
+    launch_mode_in_terminal security
     ;;
   *)
     print_help

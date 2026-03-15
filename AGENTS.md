@@ -31,6 +31,8 @@ Current priorities:
   - Owns HTML/CSS/JS implementation quality, performance, resilience, and accessibility.
 - `qa-review`
   - Verifies tests, artifact contracts, failure handling, and dashboard behavior.
+- `security-review`
+  - Reviews workflows, scripts, scraping behavior, and public artifacts for security risks and unsafe defaults.
 
 Role briefs live under `.codex/agents/`.
 Native Codex agent configs also live under `.codex/agents/*.toml` and are registered in `.codex/config.toml`.
@@ -91,6 +93,7 @@ Recommended sibling worktrees:
 - `../chief-pages-design`
 - `../chief-pages-ui`
 - `../chief-qa`
+- `../chief-security`
 
 Use `scripts/setup_multi_agent_worktrees.sh` to create them.
 
@@ -106,3 +109,5 @@ Use `scripts/setup_multi_agent_worktrees.sh` to create them.
   - launches orchestrator + board-scout + scraper-accuracy
 - `bash scripts/launch_codex_agents.sh pages`
   - launches orchestrator + pages-designer + pages-ui + qa-review
+- `bash scripts/launch_codex_agents.sh security`
+  - launches orchestrator + security-review + qa-review

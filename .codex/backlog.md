@@ -41,3 +41,10 @@
 - Add tests for dashboard-facing summary fields.
 - Add tests for broader learning-role coverage.
 - Add a script to compare root artifacts against mirrored docs data.
+
+## Security
+
+- Review workflow permissions and whether any jobs are broader than needed.
+- Review launcher and worktree shell scripts for unsafe interpolation or execution patterns.
+- Review public artifacts and mirrored docs data for accidental exposure of internal-only details.
+- Review scraping and request code for unsafe URL handling, trust-boundary assumptions, and escalation paths.

@@ -36,3 +36,7 @@ config_file = "agents/pages-ui.toml"
 [agents.qa_review]
 description = "Review regressions, verify tests, and harden the publish contract."
 config_file = "agents/qa-review.toml"
+
+[agents.security_review]
+description = "Review workflows, scripts, scraping, and public artifacts for security risks and unsafe defaults."
+config_file = "agents/security-review.toml"

@@ -14,6 +14,7 @@ declare -A WORKTREES=(
   ["chief-pages-design"]="../chief-pages-design"
   ["chief-pages-ui"]="../chief-pages-ui"
   ["chief-qa"]="../chief-qa"
+  ["chief-security"]="../chief-security"
 )
 
 cd "$ROOT_DIR"

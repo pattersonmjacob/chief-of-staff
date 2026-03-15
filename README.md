@@ -39,9 +39,9 @@ _Chief-of-Staff matches: 18 · Snapshot timestamp: 2026-03-14 13:29 UTC_
   - `jobs_chief_of_staff.csv` (strict Chief-of-Staff subset)
   - `jobs_strategy_ops.json` (adjacent strategy/operations subset)
   - `jobs_strategy_ops.csv` (adjacent strategy/operations subset)
-  - `data/run_meta.json` (latest published run totals and timestamp)
+  - `data/run_meta.json` (latest published run totals, published-feed new count, processed new count, and timestamp)
   - `data/aggregate_summary.json` (chunk aggregation diagnostics from GitHub Actions)
-  - `docs/data/*.json` (mirrored dashboard data used by GitHub Pages)
+  - `docs/data/*.json` (dashboard-sized mirrored JSON used by GitHub Pages)
   - Tracks `first_seen_at` / `last_seen_at` and marks `is_new` for jobs newly seen since the prior run.
 - Automatically tracks repeated HTTP 404 sources in `data/do_not_check.json` and skips them on future runs (after 3+ 404s and a healthy non-404 streak guard).
 - Can optionally send an email digest through SMTP (using GitHub Actions secrets).
@@ -61,7 +61,7 @@ _Chief-of-Staff matches: 18 · Snapshot timestamp: 2026-03-14 13:29 UTC_
      - Optionally set `sources_csv_url` and the script will download the CSV before reading it.
      - Optional controls:
        - `min_open_jobs` (default `1`)
-       - `max_sources` (optional; leave empty or `null` for no cap)
+       - `max_sources` (optional; defaults to `1000` per chunk in GitHub Actions)
        - `max_sources_per_platform` (optional; leave empty, `null`, or `0` for no per-platform cap)
        - `scrape_concurrency` (default `1`; set to `1` for no in-process concurrency)
        - `validate_job_links` (default `true`; verifies job URLs before publishing and removes unavailable postings)
@@ -135,7 +135,7 @@ This gives you a stable, versioned source list in-repo that is refreshed weekly 
 This repo now includes a lightweight multi-agent operating model for Codex:
 - [AGENTS.md](/Users/jacobpatterson/VSCode/chief-of-staff/AGENTS.md) defines the shared workflow and agent boundaries.
 - [.codex/config.toml](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/config.toml) now uses the docs-aligned native Codex multi-agent format with `[agents.<name>]` entries and `config_file` pointers.
-- Human role briefs live in [.codex/agents/orchestrator.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/orchestrator.md), [.codex/agents/workflow-optimizer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-optimizer.md), [.codex/agents/workflow-ops.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-ops.md), [.codex/agents/scraper-accuracy.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/scraper-accuracy.md), [.codex/agents/board-scout.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/board-scout.md), [.codex/agents/pages-designer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-designer.md), [.codex/agents/pages-ui.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-ui.md), and [.codex/agents/qa-review.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/qa-review.md).
+- Human role briefs live in [.codex/agents/orchestrator.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/orchestrator.md), [.codex/agents/workflow-optimizer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-optimizer.md), [.codex/agents/workflow-ops.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-ops.md), [.codex/agents/scraper-accuracy.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/scraper-accuracy.md), [.codex/agents/board-scout.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/board-scout.md), [.codex/agents/pages-designer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-designer.md), [.codex/agents/pages-ui.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-ui.md), [.codex/agents/qa-review.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/qa-review.md), and [.codex/agents/security-review.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/security-review.md).
 - Native per-role Codex config files live alongside them as `.toml` files in `.codex/agents/`.
 - [scripts/setup_multi_agent_worktrees.sh](/Users/jacobpatterson/VSCode/chief-of-staff/scripts/setup_multi_agent_worktrees.sh) creates isolated sibling worktrees for parallel agents.
 - [.codex/backlog.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/backlog.md) is the shared cleanup list.
@@ -157,6 +157,8 @@ Shortcut launchers:
   - launches orchestrator + workflow-ops + qa-review
 - `bash scripts/launch_codex_agents.sh discovery`
   - launches orchestrator + board-scout + scraper-accuracy
+- `bash scripts/launch_codex_agents.sh security`
+  - launches orchestrator + security-review + qa-review
 
 ### Required repo settings
 
@@ -173,7 +175,7 @@ Shortcut launchers:
 - Add per-request pacing for big source lists:
   - Set `MIN_REQUEST_INTERVAL_SECONDS=0.35` to add a small cross-thread gap between requests per host.
 - Keep chunk jobs from overloading providers:
-  - The daily workflow defaults to uncapped source limits (`MAX_SOURCES` and `MAX_SOURCES_PER_PLATFORM` unset). Use manual dispatch inputs to add temporary caps when needed.
+  - The daily workflow defaults to 1000 sources per chunk and sizes each platform matrix from the current pinned CSV. Use manual dispatch inputs to tighten `max_sources` or `max_sources_per_platform` when needed.
 - Retries are built in for temporary provider limits/errors:
   - Scraper requests now back off and retry for `429/5xx` responses.
 - Source-identifier fallback is enabled:
