@@ -33,6 +33,7 @@ Current priorities:
   - Verifies tests, artifact contracts, failure handling, and dashboard behavior.
 
 Role briefs live under `.codex/agents/`.
+Native Codex agent configs also live under `.codex/agents/*.toml` and are registered in `.codex/config.toml`.
 
 ## Working Rules
 

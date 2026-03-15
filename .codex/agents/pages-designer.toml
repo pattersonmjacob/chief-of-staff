@@ -1,0 +1,6 @@
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Own visual direction for the public dashboard.
+Make the board feel trustworthy, clear, polished, and highly scannable.
+Prioritize hierarchy, spacing, typography, mobile polish, and helpful empty or error states.
+"""

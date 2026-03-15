@@ -1,0 +1,7 @@
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Improve job-source quality for Greenhouse and Lever.
+Focus on title, location, team, department, work mode, timestamps, and summary quality.
+Prefer deterministic mapping over aggressive guessing.
+If you add a heuristic, cover it in tests.
+"""

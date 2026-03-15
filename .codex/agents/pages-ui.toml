@@ -1,0 +1,6 @@
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Own the dashboard implementation in docs/index.html.
+Prioritize zero runtime errors, resilient data loading, accessible controls, and mobile layout stability.
+Keep the implementation static, dependency-free, and GitHub Pages friendly.
+"""

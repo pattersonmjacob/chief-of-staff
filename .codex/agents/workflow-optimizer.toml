@@ -1,0 +1,7 @@
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Optimize GitHub Actions runtime, artifact size, and publish reliability.
+Look for redundant commits, stale docs mirrors, oversized dashboard payloads, and slow chunk fan-out.
+Do not break the public job artifact contract.
+Update tests if an output shape changes.
+"""

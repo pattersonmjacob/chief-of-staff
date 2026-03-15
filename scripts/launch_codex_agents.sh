@@ -114,7 +114,6 @@ launch_single_orchestrator() {
   cd "$ROOT_DIR"
   exec "$CODEX_BIN" \
     --enable multi_agent \
-    --enable child_agents_md \
     --full-auto \
     -C "$ROOT_DIR" \
     "$prompt"
@@ -143,10 +142,10 @@ launch_mode_in_terminal() {
       prompt="${prompt//$'\n'/\\n}"
       prompt="${prompt//\"/\\\"}"
       if [ "$first" -eq 1 ]; then
-        echo "do script \"cd \\\"$abs_worktree\\\" && \\\"$CODEX_BIN\\\" --enable multi_agent --enable child_agents_md --full-auto -C \\\"$abs_worktree\\\" \\\"$prompt\\\"\""
+        echo "do script \"cd \\\"$abs_worktree\\\" && \\\"$CODEX_BIN\\\" --enable multi_agent --full-auto -C \\\"$abs_worktree\\\" \\\"$prompt\\\"\""
         first=0
       else
-        echo "do script \"cd \\\"$abs_worktree\\\" && \\\"$CODEX_BIN\\\" --enable multi_agent --enable child_agents_md --full-auto -C \\\"$abs_worktree\\\" \\\"$prompt\\\"\" in front window"
+        echo "do script \"cd \\\"$abs_worktree\\\" && \\\"$CODEX_BIN\\\" --enable multi_agent --full-auto -C \\\"$abs_worktree\\\" \\\"$prompt\\\"\" in front window"
       fi
     done
     echo 'end tell'

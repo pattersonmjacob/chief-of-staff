@@ -134,8 +134,9 @@ This gives you a stable, versioned source list in-repo that is refreshed weekly 
 
 This repo now includes a lightweight multi-agent operating model for Codex:
 - [AGENTS.md](/Users/jacobpatterson/VSCode/chief-of-staff/AGENTS.md) defines the shared workflow and agent boundaries.
-- [.codex/config.toml](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/config.toml) registers role names, prompt files, and recommended worktree paths.
-- [.codex/agents/orchestrator.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/orchestrator.md), [.codex/agents/workflow-optimizer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-optimizer.md), [.codex/agents/workflow-ops.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-ops.md), [.codex/agents/scraper-accuracy.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/scraper-accuracy.md), [.codex/agents/board-scout.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/board-scout.md), [.codex/agents/pages-designer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-designer.md), [.codex/agents/pages-ui.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-ui.md), and [.codex/agents/qa-review.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/qa-review.md) hold the role briefs.
+- [.codex/config.toml](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/config.toml) now uses the docs-aligned native Codex multi-agent format with `[agents.<name>]` entries and `config_file` pointers.
+- Human role briefs live in [.codex/agents/orchestrator.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/orchestrator.md), [.codex/agents/workflow-optimizer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-optimizer.md), [.codex/agents/workflow-ops.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/workflow-ops.md), [.codex/agents/scraper-accuracy.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/scraper-accuracy.md), [.codex/agents/board-scout.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/board-scout.md), [.codex/agents/pages-designer.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-designer.md), [.codex/agents/pages-ui.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/pages-ui.md), and [.codex/agents/qa-review.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/agents/qa-review.md).
+- Native per-role Codex config files live alongside them as `.toml` files in `.codex/agents/`.
 - [scripts/setup_multi_agent_worktrees.sh](/Users/jacobpatterson/VSCode/chief-of-staff/scripts/setup_multi_agent_worktrees.sh) creates isolated sibling worktrees for parallel agents.
 - [.codex/backlog.md](/Users/jacobpatterson/VSCode/chief-of-staff/.codex/backlog.md) is the shared cleanup list.
 
@@ -147,7 +148,7 @@ Recommended flow:
 
 Shortcut launchers:
 - `bash scripts/launch_codex_agents.sh single`
-  - starts one orchestrator Codex session in the current repo with `multi_agent` enabled and a stronger Pages/workflow/discovery mission
+  - starts one orchestrator Codex session in the current repo with native `multi_agent` enabled and a stronger Pages/workflow/discovery mission
 - `bash scripts/launch_codex_agents.sh multi`
   - creates worktrees and opens one Terminal-backed Codex session per role
 - `bash scripts/launch_codex_agents.sh pages`

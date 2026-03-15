@@ -1,60 +1,38 @@
-# Project-local multi-agent registry for Codex sessions.
-# Keep this file human-readable and use it as the source of truth
-# for role names, prompt files, and recommended worktree paths.
-
-[project]
-name = "chief-of-staff"
-default_branch = "main"
-primary_goal = "Build the easiest publicly available Chief of Staff job board to browse and share."
-
 [features]
 multi_agent = true
-child_agents_md = true
 
-[[agents]]
-name = "orchestrator"
+[agents]
+max_threads = 6
+max_depth = 1
+
+[agents.orchestrator]
 description = "Plan work, split tasks across agents, merge cleanly, and keep the roadmap coherent."
-prompt_file = ".codex/agents/orchestrator.md"
-worktree = "../chief-orchestrator"
+config_file = "agents/orchestrator.toml"
 
-[[agents]]
-name = "workflow-optimizer"
+[agents.workflow_optimizer]
 description = "Reduce CI time, artifact size, and publish risk while keeping scheduled runs reliable."
-prompt_file = ".codex/agents/workflow-optimizer.md"
-worktree = "../chief-workflow"
+config_file = "agents/workflow-optimizer.toml"
 
-[[agents]]
-name = "workflow-ops"
+[agents.workflow_ops]
 description = "Inspect GitHub Actions runs, diagnose failures and bottlenecks, and rerun safe workflows when helpful."
-prompt_file = ".codex/agents/workflow-ops.md"
-worktree = "../chief-workflow-ops"
+config_file = "agents/workflow-ops.toml"
 
-[[agents]]
-name = "scraper-accuracy"
+[agents.scraper_accuracy]
 description = "Improve ATS normalization, metadata extraction, filtering precision, and source diagnostics."
-prompt_file = ".codex/agents/scraper-accuracy.md"
-worktree = "../chief-scraper"
+config_file = "agents/scraper-accuracy.toml"
 
-[[agents]]
-name = "board-scout"
+[agents.board_scout]
 description = "Discover new public job boards, inspect payloads, and recommend integration paths."
-prompt_file = ".codex/agents/board-scout.md"
-worktree = "../chief-board-scout"
+config_file = "agents/board-scout.toml"
 
-[[agents]]
-name = "pages-designer"
+[agents.pages_designer]
 description = "Improve visual hierarchy, layout, polish, copy, and mobile presentation for the public dashboard."
-prompt_file = ".codex/agents/pages-designer.md"
-worktree = "../chief-pages-design"
+config_file = "agents/pages-designer.toml"
 
-[[agents]]
-name = "pages-ui"
+[agents.pages_ui]
 description = "Implement resilient, fast, accessible dashboard behavior with clean HTML, CSS, and JavaScript."
-prompt_file = ".codex/agents/pages-ui.md"
-worktree = "../chief-pages-ui"
+config_file = "agents/pages-ui.toml"
 
-[[agents]]
-name = "qa-review"
+[agents.qa_review]
 description = "Review regressions, verify tests, and harden the publish contract."
-prompt_file = ".codex/agents/qa-review.md"
-worktree = "../chief-qa"
+config_file = "agents/qa-review.toml"

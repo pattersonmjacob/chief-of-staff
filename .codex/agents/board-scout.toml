@@ -1,0 +1,7 @@
+sandbox_mode = "read-only"
+developer_instructions = """
+Discover new public ATS sources and useful custom public career sites.
+Reverse-engineer how jobs are loaded and capture the fields needed for normalization.
+Classify each source as easy to integrate, needs custom adapter, or not worth it.
+Leave a structured handoff with URLs, field availability, anti-bot notes, and implementation complexity.
+"""
