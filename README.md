@@ -7,17 +7,15 @@ Version 1 of a free, keyword-based jobs pipeline.
 ## Latest Chief of Staff roles
 
 <!-- START_COS_ROLES -->
-_Chief-of-Staff matches: 18 · Snapshot timestamp: 2026-03-14 13:29 UTC_
-- [Chief of Staff](https://job-boards.greenhouse.io/blankstreet/jobs/7621264003) — blankstreet · greenhouse · New York City — new since last run · summary team:New York | dept:Business Operations & S… | mode:hybrid_or_onsite
-- [Chief of Staff](https://job-boards.greenhouse.io/arine/jobs/5737836004) — arine · greenhouse · San Francisco, CA (Hybrid) — new since last run · summary team:Arine HQ | dept:Office of the CEO | mode:hybrid
-- [Chief of Staff, Product & Operations](https://job-boards.greenhouse.io/mavenclinic/jobs/8451225002) — mavenclinic · greenhouse · New York, New York, United States — new since last run · summary team:New York | dept:Product Management | mode:hybrid
-- [Chief of Staff - Samlino Group](https://job-boards.greenhouse.io/ceg/jobs/7649099003) — ceg · greenhouse · Copenhagen, Denmark; Lisbon, Portugal | Lisbon, Portugal — new since last run · summary team:Samlino Group | dept:Management | Operations | mode:onsite
-- [Chief of Staff](https://job-boards.greenhouse.io/mobentertainment/jobs/5066064007) — mobentertainment · greenhouse · Remote — new since last run · summary dept:Business | mode:remote
-- [Chief of Staff](https://jobs.lever.co/arraylabs.io/035e4848-e32a-4b54-a3f6-e87bca54c180) — arraylabs.io · lever · Palo Alto, CA — opened in last 24h · summary team:Management | mode:onsite
+_Chief-of-Staff matches: 16 · Snapshot timestamp: 2026-03-14 13:29 UTC_
+- [Chief of Staff](https://job-boards.greenhouse.io/blankstreet/jobs/7621264003) — blankstreet · greenhouse · New York City — opened in last 24h · summary team:New York | dept:Business Operations & S… | mode:hybrid_or_onsite
+- [Chief of Staff](https://job-boards.greenhouse.io/arine/jobs/5737836004) — arine · greenhouse · San Francisco, CA (Hybrid) — opened in last 24h · summary team:Arine HQ | dept:Office of the CEO | mode:hybrid
+- [Chief of Staff, Product & Operations](https://job-boards.greenhouse.io/mavenclinic/jobs/8451225002) — mavenclinic · greenhouse · New York, New York, United States — opened in last 24h · summary team:New York | dept:Product Management | mode:hybrid
+- [Chief of Staff - Samlino Group](https://job-boards.greenhouse.io/ceg/jobs/7649099003) — ceg · greenhouse · Copenhagen, Denmark; Lisbon, Portugal | Lisbon, Portugal — opened in last 24h · summary team:Samlino Group | dept:Management | Operations | mode:onsite
+- [Chief of Staff](https://jobs.lever.co/arraylabs.io/035e4848-e32a-4b54-a3f6-e87bca54c180) — arraylabs.io · lever · Palo Alto, CA — opened 2026-03-14 · summary team:Management | mode:onsite
 - [Chief of Staff, Sales](https://stripe.com/jobs/search?gh_jid=7600099) — stripe · greenhouse · SF — opened 2026-03-12 · summary team:US | dept:1170 GEO Sales HQ (NA) | mode:hybrid_or_onsite
 - [Chief of Staff](https://job-boards.greenhouse.io/interfaceai/jobs/4608965006) — interfaceai · greenhouse · Palo-Alto (In-office) — opened 2026-03-12 · summary team:interface USA | dept:Office of the CEO | mode:hybrid_or_onsite
 - [Chief of Staff](https://job-boards.greenhouse.io/mochihealth/jobs/5119052008) — mochihealth · greenhouse · San Francisco, CA — opened 2026-03-12 · summary team:Mochi HQ | dept:People | mode:onsite
-- [Chief of Staff to CFO/COO](https://job-boards.greenhouse.io/babylist/jobs/5690329004) — babylist · greenhouse · Emeryville, CA — opened 2026-03-12 · summary team:Remote | dept:General & Administrative | mode:remote
 - [Chief of Staff, Tactical Recon & Strike](https://boards.greenhouse.io/andurilindustries/jobs/5068434007?gh_jid=5068434007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened 2026-03-12 · summary team:Costa Mesa, CA (HQ) | dept:Tactical Recon & Strike | mode:hybrid_or_onsite
 - [Chief of Staff, Design](https://boards.greenhouse.io/andurilindustries/jobs/4740150007?gh_jid=4740150007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened 2026-03-12 · summary team:Costa Mesa, CA (HQ) | dept:Sales and Marketing : D… | mode:onsite
 - [Chief of Staff, Air Dominance & Strike](https://boards.greenhouse.io/andurilindustries/jobs/4841348007?gh_jid=4841348007) — andurilindustries · greenhouse · Costa Mesa, California, United States — opened 2026-03-12 · summary team:Costa Mesa, CA (HQ) | dept:Air Dominance & Strike… | mode:hybrid_or_onsite

@@ -96,7 +96,7 @@
     "is_learning_and_development": false,
     "posted_at": "2026-03-05T21:29:40-05:00",
     "updated_at": "2026-03-05T21:29:40-05:00",
-    "is_new": true,
+    "is_new": false,
     "url": "https://job-boards.greenhouse.io/arine/jobs/5737836004"
   },
   {
@@ -138,26 +138,6 @@
     "updated_at": "2026-03-11T16:45:21-04:00",
     "is_new": false,
     "url": "https://job-boards.greenhouse.io/asteralabs/jobs/4632063005"
-  },
-  {
-    "id": 5690329004,
-    "title": "Chief of Staff to CFO/COO",
-    "company": "babylist",
-    "platform": "greenhouse",
-    "location": "Emeryville, CA",
-    "work_mode": "remote",
-    "comp_text": "",
-    "department": "General & Administrative",
-    "team": "Remote",
-    "employment_type": "",
-    "summary": "team:Remote | dept:General & Administrative | mode:remote",
-    "is_chief_of_staff": true,
-    "is_strategy_ops": true,
-    "is_learning_and_development": false,
-    "posted_at": "2026-03-14T08:01:27-04:00",
-    "updated_at": "2026-03-14T08:01:27-04:00",
-    "is_new": false,
-    "url": "https://job-boards.greenhouse.io/babylist/jobs/5690329004"
   },
   {
     "id": 4980694007,
@@ -216,7 +196,7 @@
     "is_learning_and_development": false,
     "posted_at": "2026-03-06T12:44:49-05:00",
     "updated_at": "2026-03-06T12:44:49-05:00",
-    "is_new": true,
+    "is_new": false,
     "url": "https://job-boards.greenhouse.io/blankstreet/jobs/7621264003"
   },
   {
@@ -256,7 +236,7 @@
     "is_learning_and_development": false,
     "posted_at": "2026-03-02T11:27:03-05:00",
     "updated_at": "2026-03-02T11:37:11-05:00",
-    "is_new": true,
+    "is_new": false,
     "url": "https://job-boards.greenhouse.io/ceg/jobs/7649099003"
   },
   {
@@ -296,28 +276,8 @@
     "is_learning_and_development": false,
     "posted_at": "2026-03-05T12:34:16-05:00",
     "updated_at": "2026-03-05T12:34:16-05:00",
-    "is_new": true,
+    "is_new": false,
     "url": "https://job-boards.greenhouse.io/mavenclinic/jobs/8451225002"
-  },
-  {
-    "id": 5066064007,
-    "title": "Chief of Staff",
-    "company": "mobentertainment",
-    "platform": "greenhouse",
-    "location": "Remote",
-    "work_mode": "remote",
-    "comp_text": "",
-    "department": "Business",
-    "team": "",
-    "employment_type": "",
-    "summary": "dept:Business | mode:remote",
-    "is_chief_of_staff": true,
-    "is_strategy_ops": true,
-    "is_learning_and_development": false,
-    "posted_at": "2026-03-01T15:46:38-05:00",
-    "updated_at": "2026-03-01T15:46:38-05:00",
-    "is_new": true,
-    "url": "https://job-boards.greenhouse.io/mobentertainment/jobs/5066064007"
   },
   {
     "id": 5119052008,
